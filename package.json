@@ -2,6 +2,6 @@
   "name": "malk",
   "version": "1.0.0",
   "dependencies": {
-    "airtable": "^0.12.2" // Replace with the current version of Airtable
+    "airtable": "^0.12.2"
   }
 }
