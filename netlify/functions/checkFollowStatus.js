@@ -9,11 +9,12 @@ exports.handler = async (event) => {
     });
     const base = Airtable.base('appaFBiB1nQcgm9Oz');
 
-    const { userId, fieldName } = event.queryStringParameters;
+    const { userId } = event.queryStringParameters;
 
     try {
         const records = await base('Posts').select({
-            filterByFormula: `SEARCH("${userId}", {${User ID}})`
+            // Using "User ID" directly in the formula
+            filterByFormula: `SEARCH("${userId}", {'User ID'})`
         }).firstPage();
 
         const slugs = records.map(record => record.fields.Slug);
