@@ -12,7 +12,7 @@ exports.handler = async (event) => {
 
     try {
         const records = await base('Posts').select({
-            filterByFormula: `SEARCH("${userId}", {'user id rollup'})`
+            filterByFormula: `SEARCH("${userId}", {user id rollup})`
         }).firstPage();
 
         const slugs = records.map(record => record.fields.Slug);
