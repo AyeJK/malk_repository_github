@@ -5,7 +5,7 @@ exports.handler = async (event) => {
     // Initialize Airtable
     Airtable.configure({
         endpointUrl: 'https://api.airtable.com',
-        apiKey: process.env.AIRTABLE_PAT 
+        apiKey: process.env.Airtable_PAT 
     });
     const base = Airtable.base('appaFBiB1nQcgm9Oz');
 
