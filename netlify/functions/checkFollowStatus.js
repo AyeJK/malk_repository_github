@@ -2,7 +2,6 @@
 const Airtable = require('airtable');
 
 exports.handler = async (event) => {
-    // Initialize Airtable
     Airtable.configure({
         endpointUrl: 'https://api.airtable.com',
         apiKey: process.env.Airtable_PAT 
@@ -13,8 +12,7 @@ exports.handler = async (event) => {
 
     try {
         const records = await base('Posts').select({
-            // Using "User ID" directly in the formula
-            filterByFormula: `SEARCH("${userId}", {'User ID Rollup'})`
+            filterByFormula: `SEARCH("${userId}", {'user id rollup'})`
         }).firstPage();
 
         const slugs = records.map(record => record.fields.Slug);
