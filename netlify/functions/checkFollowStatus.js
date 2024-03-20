@@ -19,9 +19,15 @@ exports.handler = async (event) => {
         const slugs = records.map(record => record.fields.Slug);
         return {
             statusCode: 200,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+            },
             body: JSON.stringify(slugs)
         };
     } catch (error) {
-        return { statusCode: 500, body: JSON.stringify({ error: error.toString() }) };
+        return { 
+            statusCode: 500, 
+            body: JSON.stringify({ error: error.toString() }) 
+        };
     }
 };
