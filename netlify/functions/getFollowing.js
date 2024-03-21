@@ -1,63 +1,42 @@
-// Serverless Function
-const Airtable = require('airtable');
+<script>
+document.addEventListener("DOMContentLoaded", async function() {
+    var memberElement = document.querySelector('[data-ms-member="id"]');
+    var loggedInUserId;
 
-exports.handler = async (event) => {
-    // Initialize Airtable
-    Airtable.configure({
-        endpointUrl: 'https://api.airtable.com',
-        apiKey: process.env.Airtable_PAT
-    });
-    const base = Airtable.base('appaFBiB1nQcgm9Oz');
-    const { userId } = event.queryStringParameters;
+    if (memberElement) {
+        loggedInUserId = memberElement.textContent.trim();
+        console.log("Logged-in user ID:", loggedInUserId); // Log the logged-in user ID
+    } else {
+        console.log("No logged-in user detected.");
+        return;
+    }
 
     try {
-        const records = await base('Users').select({
-            filterByFormula: `{MS User ID} = '${userId}'`
-        }).firstPage();
+        const netlifyFunctionUrl = `https://chocomalk.netlify.app/.netlify/functions/getFollowing`;
+        console.log("Fetching data from:", netlifyFunctionUrl); // Log the URL being called
+        const response = await fetch(`${netlifyFunctionUrl}?userId=${loggedInUserId}`);
+        const data = await response.json();
+        console.log("Data received from function:", data); // Log the data received from the Netlify function
 
-        if (records.length === 0) {
-            // Handle the case where no records are found
-            console.error('No records found for the provided user ID:', userId);
-            return {
-                statusCode: 404,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                },
-                body: JSON.stringify({ error: 'User not found' })
-            };
-        }
+        // Assuming the function returns a list of 'MS User IDs' the logged-in user is following
+        const followingUserIds = new Set(data); // Convert this list to a Set for efficient lookup
+        console.log("Following User IDs:", Array.from(followingUserIds)); // Log the IDs being followed
 
-        const fieldValue = records[0].fields['User is Following Rollup'];
-        if (typeof fieldValue !== 'string') {
-            // If the field value is not a string, log an error and return an appropriate response
-            console.error('User is Following Rollup field is not a string:', fieldValue);
-            return {
-                statusCode: 500,
-                headers: {
-                    "Access-Control-Allow-Origin": "*",
-                },
-                body: JSON.stringify({ error: 'Field value is not a string' })
-            };
-        }
+        // Filter the collection items on the page based on the fetched following list
+        const collectionItems = document.querySelectorAll('.Followed-Users-List');
+        console.log(`Found ${collectionItems.length} collection items.`); // Log the number of items found
 
-        // Proceed with splitting the string into an array
-        const userIsFollowing = fieldValue.split(',').map(id => id.trim());
-
-        return {
-            statusCode: 200,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-            },
-            body: JSON.stringify(userIsFollowing)
-        };
+        collectionItems.forEach(item => {
+            const userId = item.getAttribute('data-user-id');
+            if (!followingUserIds.has(userId)) {
+                console.log(`Hiding item for user ID: ${userId}`); // Log each item being hidden
+                item.style.display = 'none'; // Hide items not being followed by the logged-in user
+            } else {
+                console.log(`Displaying item for user ID: ${userId}`); // Log each item being displayed
+            }
+        });
     } catch (error) {
-        console.error('Error:', error);
-        return {
-            statusCode: 500,
-            headers: {
-                "Access-Control-Allow-Origin": "*",
-            },
-            body: JSON.stringify({ error: error.toString() })
-        };
+        console.error("Error filtering collection items based on follow status:", error);
     }
-};
+});
+</script>
