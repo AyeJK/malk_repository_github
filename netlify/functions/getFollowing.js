@@ -14,10 +14,7 @@ exports.handler = async (event) => {
         const records = await base('Users').select({
             filterByFormula: `{MS User ID} = '${userId}'`
         }).firstPage();
-        let userIsFollowing = records.length > 0 && records[0].fields['User is Following Rollup'] 
-            ? records[0].fields['User is Following Rollup'].split(',') 
-            : [];
-        userIsFollowing = userIsFollowing.map(userId => userId.trim());
+        const userIsFollowing = records.length > 0 ? records[0].fields['User Is Following'] : [];
 
         return {
             statusCode: 200,
