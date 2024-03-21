@@ -7,7 +7,7 @@ exports.handler = async (event) => {
         endpointUrl: 'https://api.airtable.com',
         apiKey: process.env.Airtable_PAT
     });
-    const base = Airtable.base('appaFBiB1nQcgm9Oz'); 
+    const base = Airtable.base('appaFBiB1nQcgm9Oz');
     const { userId } = event.queryStringParameters;
 
     try {
@@ -15,13 +15,33 @@ exports.handler = async (event) => {
             filterByFormula: `{MS User ID} = '${userId}'`
         }).firstPage();
 
-        // Adjust to reference 'User is Following Rollup' column instead
-        let userIsFollowing = records.length > 0 && records[0].fields['User is Following Rollup'] 
-            ? records[0].fields['User is Following Rollup'].split(',') 
-            : [];
+        if (records.length === 0) {
+            // Handle the case where no records are found
+            console.error('No records found for the provided user ID:', userId);
+            return {
+                statusCode: 404,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                },
+                body: JSON.stringify({ error: 'User not found' })
+            };
+        }
 
-        // Trim whitespace from each userID in the array for safety
-        userIsFollowing = userIsFollowing.map(userId => userId.trim());
+        const fieldValue = records[0].fields['User is Following Rollup'];
+        if (typeof fieldValue !== 'string') {
+            // If the field value is not a string, log an error and return an appropriate response
+            console.error('User is Following Rollup field is not a string:', fieldValue);
+            return {
+                statusCode: 500,
+                headers: {
+                    "Access-Control-Allow-Origin": "*",
+                },
+                body: JSON.stringify({ error: 'Field value is not a string' })
+            };
+        }
+
+        // Proceed with splitting the string into an array
+        const userIsFollowing = fieldValue.split(',').map(id => id.trim());
 
         return {
             statusCode: 200,
@@ -31,9 +51,13 @@ exports.handler = async (event) => {
             body: JSON.stringify(userIsFollowing)
         };
     } catch (error) {
-        return { 
-            statusCode: 500, 
-            body: JSON.stringify({ error: error.toString() }) 
+        console.error('Error:', error);
+        return {
+            statusCode: 500,
+            headers: {
+                "Access-Control-Allow-Origin": "*",
+            },
+            body: JSON.stringify({ error: error.toString() })
         };
     }
 };
