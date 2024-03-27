@@ -1,4 +1,3 @@
-<script>
 document.addEventListener("DOMContentLoaded", function() {
   var wfForm = document.getElementById('feedback-form');
 
@@ -36,4 +35,3 @@ document.addEventListener("DOMContentLoaded", function() {
 
   });
 });
-</script>
