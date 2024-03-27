@@ -1,0 +1,17 @@
+/* Apply custom styles to the placeholder text */
+.select2-container .select2-search--inline .select2-search__field {
+    color: #333;
+    font-family: 'Lato', sans-serif;
+    font-weight: 300;
+    font-size: 14px;
+}
+/* Remove border radius and change background color of the select2 tag field */
+.select2-container--default .select2-selection--multiple {
+    border-radius: 0; /* Remove border radius */
+    border-color: #b3b3b3; /* Change border color to your preference */
+}
+/* Remove border radius and change background color of the select2 category field */
+.select2-container--default .select2-selection--single {
+    border-radius: 0; /* Remove border radius */
+    border-color: #b3b3b3; /* Change border color to your preference */
+}
