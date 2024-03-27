@@ -1,3 +1,4 @@
+<script>
 document.addEventListener("DOMContentLoaded", async function() {
     var memberElement = document.querySelector('[data-ms-member="id"]');
     var loggedInUserId;
@@ -13,24 +14,13 @@ document.addEventListener("DOMContentLoaded", async function() {
         const response = await fetch(`${netlifyFunctionUrl}?userId=${loggedInUserId}`);
         const data = await response.json();
 
-        // Check if the logged-in user is not following anyone
-        if (data.length === 0) {
-            // Correctly target elements with both classes applied
-            document.querySelectorAll('.nav-menu-group.following').forEach(el => {
-                el.style.display = 'none';
-            });
-            return; // Return early as no further processing is needed
-        }
+        window.followingUserIds = new Set(data); // Store the followed user IDs globally
 
-        window.followingUserIds = new Set(data); // Convert this list to a Set for efficient lookup
-
-        const collectionItems = document.querySelectorAll('.followed-list-item');
-
-        collectionItems.forEach(item => {
+        // Hide items not being followed by the logged-in user
+        document.querySelectorAll('.followed-list-item').forEach(item => {
             const userId = item.getAttribute('data-user-id');
-
             if (!window.followingUserIds.has(userId)) {
-                item.style.display = 'none'; // Hide items not being followed by the logged-in user
+                item.style.display = 'none';
             }
         });
     } catch (error) {
