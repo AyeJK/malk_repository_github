@@ -1,4 +1,3 @@
-<script>
 document.addEventListener("DOMContentLoaded", async function() {
     var memberElement = document.querySelector('[data-ms-member="id"]');
     var loggedInUserId;
