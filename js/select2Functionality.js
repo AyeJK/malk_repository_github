@@ -16,6 +16,6 @@ $('#video-tags').select2({
     }
 });
 $('#category').select2({
-    placeholder: 'Select a category',
+    placeholder: 'Select a categoryz',
     minimumResultsForSearch: Infinity,
 });
