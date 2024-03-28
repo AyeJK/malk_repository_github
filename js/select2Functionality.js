@@ -4,26 +4,30 @@ $('#video-tags').select2({
     maximumSelectionLength: 5,
     tokenSeparators: [','],
     createTag: function(params) {
-        var term = $.trim(params.term).toLowerCase(); // Ensure the tag is in lowercase
+        // Debugging: Log the original term
+        console.log("Original term:", params.term);
 
-        // If there are no search terms, don't create a tag
+        // Trim the input term and convert it to lowercase
+        var term = $.trim(params.term).toLowerCase();
+
+        // Debugging: Log the processed term
+        console.log("Processed term:", term);
+
+        // If there are no search terms (after trimming and converting to lowercase), don't create a tag
         if (term === '') {
             return null;
         }
 
-        // Prepend '#' to the lowercase tag and ensure it's unique in case-insensitive manner
-        var isDuplicate = $(this.$element[0]).find("option").filter(function() {
-            return this.text.toLowerCase() === ('#' + term).toLowerCase();
-        }).length;
-
-        if (isDuplicate) {
-            return null;
-        }
-
-        return {
+        // Prepend '#' to the lowercase tag
+        var tag = {
             id: '#' + term, // The ID is now based on the lowercase term
             text: '#' + term // The displayed text is also based on the lowercase term
         };
+
+        // Debugging: Log the created tag
+        console.log("Created tag:", tag);
+
+        return tag;
     }
 });
 $('#category').select2({
