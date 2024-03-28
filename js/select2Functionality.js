@@ -10,8 +10,8 @@ $('#video-tags').select2({
         }
         // Prepend '#' to the tag
         return {
-            id: '#' + $.trim(params.term),
-            text: '#' + $.trim(params.term)
+            id: '#!' + $.trim(params.term),
+            text: '#!' + $.trim(params.term)
         };
     }
 });
