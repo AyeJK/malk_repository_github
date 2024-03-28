@@ -33,7 +33,7 @@ document.addEventListener('DOMContentLoaded', function() {
     }
 
     function initializeEventHandlers() {
-        handleButtonClick('.like-button', 'https://hooks.airtable.com/workflows/v1/genericWebhook/appaFBiB1nQcgm9Oz/wfluNUaUnSvFg5sFW/wtrNL8qJEnIRI95qJ');
+        handleButtonClick('.like-button', 'https://hook.us1.make.com/2bsw5yrq27ue9ow6g7j7xur90hp3tinr');
         handleButtonClick('.unlike-button', 'https://hooks.airtable.com/workflows/v1/genericWebhook/appaFBiB1nQcgm9Oz/wflCnkWP8PuX8iBBI/wtrsG9gAxZNIoj97Z');
         handleFollowButtonClick('.follow-button', 'https://hook.us1.make.com/fpoa24jektjxa83h7koxtbyai4l2cxbc');
         handleFollowButtonClick('.unfollow-button', 'https://hook.us1.make.com/6x8fruii1upfp1fwjpp29482e63vmnju');
