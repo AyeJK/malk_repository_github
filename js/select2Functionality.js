@@ -13,7 +13,7 @@ $('#video-tags').select2({
 
         // Prepend '#' to the lowercase tag and ensure it's unique in case-insensitive manner
         var isDuplicate = $(this.$element[0]).find("option").filter(function() {
-            return this.text.toUpperCase() === ('#' + term).toUpperCase();
+            return this.text.toLowerCase() === ('#' + term).toLowerCase();
         }).length;
 
         if (isDuplicate) {
