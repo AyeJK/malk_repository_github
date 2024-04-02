@@ -1,9 +1,9 @@
 /* Apply custom styles to the placeholder text */
 .select2-container .select2-search--inline .select2-search__field {
-    color: #000000;
+    color: #333;
     font-family: 'Lato', sans-serif;
-    font-weight: 300;
-    font-size: 14px;
+    font-weight: 400;
+    font-size: 54px;
 }
 /* Remove border radius and change background color of the select2 tag field */
 .select2-container--default .select2-selection--multiple {
@@ -32,8 +32,8 @@
     border-color: #f8f8f8;
 }
 .select2-selection__placeholder {
-    color: #000000;
+    color: #333;
     font-family: 'Lato', sans-serif;
-    font-weight: 300;
-    font-size: 14px;
+    font-weight: 400;
+    font-size: 16px;
 }
