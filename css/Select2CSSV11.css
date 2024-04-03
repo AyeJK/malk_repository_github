@@ -1,0 +1,64 @@
+/* Apply custom styles to the placeholder text */
+.select2-container .select2-search--inline .select2-search__field {
+    color: #333;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+}
+/* Remove border radius and change background color of the select2 tag field */
+.select2-container--default .select2-selection--multiple {
+    border-radius: 0; /* Remove border radius */
+    border-color: transparent; /* Change border color to your preference */
+    min-height: 32px;
+    background-color: #f8f8f8;
+}
+/* Remove inner border of the select2 tag field */
+.select2-container--default.select2-container--focus .select2-selection--multiple {
+    border-width: 0px;
+}
+/* Remove border radius and change background color of the select2 category field */
+.select2-container--default .select2-selection--single {
+    border-radius: 0; /* Remove border radius */
+    border-color: transparent; /* Change border color to your preference */
+    background-color: #f8f8f8;
+}
+
+.select2-selection select2-selection--multiple {
+    padding-right: 0px;
+    padding-bottom: 0px;
+}
+.select2-results__option select2-results__message {
+    border-radius: 0;
+    border-color: #f8f8f8;
+}
+.select2-selection__placeholder {
+    color: #333;
+    font-family: 'Lato', sans-serif;
+    font-weight: 400;
+    font-size: 16px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice {
+    padding: 5px;
+    padding-left: 28px;
+    background-color:#3898ec;
+    color: #ffffff;
+    border: 0px;
+}
+.select2-container--default .select2-selection--multiple .select2-selection__choice__remove {
+    padding: 5px 6px;
+    color: #ffffff;
+    border-right: #ffffff;
+    background-color: #333;
+}
+..select2-container--default .select2-selection--single .select2-selection__rendered {
+    color: #ffffff;
+    background-color: #3898ec;
+    line-height: 42px;
+}
+..select2-container--default .select2-selection--single .select2-selection__arrow {
+    height: 42px;
+    width: 42px;
+}
+.select2-container--default .select2-selection--single .select2-selection__arrow b {
+    border color: #ffffff;
+}
