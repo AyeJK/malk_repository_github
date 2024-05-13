@@ -1,0 +1,10 @@
+.slide-video-title {
+    display: -webkit-box;
+    -webkit-line-clamp: 2; /* Number of lines you want in the block element */
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 100%; /* Adjust as needed */
+    height: 3em; /* Adjust based on your line-height */
+    line-height: 1.5em; /* Adjust this to your font size and desired spacing */
+}
