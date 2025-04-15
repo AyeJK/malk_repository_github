@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Firebase Auth Test - Malk.tv</title>
+    <link rel="stylesheet" href="css/styles.css">
+</head>
+<body>
+    <div class="container">
+        <h1>Firebase Authentication Test</h1>
+        <div class="auth-links">
+            <a href="login.html" class="btn btn-primary">Login</a>
+            <a href="register.html" class="btn btn-secondary">Register</a>
+        </div>
+        <div id="authStatus"></div>
+    </div>
+
+    <!-- Firebase SDK -->
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-app-compat.js"></script>
+    <script src="https://www.gstatic.com/firebasejs/9.6.1/firebase-auth-compat.js"></script>
+    
+    <!-- Application Scripts -->
+    <script src="js/config.js"></script>
+    <script src="js/auth.js"></script>
+    <script>
+        // Update auth status when auth state changes
+        firebase.auth().onAuthStateChanged((user) => {
+            const authStatus = document.getElementById('authStatus');
+            if (user) {
+                authStatus.innerHTML = `
+                    <p>Logged in as: ${user.email}</p>
+                    <button onclick="Auth.handleLogout()" class="btn btn-danger">Logout</button>
+                `;
+            } else {
+                authStatus.innerHTML = '<p>Not logged in</p>';
+            }
+        });
+    </script>
+</body>
+</html> 

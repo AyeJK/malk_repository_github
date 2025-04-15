@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Airtable Connection Test</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/airtable/0.12.2/airtable.browser.js"></script>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 800px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        #result {
+            margin-top: 20px;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+        }
+        .success {
+            color: green;
+        }
+        .error {
+            color: red;
+        }
+    </style>
+</head>
+<body>
+    <h1>Airtable Connection Test</h1>
+    <button onclick="testConnection()" id="testButton" disabled>Test Connection</button>
+    <div id="result"></div>
+
+    <script>
+        // Check if Airtable script loaded successfully
+        window.onload = function() {
+            const resultDiv = document.getElementById('result');
+            const testButton = document.getElementById('testButton');
+            
+            if (typeof Airtable === 'undefined') {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Script Loading Error</h3>
+                        <p>Failed to load Airtable library. Please check your internet connection and try again.</p>
+                    </div>
+                `;
+                testButton.disabled = true;
+            } else {
+                testButton.disabled = false;
+                resultDiv.innerHTML = '<div class="success">✅ Airtable library loaded successfully. Click the button to test connection.</div>';
+            }
+        };
+
+        async function testConnection() {
+            const resultDiv = document.getElementById('result');
+            resultDiv.innerHTML = 'Testing connection...';
+            
+            try {
+                const base = new Airtable({
+                    apiKey: 'pat3bIdr6hGjRA2rO.f6a0db6cb871feda8752feb12dec00cfc3c10fdc12d68502088584015d5d3c40'
+                }).base('appMUjMFo1BnNb7KP');
+
+                // Try to list tables
+                const tables = await base.tables;
+                const tableNames = tables.map(table => table.name);
+                
+                resultDiv.innerHTML = `
+                    <div class="success">
+                        <h3>✅ Connection Successful!</h3>
+                        <p>Available tables:</p>
+                        <ul>
+                            ${tableNames.map(name => `<li>${name}</li>`).join('')}
+                        </ul>
+                    </div>
+                `;
+            } catch (error) {
+                resultDiv.innerHTML = `
+                    <div class="error">
+                        <h3>❌ Connection Failed</h3>
+                        <p>Error: ${error.message}</p>
+                        <p>Please check:</p>
+                        <ul>
+                            <li>Your internet connection</li>
+                            <li>The Airtable Personal Access Token</li>
+                            <li>The Base ID</li>
+                        </ul>
+                    </div>
+                `;
+            }
+        }
+    </script>
+</body>
+</html> 

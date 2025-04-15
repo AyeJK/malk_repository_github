@@ -1,7 +1,26 @@
 {
-  "name": "malk",
+  "name": "malk-tv",
   "version": "1.0.0",
+  "description": "Malk.tv - A platform for content management",
+  "main": "index.js",
+  "scripts": {
+    "dev": "netlify dev",
+    "build": "echo 'No build step required'",
+    "start": "netlify dev",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
   "dependencies": {
-    "airtable": "^0.12.2"
-  }
+    "@prisma/client": "^6.6.0",
+    "airtable": "^0.12.2",
+    "date-fns": "^4.1.0",
+    "firebase": "^10.8.0",
+    "firebase-admin": "^13.2.0",
+    "http-server": "^14.1.1",
+    "next-auth": "^4.24.11"
+  },
+  "devDependencies": {
+    "netlify-cli": "^17.19.0"
+  },
+  "author": "",
+  "license": "ISC"
 }
