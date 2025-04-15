@@ -5,6 +5,7 @@ import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
 import PostCard from '@/components/PostCard';
+import UserCard from '@/components/UserCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useFollow } from '@/hooks/useFollow';
 import { useAuth } from '@/lib/auth-context';
@@ -19,7 +20,9 @@ export default function ProfilePage() {
   const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
   const [likedPosts, setLikedPosts] = useState<any[]>([]);
-  const [activeTab, setActiveTab] = useState<'posts' | 'likes'>('posts');
+  const [followers, setFollowers] = useState<any[]>([]);
+  const [following, setFollowing] = useState<any[]>([]);
+  const [activeTab, setActiveTab] = useState<'posts' | 'likes' | 'followers' | 'following'>('posts');
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
 
@@ -61,6 +64,20 @@ export default function ProfilePage() {
           const postsData = await postsResponse.json();
           
           setPosts(postsData.posts || []);
+          
+          // Fetch followers
+          const followersResponse = await fetch(`/api/get-followers?userId=${userFirebaseUID}`);
+          if (followersResponse.ok) {
+            const followersData = await followersResponse.json();
+            setFollowers(followersData.followers || []);
+          }
+          
+          // Fetch following
+          const followingResponse = await fetch(`/api/get-following?userId=${userFirebaseUID}`);
+          if (followingResponse.ok) {
+            const followingData = await followingResponse.json();
+            setFollowing(followingData.following || []);
+          }
           
           // Fetch full post data for liked posts
           console.log('LikedPosts field:', userRecord.fields?.LikedPosts);
@@ -125,7 +142,6 @@ export default function ProfilePage() {
     }
 
     console.log('Rendering content for tab:', activeTab);
-    console.log('Liked posts state:', likedPosts);
 
     switch (activeTab) {
       case 'posts':
@@ -147,6 +163,26 @@ export default function ProfilePage() {
           </div>
         ) : (
           <div className="text-center p-4">No liked posts yet</div>
+        );
+      case 'followers':
+        return followers.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {followers.map((follower) => (
+              <UserCard key={follower.id} user={follower} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center p-4">No followers yet</div>
+        );
+      case 'following':
+        return following.length > 0 ? (
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            {following.map((followedUser) => (
+              <UserCard key={followedUser.id} user={followedUser} />
+            ))}
+          </div>
+        ) : (
+          <div className="text-center p-4">Not following anyone yet</div>
         );
       default:
         return <div className="text-center p-4">Invalid tab</div>;
@@ -249,47 +285,59 @@ export default function ProfilePage() {
                       {user.fields.SocialLink.replace(/^https?:\/\//, '')}
                     </a>
                   )}
-                  
-                  {/* User Stats */}
-                  <div className="flex items-center space-x-6 text-gray-300">
-                    <div>
-                      <span className="font-bold text-white">{posts.length}</span> posts
-                    </div>
-                  </div>
                 </div>
               </div>
             </div>
             
-            {/* Tabs Navigation */}
-            <div className="mt-8 border-b border-dark-lightest">
-              <nav className="flex space-x-8">
+            {/* Tabs */}
+            <div className="bg-dark-lighter rounded-lg mt-6 overflow-hidden">
+              <div className="flex border-b border-gray-700">
                 <button
                   onClick={() => setActiveTab('posts')}
-                  className={`py-4 px-1 border-b-2 font-medium text-sm ${
+                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
                     activeTab === 'posts'
-                      ? 'border-primary text-primary'
-                      : 'border-transparent text-gray-400 hover:text-gray-300 hover:border-gray-300'
+                      ? 'text-white border-b-2 border-blue-500'
+                      : 'text-gray-400 hover:text-white'
                   }`}
                 >
                   Posts
                 </button>
                 <button
                   onClick={() => setActiveTab('likes')}
-                  className={`px-4 py-2 ${
+                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
                     activeTab === 'likes'
-                      ? 'text-blue-500 border-b-2 border-blue-500'
-                      : 'text-gray-500'
+                      ? 'text-white border-b-2 border-blue-500'
+                      : 'text-gray-400 hover:text-white'
                   }`}
                 >
                   Likes
                 </button>
-              </nav>
-            </div>
-            
-            {/* Tab Content */}
-            <div className="mt-6">
-              <h2 className="text-2xl font-bold text-white mb-6 capitalize">{activeTab}</h2>
-              {renderContent()}
+                <button
+                  onClick={() => setActiveTab('followers')}
+                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
+                    activeTab === 'followers'
+                      ? 'text-white border-b-2 border-blue-500'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Followers
+                </button>
+                <button
+                  onClick={() => setActiveTab('following')}
+                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
+                    activeTab === 'following'
+                      ? 'text-white border-b-2 border-blue-500'
+                      : 'text-gray-400 hover:text-white'
+                  }`}
+                >
+                  Following
+                </button>
+              </div>
+              
+              {/* Tab Content */}
+              <div className="p-4">
+                {renderContent()}
+              </div>
             </div>
           </div>
         </>

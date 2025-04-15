@@ -401,7 +401,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
         {videoId ? (
           <iframe
             src={`https://www.youtube.com/embed/${videoId}`}
-            className="absolute top-0 left-0 w-full h-full"
+            className="absolute top-0 left-0 w-full h-full z-0"
             allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
             allowFullScreen
           />
