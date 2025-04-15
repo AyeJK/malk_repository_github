@@ -16,6 +16,7 @@
     "date-fns": "^4.1.0",
     "firebase": "^10.8.0",
     "firebase-admin": "^13.2.0",
+    "lru-cache": "^10.2.0",
     "next": "^14.1.0",
     "next-auth": "^4.24.6",
     "postcss": "^8.4.35",
@@ -26,8 +27,6 @@
     "tailwindcss": "^3.4.1"
   },
   "devDependencies": {
-    "@eslint/config-array": "^2.1.0",
-    "@eslint/object-schema": "^2.0.1",
     "@types/node": "^20.11.19",
     "@types/react": "^18.2.57",
     "@types/react-dom": "^18.2.19",
