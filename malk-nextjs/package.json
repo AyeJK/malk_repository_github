@@ -9,6 +9,7 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@heroicons/react": "^2.2.0",
     "@radix-ui/react-slot": "^1.2.0",
     "airtable": "^0.12.2",
     "autoprefixer": "^10.4.17",

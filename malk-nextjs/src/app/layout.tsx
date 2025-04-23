@@ -2,8 +2,9 @@ import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import { Lobster } from 'next/font/google';
 import './globals.css';
-import Navbar from '@/components/Navbar';
 import Providers from '@/components/Providers';
+import { SidebarProvider } from '@/lib/sidebar-context';
+import ClientLayout from '@/components/ClientLayout';
 
 const inter = Inter({ 
   subsets: ['latin'],
@@ -30,10 +31,11 @@ export default function RootLayout({
     <html lang="en">
       <body className={`${inter.variable} ${lobster.variable} font-sans bg-dark text-white min-h-screen`}>
         <Providers>
-          <Navbar />
-          <main className="container mx-auto px-4 py-8">
-            {children}
-          </main>
+          <SidebarProvider>
+            <ClientLayout>
+              {children}
+            </ClientLayout>
+          </SidebarProvider>
         </Providers>
       </body>
     </html>
