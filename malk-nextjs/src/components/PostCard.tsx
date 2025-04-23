@@ -358,10 +358,10 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
             <button
               onClick={handleToggleFollow}
               disabled={isFollowLoading}
-              className={`px-4 py-1 rounded-full text-sm font-medium transition-colors ${
+              className={`follow-button ${
                 isFollowing 
-                  ? 'bg-gray-600 text-white hover:bg-gray-700' 
-                  : 'bg-blue-600 text-white hover:bg-blue-700'
+                  ? 'follow-button-following' 
+                  : 'follow-button-not-following'
               }`}
             >
               {isFollowLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
