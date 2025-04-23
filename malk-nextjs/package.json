@@ -9,14 +9,17 @@
     "lint": "next lint"
   },
   "dependencies": {
+    "@radix-ui/react-slot": "^1.2.0",
     "airtable": "^0.12.2",
     "autoprefixer": "^10.4.17",
     "axios": "^1.8.4",
+    "class-variance-authority": "^0.7.1",
     "clsx": "^2.1.1",
     "date-fns": "^4.1.0",
     "firebase": "^10.8.0",
     "firebase-admin": "^13.2.0",
     "lru-cache": "^10.2.0",
+    "lucide-react": "^0.503.0",
     "next": "^14.1.0",
     "next-auth": "^4.24.6",
     "postcss": "^8.4.35",
@@ -25,7 +28,8 @@
     "rimraf": "^5.0.5",
     "sonner": "^2.0.3",
     "tailwind-merge": "^3.2.0",
-    "tailwindcss": "^3.4.1"
+    "tailwindcss": "^3.4.1",
+    "tailwindcss-animate": "^1.0.7"
   },
   "devDependencies": {
     "@types/node": "^20.11.19",
