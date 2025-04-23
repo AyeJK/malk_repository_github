@@ -206,7 +206,7 @@ export default function ProfilePage() {
       ) : (
         <>
           {/* Full-width Banner Image */}
-          <div className="relative w-screen h-48 md:h-64 -mt-8" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
+          <div className="relative w-full h-48 md:h-64 -mx-4 md:-mx-8">
             {user.fields?.BannerImage ? (
               <Image
                 src={user.fields.BannerImage}
