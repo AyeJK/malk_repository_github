@@ -9,19 +9,29 @@ export async function GET(request: NextRequest) {
     const searchParams = request.nextUrl.searchParams;
     const limit = parseInt(searchParams.get('limit') || '10');
 
-    // Fetch tags from Airtable
+    console.log('Fetching tags with limit:', limit);
+
+    // Fetch all tags from Airtable
     const tagsTable = base('Tags');
     const records = await tagsTable.select({
-      maxRecords: limit,
-      fields: ['Name']
+      maxRecords: 100, // Fetch more records to ensure we get enough valid ones
+      fields: ['Name', 'Count']
     }).all();
 
-    // Format the response
-    const tags = records.map(record => ({
-      id: record.id,
-      name: record.get('Name') as string || 'Unnamed Tag',
-      count: 0 // Default count since we don't have this field yet
-    }));
+    console.log(`Found ${records.length} total tag records`);
+
+    // Process and sort the records
+    const tags = records
+      .map(record => ({
+        id: record.id,
+        name: record.get('Name') as string,
+        count: record.get('Count') as number || 0 // Default to 0 if Count is not set
+      }))
+      .filter(tag => tag.name) // Only include tags that have a name
+      .sort((a, b) => (b.count || 0) - (a.count || 0)) // Sort by count, treating undefined as 0
+      .slice(0, limit); // Take only the requested number of tags
+
+    console.log(`Returning ${tags.length} processed tags`);
 
     return NextResponse.json({ tags });
   } catch (error) {
