@@ -258,7 +258,7 @@ export default function ProfilePage() {
                         className={`px-4 py-1 rounded-full text-sm font-medium transition-colors ${
                           isFollowing 
                             ? 'bg-gray-600 text-white hover:bg-gray-700' 
-                            : 'bg-blue-600 text-white hover:bg-blue-700'
+                            : 'bg-red-600 text-white hover:bg-red-700'
                         }`}
                       >
                         {isFollowLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
@@ -296,7 +296,7 @@ export default function ProfilePage() {
                   onClick={() => setActiveTab('posts')}
                   className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
                     activeTab === 'posts'
-                      ? 'text-white border-b-2 border-blue-500'
+                      ? 'text-white border-b-2 border-red-500'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
@@ -306,7 +306,7 @@ export default function ProfilePage() {
                   onClick={() => setActiveTab('likes')}
                   className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
                     activeTab === 'likes'
-                      ? 'text-white border-b-2 border-blue-500'
+                      ? 'text-white border-b-2 border-red-500'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
@@ -316,7 +316,7 @@ export default function ProfilePage() {
                   onClick={() => setActiveTab('followers')}
                   className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
                     activeTab === 'followers'
-                      ? 'text-white border-b-2 border-blue-500'
+                      ? 'text-white border-b-2 border-red-500'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
@@ -326,7 +326,7 @@ export default function ProfilePage() {
                   onClick={() => setActiveTab('following')}
                   className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
                     activeTab === 'following'
-                      ? 'text-white border-b-2 border-blue-500'
+                      ? 'text-white border-b-2 border-red-500'
                       : 'text-gray-400 hover:text-white'
                   }`}
                 >
