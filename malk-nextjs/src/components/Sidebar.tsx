@@ -192,19 +192,16 @@ export default function Sidebar() {
                 {isLoadingTags ? (
                   <div className="text-white/50 text-sm px-2">Loading tags...</div>
                 ) : popularTags.length > 0 ? (
-                  popularTags.map(({ id, name, count }) => (
+                  popularTags.map(({ id, name }) => (
                     <Link
                       key={id}
                       href={`/tags/${name.toLowerCase()}`}
-                      className="flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 text-white/70 hover:text-white group"
+                      className="flex items-center px-2 py-1 rounded hover:bg-white/5 text-white/70 hover:text-white group"
                     >
                       <div className="flex items-center space-x-2">
                         <span className="text-lg">🏷️</span>
                         <span>{name}</span>
                       </div>
-                      <span className="text-xs text-white/40 group-hover:text-white/60">
-                        {count}
-                      </span>
                     </Link>
                   ))
                 ) : (
