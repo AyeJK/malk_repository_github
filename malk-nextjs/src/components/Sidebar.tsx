@@ -85,7 +85,7 @@ export default function Sidebar() {
   ];
 
   return (
-    <div className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-black/40 backdrop-blur-sm border-r border-white/10 transition-all duration-300 z-20 ${
+    <div className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-black border-r border-white/10 transition-all duration-300 z-20 ${
       isCollapsed ? 'w-16' : 'w-64'
     }`}>
       <div className="h-full overflow-y-auto">
