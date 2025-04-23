@@ -3,7 +3,7 @@
 import { createContext, useContext, useEffect, useState, ReactNode } from 'react';
 import { onAuthStateChanged, signOut as firebaseSignOut, User } from 'firebase/auth';
 import { auth } from './firebase';
-import { getUserByFirebaseUID } from './airtable';
+import { getUserByFirebaseUID, UserRecord } from './airtable';
 
 interface AirtableUser {
   id: string;
