@@ -1,9 +1,9 @@
 'use client';
 
 import { ReactNode } from 'react';
-import { useSidebar } from '@/lib/sidebar-context';
 import Navbar from './Navbar';
 import Sidebar from './Sidebar';
+import { useSidebar } from '@/lib/sidebar-context';
 
 interface ClientLayoutProps {
   children: ReactNode;
@@ -15,11 +15,11 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   return (
     <div className="min-h-screen bg-black">
       <Navbar />
-      <Sidebar />
-      <div className="pt-16">
-        <main className={`transition-all duration-300 ${
-          isCollapsed ? 'pl-16' : 'pl-64'
-        } container mx-auto px-4 py-8`}>
+      <div className="flex">
+        <Sidebar />
+        <main className={`flex-1 transition-all duration-300 ${
+          isCollapsed ? 'ml-16' : 'ml-64'
+        } mt-16`}>
           {children}
         </main>
       </div>
