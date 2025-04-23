@@ -22,12 +22,20 @@ interface FollowingUser {
   };
 }
 
+interface Tag {
+  id: string;
+  name: string;
+  count: number;
+}
+
 export default function Sidebar() {
   const pathname = usePathname();
   const { isCollapsed, toggleCollapse } = useSidebar();
   const { user, airtableUser } = useAuth();
   const [following, setFollowing] = useState<FollowingUser[]>([]);
   const [isLoadingFollowing, setIsLoadingFollowing] = useState(false);
+  const [popularTags, setPopularTags] = useState<Tag[]>([]);
+  const [isLoadingTags, setIsLoadingTags] = useState(false);
   const [sections, setSections] = useState<{ [key: string]: boolean }>({
     Following: true,
     Categories: false,
@@ -57,6 +65,27 @@ export default function Sidebar() {
     fetchFollowing();
   }, [user?.uid]);
 
+  // Fetch popular tags
+  useEffect(() => {
+    const fetchPopularTags = async () => {
+      try {
+        setIsLoadingTags(true);
+        const response = await fetch('/api/get-top-tags?limit=10');
+        if (!response.ok) throw new Error('Failed to fetch tags');
+        
+        const data = await response.json();
+        setPopularTags(data.tags || []);
+      } catch (error) {
+        console.error('Error fetching popular tags:', error);
+        setPopularTags([]);
+      } finally {
+        setIsLoadingTags(false);
+      }
+    };
+
+    fetchPopularTags();
+  }, []);
+
   const toggleSection = (section: string) => {
     setSections(prev => ({
       ...prev,
@@ -69,19 +98,6 @@ export default function Sidebar() {
     { href: '/activity', label: 'Activity', icon: '📈' },
     { href: '/following', label: 'Following', icon: '👥' },
     { href: '/profile', label: 'Profile', icon: '👤' },
-  ];
-
-  const popularTags = [
-    { tag: 'snl', count: 342 },
-    { tag: 'horror', count: 256 },
-    { tag: 'plants', count: 198 },
-    { tag: 'cover', count: 187 },
-    { tag: 'music video', count: 165 },
-    { tag: 'funny', count: 145 },
-    { tag: 'parody', count: 132 },
-    { tag: 'lofi', count: 121 },
-    { tag: 'humor', count: 98 },
-    { tag: 'sandwich', count: 87 },
   ];
 
   return (
@@ -173,16 +189,24 @@ export default function Sidebar() {
             </button>
             {sections['Popular Tags'] && (
               <div className="mt-2 space-y-1">
-                {popularTags.map(({ tag, count }) => (
-                  <Link
-                    key={tag}
-                    href={`/tags/${tag}`}
-                    className="flex items-center space-x-2 px-2 py-1 rounded hover:bg-white/5 text-white/70 hover:text-white"
-                  >
-                    <span className="text-lg">🏷️</span>
-                    <span>{tag}</span>
-                  </Link>
-                ))}
+                {isLoadingTags ? (
+                  <div className="text-white/50 text-sm px-2">Loading tags...</div>
+                ) : popularTags.length > 0 ? (
+                  popularTags.map(({ id, name }) => (
+                    <Link
+                      key={id}
+                      href={`/tags/${name.toLowerCase()}`}
+                      className="flex items-center px-2 py-1 rounded hover:bg-white/5 text-white/70 hover:text-white group"
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span className="text-lg">🏷️</span>
+                        <span>{name}</span>
+                      </div>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="text-white/50 text-sm px-2">No tags found</div>
+                )}
               </div>
             )}
           </div>
