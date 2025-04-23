@@ -206,7 +206,7 @@ export default function ProfilePage() {
       ) : (
         <>
           {/* Full-width Banner Image */}
-          <div className="relative w-screen h-48 md:h-64 overflow-hidden z-10" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
+          <div className="relative w-screen h-48 md:h-64 overflow-hidden -z-10" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
             {user.fields?.BannerImage ? (
               <Image
                 src={user.fields.BannerImage}
@@ -221,7 +221,7 @@ export default function ProfilePage() {
           </div>
           
           {/* Content Container */}
-          <div className="max-w-4xl mx-auto px-4">
+          <div className="max-w-4xl mx-auto px-4 relative">
             {/* Profile Header */}
             <div className="bg-dark-lighter rounded-b-lg p-6 relative -mt-16 md:-mt-20">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
