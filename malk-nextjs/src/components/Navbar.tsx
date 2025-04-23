@@ -75,10 +75,10 @@ export default function Navbar() {
                     onClick={toggleDropdown}
                   >
                     <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">
-                      {((airtableUser?.fields.DisplayName || user?.email || 'U').charAt(0)).toUpperCase()}
+                      {((airtableUser?.displayName || user?.email || 'U').charAt(0)).toUpperCase()}
                     </div>
                     <span className="text-white">
-                      {airtableUser?.fields.DisplayName || user.email}
+                      {airtableUser?.displayName || user.email}
                     </span>
                     <svg 
                       xmlns="http://www.w3.org/2000/svg" 
