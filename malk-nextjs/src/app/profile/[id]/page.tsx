@@ -206,7 +206,7 @@ export default function ProfilePage() {
       ) : (
         <>
           {/* Full-width Banner Image */}
-          <div className="relative w-screen h-48 md:h-64 overflow-hidden -z-10" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
+          <div className="relative w-screen h-48 md:h-64 -mt-8" style={{ marginLeft: 'calc(-50vw + 50%)', marginRight: 'calc(-50vw + 50%)' }}>
             {user.fields?.BannerImage ? (
               <Image
                 src={user.fields.BannerImage}
@@ -216,14 +216,14 @@ export default function ProfilePage() {
                 priority
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-primary-dark to-accent"></div>
+              <div className="w-full h-full bg-gradient-to-br from-gray-800 to-gray-900"></div>
             )}
           </div>
           
           {/* Content Container */}
-          <div className="max-w-4xl mx-auto px-4 relative">
+          <div className="max-w-4xl mx-auto relative">
             {/* Profile Header */}
-            <div className="bg-dark-lighter rounded-b-lg p-6 relative -mt-16 md:-mt-20">
+            <div className="bg-black/80 backdrop-blur-sm rounded-lg p-6 relative -mt-16 md:-mt-20 border border-white/10">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                 {/* Profile Image */}
                 <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-dark-lighter -mt-16 md:-mt-20">
