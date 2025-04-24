@@ -28,6 +28,13 @@ interface Tag {
   count: number;
 }
 
+interface Category {
+  id: string;
+  name: string;
+  slug: string;
+  postCount: number;
+}
+
 export default function Sidebar() {
   const pathname = usePathname();
   const { isCollapsed, toggleCollapse } = useSidebar();
@@ -36,9 +43,11 @@ export default function Sidebar() {
   const [isLoadingFollowing, setIsLoadingFollowing] = useState(false);
   const [popularTags, setPopularTags] = useState<Tag[]>([]);
   const [isLoadingTags, setIsLoadingTags] = useState(false);
+  const [categories, setCategories] = useState<Category[]>([]);
+  const [isLoadingCategories, setIsLoadingCategories] = useState(false);
   const [sections, setSections] = useState<{ [key: string]: boolean }>({
     Following: true,
-    Categories: false,
+    Categories: true,
     'Popular Tags': true,
   });
 
@@ -84,6 +93,27 @@ export default function Sidebar() {
     };
 
     fetchPopularTags();
+  }, []);
+
+  // Fetch categories
+  useEffect(() => {
+    const fetchCategories = async () => {
+      try {
+        setIsLoadingCategories(true);
+        const response = await fetch('/api/get-categories');
+        if (!response.ok) throw new Error('Failed to fetch categories');
+        
+        const data = await response.json();
+        setCategories(data.categories || []);
+      } catch (error) {
+        console.error('Error fetching categories:', error);
+        setCategories([]);
+      } finally {
+        setIsLoadingCategories(false);
+      }
+    };
+
+    fetchCategories();
   }, []);
 
   const toggleSection = (section: string) => {
@@ -167,6 +197,52 @@ export default function Sidebar() {
                       </span>
                     </Link>
                   ))
+                )}
+              </div>
+            )}
+          </div>
+        )}
+
+        {/* Categories Section */}
+        {!isCollapsed && (
+          <div className="px-4 py-2">
+            <button
+              onClick={() => toggleSection('Categories')}
+              className="flex items-center justify-between w-full text-white/70 hover:text-white"
+            >
+              <span className="font-medium">Categories</span>
+              {sections.Categories ? (
+                <ChevronUpIcon className="w-4 h-4" />
+              ) : (
+                <ChevronDownIcon className="w-4 h-4" />
+              )}
+            </button>
+            {sections.Categories && (
+              <div className="mt-2 space-y-1">
+                {isLoadingCategories ? (
+                  <div className="text-white/50 text-sm px-2">Loading categories...</div>
+                ) : categories.length > 0 ? (
+                  categories.map(({ id, name, slug, postCount }) => (
+                    <Link
+                      key={id}
+                      href={`/category/${slug}`}
+                      className={`flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 ${
+                        pathname === `/category/${slug}`
+                          ? 'text-red-500 bg-red-500/10'
+                          : 'text-white/70 hover:text-white'
+                      } group`}
+                    >
+                      <div className="flex items-center space-x-2">
+                        <span className="text-lg">📁</span>
+                        <span>{name}</span>
+                      </div>
+                      <span className="text-xs text-white/50 group-hover:text-white/70">
+                        {postCount}
+                      </span>
+                    </Link>
+                  ))
+                ) : (
+                  <div className="text-white/50 text-sm px-2">No categories found</div>
                 )}
               </div>
             )}
