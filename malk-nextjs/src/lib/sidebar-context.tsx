@@ -46,8 +46,27 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggleVisibility = () => {
-    if (window.innerWidth < 792) {
+    const width = window.innerWidth;
+    
+    if (width < 792) {
+      // Mobile behavior - just toggle visibility
       setIsVisible(!isVisible);
+    } else if (width >= 1312) {
+      // Desktop behavior - toggle between expanded and collapsed
+      if (sidebarState === 'expanded') {
+        setSidebarState('collapsed');
+      } else {
+        setSidebarState('expanded');
+      }
+    } else {
+      // Tablet behavior - toggle between collapsed and hidden
+      if (sidebarState === 'collapsed') {
+        setSidebarState('hidden');
+        setIsVisible(false);
+      } else {
+        setSidebarState('collapsed');
+        setIsVisible(true);
+      }
     }
   };
 

@@ -214,7 +214,7 @@ export default function Sidebar() {
           </nav>
 
           {/* Following Section */}
-          {shouldShowLabels && user && following.length > 0 && (
+          {(shouldShowLabels || sidebarState === 'hidden') && user && following.length > 0 && (
             <div className="px-4 py-2">
               <button
                 onClick={() => toggleSection('Following')}
@@ -231,7 +231,7 @@ export default function Sidebar() {
                 <div className="mt-2 space-y-2">
                   {isLoadingFollowing ? (
                     <div className="text-white/50 text-sm px-2">Loading...</div>
-                  ) : (
+                  ) :
                     following.map((followedUser) => (
                       <Link
                         key={followedUser.id}
@@ -264,7 +264,7 @@ export default function Sidebar() {
           )}
 
           {/* Categories Section */}
-          {shouldShowLabels && (
+          {(shouldShowLabels || sidebarState === 'hidden') && (
             <div className="px-4 py-2">
               <button
                 onClick={() => toggleSection('Categories')}
@@ -299,7 +299,7 @@ export default function Sidebar() {
                             <span className="text-white/70 group-hover:text-white">
                               {getCategoryIcon(name)}
                             </span>
-                            {shouldShowLabels && <span>{name}</span>}
+                            {(shouldShowLabels || sidebarState === 'hidden') && <span>{name}</span>}
                           </div>
                         </Link>
                       ))
@@ -312,7 +312,7 @@ export default function Sidebar() {
           )}
 
           {/* Popular Tags Section */}
-          {shouldShowLabels && (
+          {(shouldShowLabels || sidebarState === 'hidden') && (
             <div className="px-4 py-2">
               <button
                 onClick={() => toggleSection('Popular Tags')}
@@ -339,7 +339,7 @@ export default function Sidebar() {
                       >
                         <div className={`flex items-center ${shouldShowLabels ? 'space-x-2' : 'justify-center'}`}>
                           <HashtagIcon className="w-5 h-5 text-white/70 group-hover:text-white" />
-                          {shouldShowLabels && <span>{name}</span>}
+                          {(shouldShowLabels || sidebarState === 'hidden') && <span>{name}</span>}
                         </div>
                       </Link>
                     ))
