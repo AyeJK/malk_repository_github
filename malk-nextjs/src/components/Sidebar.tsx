@@ -94,10 +94,10 @@ export default function Sidebar() {
   };
 
   const mainLinks = [
-    { href: '/discover', label: 'Discover', icon: '👀' },
-    { href: '/activity', label: 'Activity', icon: '📈' },
+    { href: '/discover', label: 'Discover', icon: '��' },
+    { href: '/posts', label: 'Activity', icon: '📈' },
     { href: '/following', label: 'Following', icon: '👥' },
-    { href: '/profile', label: 'Profile', icon: '👤' },
+    { href: user && airtableUser ? `/profile/${airtableUser.id}` : '/login', label: 'Profile', icon: '👤' },
   ];
 
   return (

@@ -1,26 +1,32 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getUserPosts } from '@/lib/airtable';
+import Airtable from 'airtable';
+
+const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(process.env.AIRTABLE_BASE_ID!);
 
 export async function GET(request: NextRequest) {
   try {
-    const searchParams = request.nextUrl.searchParams;
-    const userId = searchParams.get('userId');
+    const userId = request.nextUrl.searchParams.get('userId');
     
     if (!userId) {
       return NextResponse.json(
-        { error: 'User ID is required' },
+        { error: 'Missing userId parameter' },
         { status: 400 }
       );
     }
-    
-    console.log('Fetching posts for user ID:', userId);
-    
-    // Get the user's posts from Airtable
-    const posts = await getUserPosts(userId);
-    
-    console.log(`Found ${posts.length} posts for user`);
-    
-    return NextResponse.json({ posts });
+
+    // Get posts where FirebaseUID matches the provided userId
+    const posts = await base('Posts').select({
+      filterByFormula: `{FirebaseUID} = '${userId}'`,
+      sort: [{ field: 'DateCreated', direction: 'desc' }]
+    }).all();
+
+    // Map the records to include only necessary fields
+    const formattedPosts = posts.map(record => ({
+      id: record.id,
+      fields: record.fields
+    }));
+
+    return NextResponse.json({ posts: formattedPosts });
   } catch (error) {
     console.error('Error fetching user posts:', error);
     return NextResponse.json(
