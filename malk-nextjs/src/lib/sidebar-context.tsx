@@ -49,12 +49,12 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     if (window.innerWidth < 792) {
       // For mobile screens, toggle visibility
       setIsVisible(!isVisible);
-    } else if (window.innerWidth < 1312 && sidebarState === 'collapsed') {
-      // For medium screens when collapsed, expand the sidebar
-      setSidebarState('expanded');
-    } else if (window.innerWidth < 1312 && sidebarState === 'expanded') {
-      // For medium screens when expanded, collapse the sidebar
-      setSidebarState('collapsed');
+    } else if (window.innerWidth < 1312) {
+      // For medium screens, toggle between expanded and collapsed
+      setSidebarState(sidebarState === 'collapsed' ? 'expanded' : 'collapsed');
+    } else {
+      // For large screens, toggle between expanded and collapsed
+      setSidebarState(sidebarState === 'expanded' ? 'collapsed' : 'expanded');
     }
   };
 
