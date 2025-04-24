@@ -51,7 +51,7 @@ export default function Navbar() {
   return (
     <>
       <nav className="fixed top-0 left-0 right-0 bg-black text-white p-4 z-50 border-b border-white/10">
-        <div className="container mx-auto flex justify-between items-center">
+        <div className="flex justify-between items-center px-4">
           <div className="flex items-center space-x-4">
             <button
               onClick={toggleCollapse}
