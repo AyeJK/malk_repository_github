@@ -223,7 +223,7 @@ export default function ProfilePage() {
           {/* Content Container - With max width and padding */}
           <div className="max-w-4xl mx-auto px-4 md:px-6 lg:px-8">
             {/* Profile Header */}
-            <div className="bg-dark-lighter rounded-b-lg p-6 relative -mt-16 md:-mt-20">
+            <div className="bg-dark-lighter rounded-lg p-6 relative -mt-16 md:-mt-20">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                 {/* Profile Image */}
                 <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-dark-lighter -mt-16 md:-mt-20">
