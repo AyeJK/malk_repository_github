@@ -46,9 +46,7 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggleVisibility = () => {
-    if (window.innerWidth < 792) {
-      setIsVisible(!isVisible);
-    }
+    setIsVisible(!isVisible);
   };
 
   return (
