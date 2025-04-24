@@ -1,0 +1,993 @@
+[12:12:51.615] Cloning github.com/AyeJK/malk_repository_github (Branch: development, Commit: d42415d)
+[12:12:51.872] Cloning completed: 256.000ms
+[12:12:57.385] Restored build cache from previous deployment (4qj1kkYB6wyGpGscXwta4dYUnyhn)
+[12:12:57.478] Running build in Washington, D.C., USA (East) – iad1
+[12:12:58.189] Running "vercel build"
+[12:12:58.572] Vercel CLI 41.6.2
+[12:12:59.079] Running "install" command: `npm install`...
+[12:13:52.312] 
+[12:13:52.313] up to date, audited 611 packages in 53s
+[12:13:52.313] 
+[12:13:52.313] 169 packages are looking for funding
+[12:13:52.314]   run `npm fund` for details
+[12:13:52.900] 
+[12:13:52.901] 10 moderate severity vulnerabilities
+[12:13:52.901] 
+[12:13:52.902] To address all issues, run:
+[12:13:52.903]   npm audit fix
+[12:13:52.903] 
+[12:13:52.904] Run `npm audit` for details.
+[12:13:52.946] Detected Next.js version: 14.2.28
+[12:13:52.946] Running "next build"
+[12:13:53.645]   ▲ Next.js 14.2.28
+[12:13:53.646] 
+[12:13:53.715]    Creating an optimized production build ...
+[12:13:54.296]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+[12:13:58.982]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+[12:13:59.938]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+[12:14:03.034]  ✓ Compiled successfully
+[12:14:03.035]    Linting and checking validity of types ...
+[12:14:09.990]    Collecting page data ...
+[12:14:10.470] Firebase config: {
+[12:14:10.470]   authDomain: 'malk-6e13e.firebaseapp.com',
+[12:14:10.470]   projectId: 'malk-6e13e',
+[12:14:10.470]   apiKey: 'present',
+[12:14:10.471]   appId: 'present',
+[12:14:10.471]   storageBucket: 'present',
+[12:14:10.471]   messagingSenderId: 'present',
+[12:14:10.471]   measurementId: 'present'
+[12:14:10.471] }
+[12:14:10.471] Firebase app initialized successfully
+[12:14:10.660]  ⚠ Found lockfile missing swc dependencies, run next locally to automatically patch
+[12:14:11.503]    Generating static pages (0/50) ...
+[12:14:15.080] Posts table exists with 1 records
+[12:14:15.080] Attempting to upsert user: test-user-1745522054899@example.com
+[12:14:15.081] Airtable Base ID: appMUjMFo1BnNb7KP
+[12:14:15.081] Airtable PAT available: true
+[12:14:15.081] Existing user records found: 0
+[12:14:15.081] Creating new user record
+[12:14:15.550] User record created successfully: rec42KqDUkgiWzHFT
+[12:14:15.551] Creating post with data: {
+[12:14:15.551]   firebaseUID: 'test-uid-1745522054899',
+[12:14:15.551]   videoURL: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+[12:14:15.551]   userCaption: 'This is a test post created via the API',
+[12:14:15.551]   userTags: undefined,
+[12:14:15.551]   categories: undefined
+[12:14:15.551] }
+[12:14:15.551] Looking up user with Firebase UID: test-uid-1745522054899
+[12:14:15.551] User record found: rec42KqDUkgiWzHFT
+[12:14:15.551] Video ID extracted: dQw4w9WgXcQ
+[12:14:15.551] Video title fetched: Rick Astley - Never Gonna Give You Up (Official Music Video)
+[12:14:15.551] Creating post with fields: {
+[12:14:15.551]   FirebaseUID: [ 'rec42KqDUkgiWzHFT' ],
+[12:14:15.551]   VideoURL: 'https://www.youtube.com/watch?v=dQw4w9WgXcQ',
+[12:14:15.551]   UserCaption: 'This is a test post created via the API',
+[12:14:15.551]   VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)'
+[12:14:15.551] }
+[12:14:15.928] Post created successfully: recJXznKLVuxHxQYq
+[12:14:16.271] Error fetching followers: B [Error]: Dynamic server usage: Route /api/get-followers couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.272]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.272]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29137)
+[12:14:16.273]     at u (/vercel/path0/malk-nextjs/.next/server/app/api/get-followers/route.js:1:857)
+[12:14:16.273]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.273]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.273]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.273]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.273]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.274]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.274]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.274]   description: "Route /api/get-followers couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.275]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.277] }
+[12:14:16.277]    Generating static pages (12/50) 
+[12:14:16.303] Error fetching following users: B [Error]: Dynamic server usage: Route /api/get-following couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.303]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.305]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29137)
+[12:14:16.305]     at u (/vercel/path0/malk-nextjs/.next/server/app/api/get-following/route.js:1:861)
+[12:14:16.305]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.305]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.305]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.306]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.306]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.306]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.306]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.306]   description: "Route /api/get-following couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.307]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.307] }
+[12:14:16.423] Posts table exists with 1 records
+[12:14:16.534] Fetched posts: [
+[12:14:16.535]   {
+[12:14:16.536]     id: 'recJXznKLVuxHxQYq',
+[12:14:16.538]     fields: {
+[12:14:16.538]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.538]       FirebaseUID: [Array]
+[12:14:16.538]     }
+[12:14:16.538]   },
+[12:14:16.538]   {
+[12:14:16.538]     id: 'recd58mhB2RpOoYYY',
+[12:14:16.539]     fields: {
+[12:14:16.539]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.539]       FirebaseUID: [Array]
+[12:14:16.539]     }
+[12:14:16.539]   },
+[12:14:16.539]   {
+[12:14:16.539]     id: 'reczhyPe3auYP4U4P',
+[12:14:16.539]     fields: {
+[12:14:16.539]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.539]       FirebaseUID: [Array]
+[12:14:16.539]     }
+[12:14:16.539]   },
+[12:14:16.539]   {
+[12:14:16.540]     id: 'recwIjY61vx3IznL5',
+[12:14:16.540]     fields: {
+[12:14:16.540]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.540]       FirebaseUID: [Array]
+[12:14:16.540]     }
+[12:14:16.540]   },
+[12:14:16.540]   {
+[12:14:16.540]     id: 'recNQa95AVljC6KUs',
+[12:14:16.540]     fields: {
+[12:14:16.540]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.540]       FirebaseUID: [Array]
+[12:14:16.540]     }
+[12:14:16.540]   },
+[12:14:16.540]   {
+[12:14:16.541]     id: 'recFoF1ESMbzgEpL8',
+[12:14:16.541]     fields: {
+[12:14:16.541]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.541]       FirebaseUID: [Array]
+[12:14:16.541]     }
+[12:14:16.541]   },
+[12:14:16.541]   {
+[12:14:16.541]     id: 'rec8kfocDblHXAaEd',
+[12:14:16.541]     fields: {
+[12:14:16.541]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.541]       FirebaseUID: [Array]
+[12:14:16.541]     }
+[12:14:16.541]   },
+[12:14:16.541]   {
+[12:14:16.542]     id: 'recFEUkD9jNNUZO1y',
+[12:14:16.542]     fields: {
+[12:14:16.542]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.542]       FirebaseUID: [Array]
+[12:14:16.542]     }
+[12:14:16.542]   },
+[12:14:16.542]   {
+[12:14:16.542]     id: 'recu7JoPqaqEaL34k',
+[12:14:16.542]     fields: {
+[12:14:16.542]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.542]       FirebaseUID: [Array]
+[12:14:16.549]     }
+[12:14:16.549]   },
+[12:14:16.549]   {
+[12:14:16.549]     id: 'recdTLoqmok3g7OmI',
+[12:14:16.549]     fields: {
+[12:14:16.549]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.549]       FirebaseUID: [Array]
+[12:14:16.549]     }
+[12:14:16.549]   },
+[12:14:16.549]   {
+[12:14:16.549]     id: 'recTlw3zyRsE3fggq',
+[12:14:16.550]     fields: {
+[12:14:16.550]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.550]       FirebaseUID: [Array]
+[12:14:16.550]     }
+[12:14:16.550]   },
+[12:14:16.550]   {
+[12:14:16.550]     id: 'reckdAnqmb3Bk1cWk',
+[12:14:16.550]     fields: {
+[12:14:16.550]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.550]       FirebaseUID: [Array]
+[12:14:16.550]     }
+[12:14:16.550]   },
+[12:14:16.550]   {
+[12:14:16.551]     id: 'recUgd9bAMkNAxXgy',
+[12:14:16.551]     fields: {
+[12:14:16.551]       VideoTitle: 'Duckwrth - Escapist (OFFICIAL MUSIC VIDEO)',
+[12:14:16.551]       FirebaseUID: [Array]
+[12:14:16.551]     }
+[12:14:16.551]   },
+[12:14:16.552]   {
+[12:14:16.552]     id: 'recaoGGx5BVU6zKwc',
+[12:14:16.552]     fields: {
+[12:14:16.553]       VideoTitle: "Where Do Red Dead Redemption 2's Birds Go?",
+[12:14:16.553]       FirebaseUID: [Array]
+[12:14:16.553]     }
+[12:14:16.555]   },
+[12:14:16.555]   {
+[12:14:16.555]     id: 'recwDP0hVwUzseb4p',
+[12:14:16.555]     fields: {
+[12:14:16.556]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.557]       FirebaseUID: [Array]
+[12:14:16.557]     }
+[12:14:16.557]   },
+[12:14:16.557]   {
+[12:14:16.557]     id: 'recw6UZPckCQH6IeP',
+[12:14:16.557]     fields: {
+[12:14:16.557]       VideoTitle: 'Rick Astley - Never Gonna Give You Up (Official Music Video)',
+[12:14:16.557]       FirebaseUID: [Array]
+[12:14:16.558]     }
+[12:14:16.558]   },
+[12:14:16.558]   {
+[12:14:16.558]     id: 'recTY8XKaUHnkCt2V',
+[12:14:16.559]     fields: {
+[12:14:16.559]       VideoTitle: 'Answering your questions, the Chaumont playlist challenge.',
+[12:14:16.560]       FirebaseUID: [Array]
+[12:14:16.560]     }
+[12:14:16.561]   },
+[12:14:16.561]   {
+[12:14:16.561]     id: 'recYwTkdsbKtvY79t',
+[12:14:16.561]     fields: {
+[12:14:16.561]       VideoTitle: 'Professor Answers Supply Chain Questions | Tech Support | WIRED',
+[12:14:16.562]       FirebaseUID: [Array]
+[12:14:16.562]     }
+[12:14:16.562]   },
+[12:14:16.562]   {
+[12:14:16.562]     id: 'recLbFsKDiwQGhQx7',
+[12:14:16.563]     fields: { VideoTitle: undefined, FirebaseUID: [Array] }
+[12:14:16.563]   },
+[12:14:16.563]   {
+[12:14:16.563]     id: 'rec3OfN0lhn0V59JA',
+[12:14:16.563]     fields: { VideoTitle: undefined, FirebaseUID: [Array] }
+[12:14:16.563]   },
+[12:14:16.563]   {
+[12:14:16.563]     id: 'rec2wJGHGG0XIo6Zt',
+[12:14:16.563]     fields: { VideoTitle: undefined, FirebaseUID: [Array] }
+[12:14:16.563]   },
+[12:14:16.563]   {
+[12:14:16.563]     id: 'recq8cC2K7G6TBJXY',
+[12:14:16.563]     fields: { VideoTitle: undefined, FirebaseUID: [Array] }
+[12:14:16.563]   },
+[12:14:16.564]   {
+[12:14:16.564]     id: 'recEuimszugxtJ7p3',
+[12:14:16.564]     fields: { VideoTitle: undefined, FirebaseUID: [Array] }
+[12:14:16.564]   }
+[12:14:16.564] ]
+[12:14:16.586] Error fetching posts by category: B [Error]: Dynamic server usage: Route /api/get-posts-by-category couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.590]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.590]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29137)
+[12:14:16.591]     at l (/vercel/path0/malk-nextjs/.next/server/app/api/get-posts-by-category/route.js:1:861)
+[12:14:16.591]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.591]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.591]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.591]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.591]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.591]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.592]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.592]   description: "Route /api/get-posts-by-category couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.592]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.592] }
+[12:14:16.607] Error fetching posts by record IDs: B [Error]: Dynamic server usage: Route /api/get-posts-by-record-ids couldn't be rendered statically because it used `request.url`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.607]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.607]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29465)
+[12:14:16.607]     at d (/vercel/path0/malk-nextjs/.next/server/app/api/get-posts-by-record-ids/route.js:1:878)
+[12:14:16.607]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.608]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.608]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.608]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.608]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.608]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.608]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.608]   description: "Route /api/get-posts-by-record-ids couldn't be rendered statically because it used `request.url`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.608]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.608] }
+[12:14:16.632] Error fetching tags: B [Error]: Dynamic server usage: Route /api/get-tags couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.633]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.633]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29137)
+[12:14:16.634]     at l (/vercel/path0/malk-nextjs/.next/server/app/api/get-tags/route.js:1:865)
+[12:14:16.634]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.634]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.635]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.635]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.635]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.636]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.636]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.636]   description: "Route /api/get-tags couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.637]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.637] }
+[12:14:16.645] Error fetching top tags: B [Error]: Dynamic server usage: Route /api/get-top-tags couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.645]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.645]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29137)
+[12:14:16.645]     at l (/vercel/path0/malk-nextjs/.next/server/app/api/get-top-tags/route.js:1:861)
+[12:14:16.646]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.646]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.646]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.646]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.647]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.647]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.647]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.647]   description: "Route /api/get-top-tags couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.647]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.648] }
+[12:14:16.661] Error fetching user: B [Error]: Dynamic server usage: Route /api/get-user-by-id couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.662]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.662]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29137)
+[12:14:16.662]     at d (/vercel/path0/malk-nextjs/.next/server/app/api/get-user-by-id/route.js:1:865)
+[12:14:16.662]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.663]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.663]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.663]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.663]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.663]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.664]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.664]   description: "Route /api/get-user-by-id couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.664]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.664] }
+[12:14:16.670] Error fetching liked posts: B [Error]: Dynamic server usage: Route /api/get-user-liked-posts couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.670]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.671]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29137)
+[12:14:16.671]     at n (/vercel/path0/malk-nextjs/.next/server/app/api/get-user-liked-posts/route.js:1:1067)
+[12:14:16.671]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.671]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.671]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.672]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.672]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.672]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.672]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.672]   description: "Route /api/get-user-liked-posts couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.672]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.673] }
+[12:14:16.679] Error fetching user posts: B [Error]: Dynamic server usage: Route /api/get-user-posts couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.679]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.679]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29137)
+[12:14:16.679]     at d (/vercel/path0/malk-nextjs/.next/server/app/api/get-user-posts/route.js:1:861)
+[12:14:16.680]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.680]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.680]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.680]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.680]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.681]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.681]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.681]   description: "Route /api/get-user-posts couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.681]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.681] }
+[12:14:16.697] Error fetching users: B [Error]: Dynamic server usage: Route /api/get-user couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.698]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.698]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29137)
+[12:14:16.698]     at p (/vercel/path0/malk-nextjs/.next/server/app/api/get-user/route.js:1:865)
+[12:14:16.699]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.699]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.699]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.699]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.699]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.699]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.700]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.700]   description: "Route /api/get-user couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.700]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.700] }
+[12:14:16.707] Error inspecting user: B [Error]: Dynamic server usage: Route /api/inspect-user couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.707]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.707]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29137)
+[12:14:16.707]     at l (/vercel/path0/malk-nextjs/.next/server/app/api/inspect-user/route.js:1:904)
+[12:14:16.708]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.708]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.708]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.708]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.708]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.708]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.709]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.709]   description: "Route /api/inspect-user couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.709]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.709] }
+[12:14:16.712] Inspect user API called
+[12:14:16.805]    Generating static pages (24/50) 
+[12:14:16.840] Error searching tags: B [Error]: Dynamic server usage: Route /api/search-tags couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error
+[12:14:16.840]     at V (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:21778)
+[12:14:16.840]     at Object.get (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:29137)
+[12:14:16.840]     at n (/vercel/path0/malk-nextjs/.next/server/app/api/search-tags/route.js:1:1066)
+[12:14:16.840]     at /vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-route.runtime.prod.js:6:38417
+[12:14:16.840]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:140:36
+[12:14:16.840]     at NoopContextManager.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/context/NoopContextManager.js:25:19)
+[12:14:16.840]     at ContextAPI.with (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/api/context.js:60:46)
+[12:14:16.840]     at NoopTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/NoopTracer.js:65:31)
+[12:14:16.840]     at ProxyTracer.startActiveSpan (/vercel/path0/malk-nextjs/node_modules/@opentelemetry/api/build/src/trace/ProxyTracer.js:36:24)
+[12:14:16.840]     at /vercel/path0/malk-nextjs/node_modules/next/dist/server/lib/trace/tracer.js:122:103 {
+[12:14:16.840]   description: "Route /api/search-tags couldn't be rendered statically because it used `nextUrl.searchParams`. See more info here: https://nextjs.org/docs/messages/dynamic-server-error",
+[12:14:16.840]   digest: 'DYNAMIC_SERVER_USAGE'
+[12:14:16.840] }
+[12:14:16.886] Environment variables check: { hasPat: true, hasBaseId: true, baseId: 'appMUjMFo1BnNb7KP' }
+[12:14:16.943] Environment variables check: { hasPat: true, hasBaseId: true, baseId: 'appMUjMFo1BnNb7KP' }
+[12:14:17.849] Firebase config: {
+[12:14:17.849]   authDomain: 'malk-6e13e.firebaseapp.com',
+[12:14:17.850]   projectId: 'malk-6e13e',
+[12:14:17.850]   apiKey: 'present',
+[12:14:17.850]   appId: 'present',
+[12:14:17.850]   storageBucket: 'present',
+[12:14:17.850]   messagingSenderId: 'present',
+[12:14:17.851]   measurementId: 'present'
+[12:14:17.851] }
+[12:14:17.851] Firebase app initialized successfully
+[12:14:17.932] ReferenceError: window is not defined
+[12:14:17.933]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:17.933]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:17.933]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:17.933]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:17.933]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:17.933]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:17.933]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:17.933]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:17.933]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:17.933]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:17.933]   digest: '2379756205'
+[12:14:17.933] }
+[12:14:17.933] 
+[12:14:17.933] Error occurred prerendering page "/_not-found". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:17.933] 
+[12:14:17.933] ReferenceError: window is not defined
+[12:14:17.933]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:17.933]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:17.933]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:17.933]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:17.934]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:17.934]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:17.934]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:17.934]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:17.934]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:17.934]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:17.967] ReferenceError: window is not defined
+[12:14:17.968]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:17.968]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:17.969]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:17.969]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:17.969]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:17.969]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:17.969]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:17.969]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:17.970]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:17.970]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:17.970]   digest: '2379756205'
+[12:14:17.970] }
+[12:14:17.980] 
+[12:14:17.980] Error occurred prerendering page "/airtable-debug". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:17.980] 
+[12:14:17.981] ReferenceError: window is not defined
+[12:14:17.981]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:17.981]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:17.981]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:17.981]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:17.981]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:17.982]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:17.982]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:17.982]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:17.982]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:17.982]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:17.996] ReferenceError: window is not defined
+[12:14:17.997]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:17.997]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:17.997]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:17.998]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:17.998]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:17.998]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:17.998]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:17.998]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:17.999]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:17.999]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:17.999]   digest: '2379756205'
+[12:14:17.999] }
+[12:14:18.021] 
+[12:14:18.021] Error occurred prerendering page "/basic-test". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:18.022] 
+[12:14:18.022] ReferenceError: window is not defined
+[12:14:18.022]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.022]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.023]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.023]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.023]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.023]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.023]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.023]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.024]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.024]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.038] ReferenceError: window is not defined
+[12:14:18.039]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.039]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.040]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.040]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.040]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.041]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.041]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.042]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.042]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.042]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:18.042]   digest: '2379756205'
+[12:14:18.042] }
+[12:14:18.173] 
+[12:14:18.173] Error occurred prerendering page "/check-env". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:18.182] 
+[12:14:18.182] ReferenceError: window is not defined
+[12:14:18.182]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.182]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.182]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.182]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.182]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.182]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.182]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.182]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.182]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.182]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.429] ReferenceError: window is not defined
+[12:14:18.429]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.430]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.430]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.430]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.430]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.430]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.430]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.430]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.430]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.430]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:18.430]   digest: '2379756205'
+[12:14:18.430] }
+[12:14:18.430] 
+[12:14:18.431] Error occurred prerendering page "/content". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:18.431] 
+[12:14:18.431] ReferenceError: window is not defined
+[12:14:18.431]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.431]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.433]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.433]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.433]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.433]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.433]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.433]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.433]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.433]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.683] ReferenceError: window is not defined
+[12:14:18.683]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.684]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.684]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.684]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.684]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.684]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.684]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.684]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.684]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.685]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:18.685]   digest: '2379756205'
+[12:14:18.685] }
+[12:14:18.685] 
+[12:14:18.685] Error occurred prerendering page "/dashboard". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:18.685] 
+[12:14:18.685] ReferenceError: window is not defined
+[12:14:18.686]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.686]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.686]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.686]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.686]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.686]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.686]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.686]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.686]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.687]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.715] ReferenceError: window is not defined
+[12:14:18.715]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.715]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.715]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.716]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.716]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.716]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.717]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.717]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.717]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.717]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:18.718]   digest: '2379756205'
+[12:14:18.718] }
+[12:14:18.718] 
+[12:14:18.718] Error occurred prerendering page "/following". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:18.718] 
+[12:14:18.719] ReferenceError: window is not defined
+[12:14:18.719]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.719]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.719]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.720]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.720]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.720]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.720]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.720]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.720]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.721]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.734] ReferenceError: window is not defined
+[12:14:18.735]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.735]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.735]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.735]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.735]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.735]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.735]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.736]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.736]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.736]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:18.736]   digest: '2379756205'
+[12:14:18.736] }
+[12:14:18.752] 
+[12:14:18.752] Error occurred prerendering page "/login". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:18.753] 
+[12:14:18.753] ReferenceError: window is not defined
+[12:14:18.753]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.753]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.753]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.754]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.754]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.754]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.754]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.754]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.754]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.754]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.754]    Generating static pages (37/50) 
+[12:14:18.782] ReferenceError: window is not defined
+[12:14:18.783]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.783]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.783]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.783]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.783]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.783]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.783]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.783]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.784]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.784]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:18.784]   digest: '2379756205'
+[12:14:18.784] }
+[12:14:18.784] 
+[12:14:18.784] Error occurred prerendering page "/manual-test". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:18.784] 
+[12:14:18.784] ReferenceError: window is not defined
+[12:14:18.784]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.784]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.785]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.785]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.785]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.785]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.785]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.785]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.785]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.785]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.860] ReferenceError: window is not defined
+[12:14:18.860]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.860]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.860]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.861]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.861]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.861]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.861]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.862]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.862]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.862]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:18.862]   digest: '2379756205'
+[12:14:18.863] }
+[12:14:18.863] 
+[12:14:18.863] Error occurred prerendering page "/no-api-test". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:18.864] 
+[12:14:18.864] ReferenceError: window is not defined
+[12:14:18.864]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.864]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.866]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.866]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.866]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.867]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.867]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.867]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.867]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.867]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.876] ReferenceError: window is not defined
+[12:14:18.876]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:18.876]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:18.877]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:18.877]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:18.877]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.877]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:18.877]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:18.877]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:18.877]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:18.877]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:18.877]   digest: '2379756205'
+[12:14:18.877] }
+[12:14:19.360] 
+[12:14:19.361] Error occurred prerendering page "/". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:19.361] 
+[12:14:19.362] ReferenceError: window is not defined
+[12:14:19.362]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.363]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.363]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.363]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.363]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.363]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.366]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.367]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.367]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.367]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.374] ReferenceError: window is not defined
+[12:14:19.374]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.375]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.375]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.375]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.375]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.375]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.375]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.375]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.376]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.376]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:19.376]   digest: '2379756205'
+[12:14:19.376] }
+[12:14:19.399] 
+[12:14:19.399] Error occurred prerendering page "/posts/create". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:19.399] 
+[12:14:19.400] ReferenceError: window is not defined
+[12:14:19.400]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.400]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.400]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.400]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.400]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.400]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.400]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.400]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.400]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.400]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.412] ReferenceError: window is not defined
+[12:14:19.413]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.413]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.413]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.413]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.413]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.414]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.414]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.414]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.414]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.414]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:19.414]   digest: '2379756205'
+[12:14:19.414] }
+[12:14:19.440] 
+[12:14:19.441] Error occurred prerendering page "/posts". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:19.441] 
+[12:14:19.441] ReferenceError: window is not defined
+[12:14:19.441]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.441]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.441]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.442]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.442]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.442]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.442]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.442]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.442]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.442]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.454] ReferenceError: window is not defined
+[12:14:19.454]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.456]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.456]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.456]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.456]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.456]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.456]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.456]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.456]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.456]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:19.456]   digest: '2379756205'
+[12:14:19.456] }
+[12:14:19.466] 
+[12:14:19.466] Error occurred prerendering page "/signup". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:19.466] 
+[12:14:19.467] ReferenceError: window is not defined
+[12:14:19.467]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.467]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.467]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.467]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.468]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.468]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.468]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.468]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.469]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.469]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.496] ReferenceError: window is not defined
+[12:14:19.497]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.497]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.497]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.498]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.498]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.498]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.498]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.499]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.499]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.499]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:19.499]   digest: '2379756205'
+[12:14:19.499] }
+[12:14:19.500] 
+[12:14:19.500] Error occurred prerendering page "/simple-test". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:19.500] 
+[12:14:19.500] ReferenceError: window is not defined
+[12:14:19.500]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.501]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.501]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.502]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.502]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.502]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.502]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.503]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.503]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.503]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.522] ReferenceError: window is not defined
+[12:14:19.524]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.524]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.524]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.525]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.525]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.525]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.525]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.525]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.525]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.525]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:19.525]   digest: '2379756205'
+[12:14:19.525] }
+[12:14:19.525] 
+[12:14:19.526] Error occurred prerendering page "/static-test". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:19.526] 
+[12:14:19.526] ReferenceError: window is not defined
+[12:14:19.526]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.526]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.526]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.526]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.526]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.530]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.531]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.531]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.531]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.531]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.612] ReferenceError: window is not defined
+[12:14:19.612]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.615]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.615]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.615]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.615]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.616]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.616]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.616]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.616]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.616]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:19.616]   digest: '2379756205'
+[12:14:19.617] }
+[12:14:19.617] 
+[12:14:19.617] Error occurred prerendering page "/test-airtable-direct". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:19.617] 
+[12:14:19.617] ReferenceError: window is not defined
+[12:14:19.617]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.617]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.618]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.618]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.618]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.618]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.618]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.618]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.618]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.618]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.677] ReferenceError: window is not defined
+[12:14:19.677]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.677]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.678]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.678]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.678]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.678]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.678]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.678]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.678]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.678]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:19.678]   digest: '2379756205'
+[12:14:19.678] }
+[12:14:19.678] 
+[12:14:19.678] Error occurred prerendering page "/test-airtable". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:19.681] 
+[12:14:19.681] ReferenceError: window is not defined
+[12:14:19.681]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.681]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.681]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.681]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.681]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.682]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.682]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.682]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.682]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.682]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.692] ReferenceError: window is not defined
+[12:14:19.692]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.692]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.692]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.692]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.692]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.692]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.693]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.693]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.693]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.693]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:19.693]   digest: '2379756205'
+[12:14:19.693] }
+[12:14:19.703] 
+[12:14:19.703] Error occurred prerendering page "/test-posts". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:19.703] 
+[12:14:19.703] ReferenceError: window is not defined
+[12:14:19.703]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.704]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.704]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.704]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.704]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.704]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.704]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.704]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.704]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.704]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.711] ReferenceError: window is not defined
+[12:14:19.712]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.712]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.712]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.712]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.712]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.712]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.712]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.712]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.713]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.713]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:19.713]   digest: '2379756205'
+[12:14:19.713] }
+[12:14:19.720] 
+[12:14:19.721] Error occurred prerendering page "/test". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:19.721] 
+[12:14:19.721] ReferenceError: window is not defined
+[12:14:19.721]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.721]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.721]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.721]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.721]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.721]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.721]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.721]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.722]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.722]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.729] ReferenceError: window is not defined
+[12:14:19.729]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.729]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.729]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.729]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.729]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.730]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.730]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.730]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.730]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.730]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547) {
+[12:14:19.730]   digest: '2379756205'
+[12:14:19.730] }
+[12:14:19.736] 
+[12:14:19.736] Error occurred prerendering page "/xml-test". Read more: https://nextjs.org/docs/messages/prerender-error
+[12:14:19.737] 
+[12:14:19.737] ReferenceError: window is not defined
+[12:14:19.737]     at F (/vercel/path0/malk-nextjs/.next/server/chunks/6730.js:1:4386)
+[12:14:19.737]     at nj (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:46252)
+[12:14:19.740]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:47572)
+[12:14:19.741]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.741]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.741]     at nD (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:66681)
+[12:14:19.741]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64854)
+[12:14:19.741]     at nB (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:67539)
+[12:14:19.741]     at nM (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:58561)
+[12:14:19.741]     at nN (/vercel/path0/malk-nextjs/node_modules/next/dist/compiled/next-server/app-page.runtime.prod.js:12:64547)
+[12:14:19.741]  ✓ Generating static pages (50/50)
+[12:14:19.742] 
+[12:14:19.742] > Export encountered errors on following paths:
+[12:14:19.742] 	/_not-found/page: /_not-found
+[12:14:19.742] 	/airtable-debug/page: /airtable-debug
+[12:14:19.742] 	/basic-test/page: /basic-test
+[12:14:19.742] 	/check-env/page: /check-env
+[12:14:19.742] 	/content/page: /content
+[12:14:19.742] 	/dashboard/page: /dashboard
+[12:14:19.742] 	/following/page: /following
+[12:14:19.742] 	/login/page: /login
+[12:14:19.742] 	/manual-test/page: /manual-test
+[12:14:19.742] 	/no-api-test/page: /no-api-test
+[12:14:19.742] 	/page: /
+[12:14:19.742] 	/posts/create/page: /posts/create
+[12:14:19.742] 	/posts/page: /posts
+[12:14:19.743] 	/signup/page: /signup
+[12:14:19.743] 	/simple-test/page: /simple-test
+[12:14:19.743] 	/static-test/page: /static-test
+[12:14:19.743] 	/test-airtable-direct/page: /test-airtable-direct
+[12:14:19.743] 	/test-airtable/page: /test-airtable
+[12:14:19.743] 	/test-posts/page: /test-posts
+[12:14:19.743] 	/test/page: /test
+[12:14:19.743] 	/xml-test/page: /xml-test
+[12:14:19.772] Error: Command "next build" exited with 1
+[12:14:20.193] 

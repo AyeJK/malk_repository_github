@@ -47,7 +47,8 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
 
   const toggleVisibility = () => {
     if (window.innerWidth < 792) {
-      // For mobile screens, toggle visibility
+      // For mobile screens, toggle visibility while keeping state as hidden
+      setSidebarState('hidden');
       setIsVisible(!isVisible);
     } else if (window.innerWidth < 1312) {
       // For medium screens, toggle between expanded and collapsed
