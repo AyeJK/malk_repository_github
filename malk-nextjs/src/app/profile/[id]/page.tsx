@@ -205,8 +205,8 @@ export default function ProfilePage() {
         </div>
       ) : (
         <>
-          {/* Full-width Banner Image */}
-          <div className="relative w-full h-48 md:h-64 overflow-hidden">
+          {/* Full-width Banner Image - Outside of content padding */}
+          <div className="relative w-full h-48 md:h-64 bg-black">
             {user.fields?.BannerImage ? (
               <Image
                 src={user.fields.BannerImage}
@@ -220,8 +220,8 @@ export default function ProfilePage() {
             )}
           </div>
           
-          {/* Content Container */}
-          <div className="max-w-4xl mx-auto px-4 relative">
+          {/* Content Container - With max width and padding */}
+          <div className="max-w-4xl mx-auto">
             {/* Profile Header */}
             <div className="bg-dark-lighter rounded-b-lg p-6 relative -mt-16 md:-mt-20">
               <div className="flex flex-col md:flex-row items-start md:items-center gap-4">

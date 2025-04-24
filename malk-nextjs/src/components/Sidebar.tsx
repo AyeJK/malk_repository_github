@@ -186,7 +186,7 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <div
-        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-black border-r border-white/10 transition-all duration-300 ${
+        className={`fixed left-0 top-12 h-[calc(100vh-3rem)] bg-black border-r border-white/10 transition-all duration-300 ${
           !isVisible ? '-translate-x-full' : 'translate-x-0'
         } ${
           sidebarState === 'hidden' ? 'z-50 w-64 shadow-lg' :

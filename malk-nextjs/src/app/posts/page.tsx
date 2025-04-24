@@ -76,7 +76,7 @@ export default function PostsPage() {
   }
 
   return (
-    <div className="max-w-4xl mx-auto py-8">
+    <div className="max-w-4xl mx-auto py-8 px-4 md:px-6 lg:px-8">
       <div className="flex justify-between items-center mb-8">
         <h1 className="text-3xl font-bold text-white">Latest Posts</h1>
       </div>
