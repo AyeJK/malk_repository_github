@@ -66,13 +66,6 @@ export default function Navbar() {
           </div>
           
           <div className="flex items-center space-x-6">
-            <Link 
-              href="/posts" 
-              className="text-white hover:text-blue-300 transition-colors"
-            >
-              Browse Videos
-            </Link>
-            
             {user ? (
               <>
                 <button 
@@ -82,26 +75,12 @@ export default function Navbar() {
                   Share Video
                 </button>
                 <div className="relative" ref={dropdownRef}>
-                  <div 
-                    className="flex items-center space-x-2 cursor-pointer"
+                  <button 
+                    className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium hover:bg-blue-700 transition-colors"
                     onClick={toggleDropdown}
                   >
-                    <div className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium">
-                      {((airtableUser?.displayName || user?.email || 'U').charAt(0)).toUpperCase()}
-                    </div>
-                    <span className="text-white">
-                      {airtableUser?.displayName || user.email}
-                    </span>
-                    <svg 
-                      xmlns="http://www.w3.org/2000/svg" 
-                      className="h-4 w-4 text-white/70" 
-                      fill="none" 
-                      viewBox="0 0 24 24" 
-                      stroke="currentColor"
-                    >
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                    </svg>
-                  </div>
+                    {((airtableUser?.displayName || user?.email || 'U').charAt(0)).toUpperCase()}
+                  </button>
                   
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-black/90 border border-white/10 rounded-md shadow-lg py-1 z-50">
