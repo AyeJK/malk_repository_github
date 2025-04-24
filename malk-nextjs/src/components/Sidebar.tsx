@@ -222,11 +222,13 @@ export default function Sidebar() {
                 {isLoadingCategories ? (
                   <div className="text-white/50 text-sm px-2">Loading categories...</div>
                 ) : categories.length > 0 ? (
-                  categories.map(({ id, name, slug, postCount }) => (
+                  categories
+                    .filter(category => category.name.toLowerCase() !== 'test category')
+                    .map(({ id, name, slug }) => (
                     <Link
                       key={id}
                       href={`/category/${slug}`}
-                      className={`flex items-center justify-between px-2 py-1 rounded hover:bg-white/5 ${
+                      className={`flex items-center px-2 py-1 rounded hover:bg-white/5 ${
                         pathname === `/category/${slug}`
                           ? 'text-red-500 bg-red-500/10'
                           : 'text-white/70 hover:text-white'
@@ -236,9 +238,6 @@ export default function Sidebar() {
                         <span className="text-lg">📁</span>
                         <span>{name}</span>
                       </div>
-                      <span className="text-xs text-white/50 group-hover:text-white/70">
-                        {postCount}
-                      </span>
                     </Link>
                   ))
                 ) : (
