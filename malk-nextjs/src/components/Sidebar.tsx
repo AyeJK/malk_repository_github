@@ -4,7 +4,25 @@ import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import Image from 'next/image';
 import { usePathname } from 'next/navigation';
-import { ChevronDownIcon, ChevronUpIcon } from '@heroicons/react/24/outline';
+import { 
+  ChevronDownIcon, 
+  ChevronUpIcon,
+  HomeIcon,
+  MusicalNoteIcon,
+  FaceSmileIcon,
+  PuzzlePieceIcon,
+  CakeIcon,
+  FilmIcon,
+  SparklesIcon,
+  AcademicCapIcon,
+  SunIcon,
+  CommandLineIcon,
+  MicrophoneIcon,
+  TrophyIcon,
+  GlobeAltIcon,
+  FolderIcon,
+  HeartIcon
+} from '@heroicons/react/24/outline';
 import { useSidebar } from '@/lib/sidebar-context';
 import { useAuth } from '@/lib/auth-context';
 
@@ -123,11 +141,32 @@ export default function Sidebar() {
     }));
   };
 
+  const getCategoryIcon = (categoryName: string) => {
+    const name = categoryName.toLowerCase();
+    const IconComponent = (() => {
+      if (name.includes('music')) return MusicalNoteIcon;
+      if (name.includes('comedy')) return FaceSmileIcon;
+      if (name.includes('gaming')) return PuzzlePieceIcon;
+      if (name.includes('food')) return CakeIcon;
+      if (name.includes('film') || name.includes('tv') || name.includes('movie')) return FilmIcon;
+      if (name.includes('beauty') || name.includes('fashion')) return SparklesIcon;
+      if (name.includes('learning')) return AcademicCapIcon;
+      if (name.includes('nature')) return SunIcon;
+      if (name.includes('crafting') || name.includes('tech')) return CommandLineIcon;
+      if (name.includes('podcast')) return MicrophoneIcon;
+      if (name.includes('sports')) return TrophyIcon;
+      if (name.includes('travel')) return GlobeAltIcon;
+      return FolderIcon;
+    })();
+    
+    return <IconComponent className="w-5 h-5" />;
+  };
+
   const mainLinks = [
-    { href: '/discover', label: 'Discover', icon: '��' },
-    { href: '/posts', label: 'Activity', icon: '📈' },
-    { href: '/following', label: 'Following', icon: '👥' },
-    { href: user && airtableUser ? `/profile/${airtableUser.id}` : '/login', label: 'Profile', icon: '👤' },
+    { href: '/discover', label: 'Discover', icon: <HomeIcon className="w-5 h-5" /> },
+    { href: '/posts', label: 'Activity', icon: <FilmIcon className="w-5 h-5" /> },
+    { href: '/following', label: 'Following', icon: <HeartIcon className="w-5 h-5" /> },
+    { href: user && airtableUser ? `/profile/${airtableUser.id}` : '/login', label: 'Profile', icon: <FolderIcon className="w-5 h-5" /> },
   ];
 
   return (
@@ -235,7 +274,9 @@ export default function Sidebar() {
                       } group`}
                     >
                       <div className="flex items-center space-x-2">
-                        <span className="text-lg">📁</span>
+                        <span className="text-white/70 group-hover:text-white">
+                          {getCategoryIcon(name)}
+                        </span>
                         <span>{name}</span>
                       </div>
                     </Link>
