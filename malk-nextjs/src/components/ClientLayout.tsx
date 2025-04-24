@@ -21,7 +21,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
       <main className={`transition-all duration-300 ${
         isHidden ? 'ml-0' : 
         isCollapsed ? 'ml-16' : 'ml-64'
-      } mt-16`}>
+      } mt-16 px-4 md:px-6 lg:px-8`}>
         {children}
       </main>
     </div>
