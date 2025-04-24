@@ -2,46 +2,57 @@
 
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react';
 
+type SidebarState = 'expanded' | 'collapsed' | 'hidden';
+
 interface SidebarContextType {
-  isCollapsed: boolean;
-  toggleCollapse: () => void;
-  isMobile: boolean;
+  isVisible: boolean;
+  sidebarState: SidebarState;
+  toggleVisibility: () => void;
 }
 
 const SidebarContext = createContext<SidebarContextType>({
-  isCollapsed: false,
-  toggleCollapse: () => {},
-  isMobile: false,
+  isVisible: true,
+  sidebarState: 'expanded',
+  toggleVisibility: () => {},
 });
 
 export function SidebarProvider({ children }: { children: ReactNode }) {
-  const [isCollapsed, setIsCollapsed] = useState(false);
-  const [isMobile, setIsMobile] = useState(false);
+  const [isVisible, setIsVisible] = useState(true);
+  const [sidebarState, setSidebarState] = useState<SidebarState>('expanded');
 
   useEffect(() => {
-    // Function to check screen size and set initial state
-    const checkScreenSize = () => {
-      const isMobileScreen = window.innerWidth < 768; // md breakpoint
-      setIsMobile(isMobileScreen);
-      setIsCollapsed(isMobileScreen); // Collapsed by default on mobile
+    const handleResize = () => {
+      const width = window.innerWidth;
+      if (width >= 1312) {
+        setSidebarState('expanded');
+        setIsVisible(true);
+      } else if (width >= 792) {
+        setSidebarState('collapsed');
+        setIsVisible(true);
+      } else {
+        setSidebarState('hidden');
+        setIsVisible(false);
+      }
     };
 
-    // Check initial screen size
-    checkScreenSize();
+    // Initial check
+    handleResize();
 
-    // Add event listener for window resize
-    window.addEventListener('resize', checkScreenSize);
+    // Add event listener
+    window.addEventListener('resize', handleResize);
 
     // Cleanup
-    return () => window.removeEventListener('resize', checkScreenSize);
+    return () => window.removeEventListener('resize', handleResize);
   }, []);
 
-  const toggleCollapse = () => {
-    setIsCollapsed(prev => !prev);
+  const toggleVisibility = () => {
+    if (window.innerWidth < 792) {
+      setIsVisible(!isVisible);
+    }
   };
 
   return (
-    <SidebarContext.Provider value={{ isCollapsed, toggleCollapse, isMobile }}>
+    <SidebarContext.Provider value={{ isVisible, sidebarState, toggleVisibility }}>
       {children}
     </SidebarContext.Provider>
   );

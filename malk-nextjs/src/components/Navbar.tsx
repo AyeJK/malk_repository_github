@@ -9,7 +9,7 @@ import { useSidebar } from '@/lib/sidebar-context';
 
 export default function Navbar() {
   const { user, airtableUser, signOut } = useAuth();
-  const { toggleCollapse } = useSidebar();
+  const { toggleVisibility } = useSidebar();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -54,7 +54,7 @@ export default function Navbar() {
         <div className="flex justify-between items-center px-4">
           <div className="flex items-center space-x-4">
             <button
-              onClick={toggleCollapse}
+              onClick={toggleVisibility}
               className="p-1 hover:bg-white/5 rounded-lg transition-colors"
               aria-label="Toggle sidebar"
             >

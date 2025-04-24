@@ -56,7 +56,7 @@ interface Category {
 
 export default function Sidebar() {
   const pathname = usePathname();
-  const { isCollapsed, toggleCollapse, isMobile } = useSidebar();
+  const { isVisible, sidebarState } = useSidebar();
   const { user, airtableUser } = useAuth();
   const [following, setFollowing] = useState<FollowingUser[]>([]);
   const [isLoadingFollowing, setIsLoadingFollowing] = useState(false);
@@ -170,29 +170,27 @@ export default function Sidebar() {
     { href: user && airtableUser ? `/profile/${airtableUser.id}` : '/login', label: 'Profile', icon: <FolderIcon className="w-5 h-5" /> },
   ];
 
+  const isExpanded = sidebarState === 'expanded';
+  const isCollapsed = sidebarState === 'collapsed';
+  const shouldShowLabels = isExpanded;
+
   return (
     <>
-      {/* Mobile Backdrop */}
-      {isMobile && !isCollapsed && (
-        <div
-          className="fixed inset-0 bg-black/50 z-10"
-          onClick={toggleCollapse}
-          aria-hidden="true"
+      {/* Mobile Overlay Background */}
+      {isVisible && sidebarState === 'hidden' && (
+        <div 
+          className="fixed inset-0 bg-black/50 z-40"
+          onClick={() => useSidebar().toggleVisibility()}
         />
       )}
-      
+
       {/* Sidebar */}
       <div 
         className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-black border-r border-white/10 transition-all duration-300 ${
-          isMobile ? 'z-20' : 'z-10'
+          !isVisible ? '-translate-x-full' : 'translate-x-0'
         } ${
-          isCollapsed 
-            ? 'w-16' 
-            : isMobile
-              ? 'w-64 shadow-lg'
-              : 'w-64'
-        } ${
-          isMobile && isCollapsed ? '-translate-x-full' : 'translate-x-0'
+          sidebarState === 'hidden' ? 'z-50 w-64' :
+          isExpanded ? 'w-64' : 'w-16'
         }`}
       >
         <div className="h-full overflow-y-auto">
@@ -202,20 +200,21 @@ export default function Sidebar() {
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center space-x-3 px-3 py-2 rounded-lg transition-colors ${
+                className={`flex items-center ${shouldShowLabels ? 'space-x-3' : 'justify-center'} px-3 py-2 rounded-lg transition-colors ${
                   pathname === href
                     ? 'bg-red-600/20 text-red-500'
                     : 'text-white/70 hover:bg-white/5 hover:text-white'
                 }`}
+                title={!shouldShowLabels ? label : undefined}
               >
                 <span>{icon}</span>
-                {!isCollapsed && <span>{label}</span>}
+                {shouldShowLabels && <span>{label}</span>}
               </Link>
             ))}
           </nav>
 
-          {/* Following Section - Only show if user is logged in and has followings */}
-          {!isCollapsed && user && following.length > 0 && (
+          {/* Following Section */}
+          {shouldShowLabels && user && following.length > 0 && (
             <div className="px-4 py-2">
               <button
                 onClick={() => toggleSection('Following')}
@@ -265,7 +264,7 @@ export default function Sidebar() {
           )}
 
           {/* Categories Section */}
-          {!isCollapsed && (
+          {shouldShowLabels && (
             <div className="px-4 py-2">
               <button
                 onClick={() => toggleSection('Categories')}
@@ -294,12 +293,13 @@ export default function Sidebar() {
                               ? 'text-red-500 bg-red-500/10'
                               : 'text-white/70 hover:text-white'
                           } group`}
+                          title={!shouldShowLabels ? name : undefined}
                         >
-                          <div className="flex items-center space-x-2">
+                          <div className={`flex items-center ${shouldShowLabels ? 'space-x-2' : 'justify-center'}`}>
                             <span className="text-white/70 group-hover:text-white">
                               {getCategoryIcon(name)}
                             </span>
-                            <span>{name}</span>
+                            {shouldShowLabels && <span>{name}</span>}
                           </div>
                         </Link>
                       ))
@@ -312,7 +312,7 @@ export default function Sidebar() {
           )}
 
           {/* Popular Tags Section */}
-          {!isCollapsed && (
+          {shouldShowLabels && (
             <div className="px-4 py-2">
               <button
                 onClick={() => toggleSection('Popular Tags')}
@@ -335,10 +335,11 @@ export default function Sidebar() {
                         key={id}
                         href={`/tags/${name.toLowerCase()}`}
                         className="flex items-center px-2 py-1 rounded hover:bg-white/5 text-white/70 hover:text-white group"
+                        title={!shouldShowLabels ? name : undefined}
                       >
-                        <div className="flex items-center space-x-2">
+                        <div className={`flex items-center ${shouldShowLabels ? 'space-x-2' : 'justify-center'}`}>
                           <HashtagIcon className="w-5 h-5 text-white/70 group-hover:text-white" />
-                          <span>{name}</span>
+                          {shouldShowLabels && <span>{name}</span>}
                         </div>
                       </Link>
                     ))
