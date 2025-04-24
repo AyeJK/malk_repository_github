@@ -17,10 +17,19 @@ export default function CategoryPage() {
     const fetchCategoryPosts = async () => {
       try {
         setLoading(true);
-        const response = await fetch(`/api/get-posts-by-category?category=${encodeURIComponent(categorySlug.replace(/-/g, ' '))}`);
+        const categoryName = decodeURIComponent(categorySlug)
+          .replace(/-/g, ' ')
+          .replace(/\band\b/g, '&');
+        
+        const response = await fetch(`/api/get-posts-by-category?category=${encodeURIComponent(categoryName)}`);
         
         if (!response.ok) {
-          throw new Error('Failed to fetch category posts');
+          if (response.status === 404) {
+            setError('Category not found');
+          } else {
+            throw new Error('Failed to fetch category posts');
+          }
+          return;
         }
         
         const data = await response.json();
