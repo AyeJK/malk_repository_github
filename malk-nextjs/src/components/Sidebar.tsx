@@ -21,7 +21,8 @@ import {
   TrophyIcon,
   GlobeAltIcon,
   FolderIcon,
-  HeartIcon
+  HeartIcon,
+  HashtagIcon
 } from '@heroicons/react/24/outline';
 import { useSidebar } from '@/lib/sidebar-context';
 import { useAuth } from '@/lib/auth-context';
@@ -315,7 +316,7 @@ export default function Sidebar() {
                       className="flex items-center px-2 py-1 rounded hover:bg-white/5 text-white/70 hover:text-white group"
                     >
                       <div className="flex items-center space-x-2">
-                        <span className="text-lg">🏷️</span>
+                        <HashtagIcon className="w-5 h-5 text-white/70 group-hover:text-white" />
                         <span>{name}</span>
                       </div>
                     </Link>
