@@ -46,7 +46,16 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
   }, []);
 
   const toggleVisibility = () => {
-    setIsVisible(!isVisible);
+    if (window.innerWidth < 792) {
+      // For mobile screens, toggle visibility
+      setIsVisible(!isVisible);
+    } else if (window.innerWidth < 1312 && sidebarState === 'collapsed') {
+      // For medium screens when collapsed, expand the sidebar
+      setSidebarState('expanded');
+    } else if (window.innerWidth < 1312 && sidebarState === 'expanded') {
+      // For medium screens when expanded, collapse the sidebar
+      setSidebarState('collapsed');
+    }
   };
 
   return (
