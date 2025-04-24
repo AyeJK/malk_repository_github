@@ -49,17 +49,13 @@ export function SidebarProvider({ children }: { children: ReactNode }) {
     const width = window.innerWidth;
     
     if (width < 792) {
-      // Mobile behavior - just toggle visibility
+      // Mobile behavior: toggle visibility
       setIsVisible(!isVisible);
     } else if (width >= 1312) {
-      // Desktop behavior - toggle between expanded and collapsed
-      if (sidebarState === 'expanded') {
-        setSidebarState('collapsed');
-      } else {
-        setSidebarState('expanded');
-      }
+      // Large screens: toggle between expanded and collapsed
+      setSidebarState(current => current === 'expanded' ? 'collapsed' : 'expanded');
     } else {
-      // Tablet behavior - toggle between collapsed and hidden
+      // Medium screens: toggle between collapsed and hidden
       if (sidebarState === 'collapsed') {
         setSidebarState('hidden');
         setIsVisible(false);
