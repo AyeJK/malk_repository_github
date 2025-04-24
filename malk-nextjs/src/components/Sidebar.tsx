@@ -329,14 +329,6 @@ export default function Sidebar() {
           </div>
         )}
       </div>
-
-      {/* Collapse Toggle */}
-      <button
-        onClick={toggleCollapse}
-        className="absolute -right-3 top-4 w-6 h-6 bg-red-600 text-white rounded-full flex items-center justify-center shadow-lg"
-      >
-        {isCollapsed ? '→' : '←'}
-      </button>
     </div>
   );
 } 

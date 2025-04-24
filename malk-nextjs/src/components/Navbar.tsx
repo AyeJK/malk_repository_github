@@ -4,9 +4,12 @@ import { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import ShareVideoModal from './ShareVideoModal';
+import { Bars3Icon } from '@heroicons/react/24/outline';
+import { useSidebar } from '@/lib/sidebar-context';
 
 export default function Navbar() {
   const { user, airtableUser, signOut } = useAuth();
+  const { toggleCollapse } = useSidebar();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
@@ -49,9 +52,18 @@ export default function Navbar() {
     <>
       <nav className="fixed top-0 left-0 right-0 bg-black text-white p-4 z-50 border-b border-white/10">
         <div className="container mx-auto flex justify-between items-center">
-          <Link href="/" className="text-3xl font-lobster text-white">
-            Malk.tv <span className="text-blue-300 text-sm bg-blue-900/30 px-2 py-0.5 rounded-full">Beta</span>
-          </Link>
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={toggleCollapse}
+              className="p-1 hover:bg-white/5 rounded-lg transition-colors"
+              aria-label="Toggle sidebar"
+            >
+              <Bars3Icon className="w-6 h-6 text-white/70 hover:text-white" />
+            </button>
+            <Link href="/" className="text-3xl font-lobster text-white">
+              Malk.tv <span className="text-blue-300 text-sm bg-blue-900/30 px-2 py-0.5 rounded-full">Beta</span>
+            </Link>
+          </div>
           
           <div className="flex items-center space-x-6">
             <Link 
