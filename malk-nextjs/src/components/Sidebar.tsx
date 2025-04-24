@@ -172,7 +172,7 @@ export default function Sidebar() {
 
   const isExpanded = sidebarState === 'expanded';
   const isCollapsed = sidebarState === 'collapsed';
-  const shouldShowLabels = isExpanded;
+  const shouldShowLabels = isExpanded || sidebarState === 'hidden';
 
   return (
     <>
@@ -185,11 +185,11 @@ export default function Sidebar() {
       )}
 
       {/* Sidebar */}
-      <div 
+      <div
         className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-black border-r border-white/10 transition-all duration-300 ${
           !isVisible ? '-translate-x-full' : 'translate-x-0'
         } ${
-          sidebarState === 'hidden' ? 'z-50 w-64' :
+          sidebarState === 'hidden' ? 'z-50 w-64 shadow-lg' :
           isExpanded ? 'w-64' : 'w-16'
         }`}
       >
