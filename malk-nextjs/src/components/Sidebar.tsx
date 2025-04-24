@@ -22,13 +22,10 @@ import {
   GlobeAltIcon,
   FolderIcon,
   HeartIcon,
-  HashtagIcon,
-  TagIcon,
-  UsersIcon
+  HashtagIcon
 } from '@heroicons/react/24/outline';
 import { useSidebar } from '@/lib/sidebar-context';
 import { useAuth } from '@/lib/auth-context';
-import { cn } from '@/lib/utils';
 
 interface SidebarSection {
   title: string;
@@ -57,8 +54,6 @@ interface Category {
   postCount: number;
 }
 
-type SectionKeys = 'Following' | 'Categories' | 'Popular Tags';
-
 export default function Sidebar() {
   const pathname = usePathname();
   const { isVisible, sidebarState } = useSidebar();
@@ -69,7 +64,7 @@ export default function Sidebar() {
   const [isLoadingTags, setIsLoadingTags] = useState(false);
   const [categories, setCategories] = useState<Category[]>([]);
   const [isLoadingCategories, setIsLoadingCategories] = useState(false);
-  const [sections, setSections] = useState<Record<SectionKeys, boolean>>({
+  const [sections, setSections] = useState<{ [key: string]: boolean }>({
     Following: true,
     Categories: true,
     'Popular Tags': true,
@@ -140,7 +135,7 @@ export default function Sidebar() {
     fetchCategories();
   }, []);
 
-  const toggleSection = (section: SectionKeys) => {
+  const toggleSection = (section: string) => {
     setSections(prev => ({
       ...prev,
       [section]: !prev[section]
@@ -176,10 +171,11 @@ export default function Sidebar() {
   ];
 
   const isExpanded = sidebarState === 'expanded';
+  const isCollapsed = sidebarState === 'collapsed';
   const shouldShowLabels = isExpanded;
 
   return (
-    <div>
+    <>
       {/* Mobile Overlay Background */}
       {isVisible && sidebarState === 'hidden' && (
         <div 
@@ -189,12 +185,15 @@ export default function Sidebar() {
       )}
 
       {/* Sidebar */}
-      <div className={cn(
-        "fixed left-0 top-16 h-[calc(100vh-4rem)] w-64 bg-black border-r border-gray-800 transition-all duration-300 z-40",
-        !isVisible && "-translate-x-full",
-        sidebarState === "collapsed" && "w-16"
-      )}>
-        <div className="h-full flex flex-col gap-4 p-4 overflow-y-auto">
+      <div 
+        className={`fixed left-0 top-16 h-[calc(100vh-4rem)] bg-black border-r border-white/10 transition-all duration-300 ${
+          !isVisible ? '-translate-x-full' : 'translate-x-0'
+        } ${
+          sidebarState === 'hidden' ? 'z-50 w-64' :
+          isExpanded ? 'w-64' : 'w-16'
+        }`}
+      >
+        <div className="h-full overflow-y-auto">
           {/* Main Navigation */}
           <nav className="p-4 space-y-2">
             {mainLinks.map(({ href, label, icon }) => (
@@ -215,141 +214,144 @@ export default function Sidebar() {
           </nav>
 
           {/* Following Section */}
-          <div>
-            <button
-              onClick={() => toggleSection('Following')}
-              className="flex items-center justify-between w-full text-gray-400 hover:text-white"
-            >
-              <div className="flex items-center gap-2">
-                <UsersIcon className="h-5 w-5" />
-                {sidebarState === "expanded" && <span>Following</span>}
-              </div>
-              {sidebarState === "expanded" && (
-                <ChevronDownIcon className={cn("h-4 w-4 transition-transform", sections['Following'] ? "rotate-180" : "")} />
-              )}
-            </button>
-            {sections.Following && (
-              <div className="mt-2 space-y-2">
-                {isLoadingFollowing ? (
-                  <div className="text-white/50 text-sm px-2">Loading...</div>
+          {shouldShowLabels && user && following.length > 0 && (
+            <div className="px-4 py-2">
+              <button
+                onClick={() => toggleSection('Following')}
+                className="flex items-center justify-between w-full text-white/70 hover:text-white"
+              >
+                <span className="font-medium">Following</span>
+                {sections.Following ? (
+                  <ChevronUpIcon className="w-4 h-4" />
                 ) : (
-                  following.map((followedUser) => (
-                    <Link
-                      key={followedUser.id}
-                      href={`/profile/${followedUser.id}`}
-                      className="flex items-center space-x-2 px-2 py-1 rounded hover:bg-white/5 group"
-                    >
-                      <div className="relative w-6 h-6 rounded-full overflow-hidden bg-gray-700">
-                        {followedUser.fields?.ProfileImage ? (
-                          <Image
-                            src={followedUser.fields.ProfileImage}
-                            alt={followedUser.fields.DisplayName || 'User'}
-                            fill
-                            className="object-cover"
-                          />
-                        ) : (
-                          <div className="w-full h-full flex items-center justify-center text-xs font-medium text-white">
-                            {(followedUser.fields?.DisplayName || 'U').charAt(0).toUpperCase()}
-                          </div>
-                        )}
-                      </div>
-                      <span className="text-white/70 group-hover:text-white transition-colors">
-                        {followedUser.fields?.DisplayName || 'Anonymous'}
-                      </span>
-                    </Link>
-                  ))
+                  <ChevronDownIcon className="w-4 h-4" />
                 )}
-              </div>
-            )}
-          </div>
+              </button>
+              {sections.Following && (
+                <div className="mt-2 space-y-2">
+                  {isLoadingFollowing ? (
+                    <div className="text-white/50 text-sm px-2">Loading...</div>
+                  ) : (
+                    following.map((followedUser) => (
+                      <Link
+                        key={followedUser.id}
+                        href={`/profile/${followedUser.id}`}
+                        className="flex items-center space-x-2 px-2 py-1 rounded hover:bg-white/5 group"
+                      >
+                        <div className="relative w-6 h-6 rounded-full overflow-hidden bg-gray-700">
+                          {followedUser.fields?.ProfileImage ? (
+                            <Image
+                              src={followedUser.fields.ProfileImage}
+                              alt={followedUser.fields.DisplayName || 'User'}
+                              fill
+                              className="object-cover"
+                            />
+                          ) : (
+                            <div className="w-full h-full flex items-center justify-center text-xs font-medium text-white">
+                              {(followedUser.fields?.DisplayName || 'U').charAt(0).toUpperCase()}
+                            </div>
+                          )}
+                        </div>
+                        <span className="text-white/70 group-hover:text-white transition-colors">
+                          {followedUser.fields?.DisplayName || 'Anonymous'}
+                        </span>
+                      </Link>
+                    ))
+                  )}
+                </div>
+              )}
+            </div>
+          )}
 
           {/* Categories Section */}
-          <div>
-            <button
-              onClick={() => toggleSection('Categories')}
-              className="flex items-center justify-between w-full text-gray-400 hover:text-white"
-            >
-              <div className="flex items-center gap-2">
-                <FolderIcon className="h-5 w-5" />
-                {sidebarState === "expanded" && <span>Categories</span>}
-              </div>
-              {sidebarState === "expanded" && (
-                <ChevronDownIcon className={cn("h-4 w-4 transition-transform", sections['Categories'] ? "rotate-180" : "")} />
+          {shouldShowLabels && (
+            <div className="px-4 py-2">
+              <button
+                onClick={() => toggleSection('Categories')}
+                className="flex items-center justify-between w-full text-white/70 hover:text-white"
+              >
+                <span className="font-medium">Categories</span>
+                {sections.Categories ? (
+                  <ChevronUpIcon className="w-4 h-4" />
+                ) : (
+                  <ChevronDownIcon className="w-4 h-4" />
+                )}
+              </button>
+              {sections.Categories && (
+                <div className="mt-2 space-y-1">
+                  {isLoadingCategories ? (
+                    <div className="text-white/50 text-sm px-2">Loading categories...</div>
+                  ) : categories.length > 0 ? (
+                    categories
+                      .filter(category => category.name.toLowerCase() !== 'test category')
+                      .map(({ id, name, slug }) => (
+                        <Link
+                          key={id}
+                          href={`/category/${slug}`}
+                          className={`flex items-center px-2 py-1 rounded hover:bg-white/5 ${
+                            pathname === `/category/${slug}`
+                              ? 'text-red-500 bg-red-500/10'
+                              : 'text-white/70 hover:text-white'
+                          } group`}
+                          title={!shouldShowLabels ? name : undefined}
+                        >
+                          <div className={`flex items-center ${shouldShowLabels ? 'space-x-2' : 'justify-center'}`}>
+                            <span className="text-white/70 group-hover:text-white">
+                              {getCategoryIcon(name)}
+                            </span>
+                            {shouldShowLabels && <span>{name}</span>}
+                          </div>
+                        </Link>
+                      ))
+                  ) : (
+                    <div className="text-white/50 text-sm px-2">No categories found</div>
+                  )}
+                </div>
               )}
-            </button>
-            {sections.Categories && (
-              <div className="mt-2 space-y-1">
-                {isLoadingCategories ? (
-                  <div className="text-white/50 text-sm px-2">Loading categories...</div>
-                ) : categories.length > 0 ? (
-                  categories
-                    .filter(category => category.name.toLowerCase() !== 'test category')
-                    .map(({ id, name, slug }) => (
+            </div>
+          )}
+
+          {/* Popular Tags Section */}
+          {shouldShowLabels && (
+            <div className="px-4 py-2">
+              <button
+                onClick={() => toggleSection('Popular Tags')}
+                className="flex items-center justify-between w-full text-white/70 hover:text-white"
+              >
+                <span className="font-medium">Popular Tags</span>
+                {sections['Popular Tags'] ? (
+                  <ChevronUpIcon className="w-4 h-4" />
+                ) : (
+                  <ChevronDownIcon className="w-4 h-4" />
+                )}
+              </button>
+              {sections['Popular Tags'] && (
+                <div className="mt-2 space-y-1">
+                  {isLoadingTags ? (
+                    <div className="text-white/50 text-sm px-2">Loading tags...</div>
+                  ) : popularTags.length > 0 ? (
+                    popularTags.map(({ id, name }) => (
                       <Link
                         key={id}
-                        href={`/category/${slug}`}
-                        className={`flex items-center px-2 py-1 rounded hover:bg-white/5 ${
-                          pathname === `/category/${slug}`
-                            ? 'text-red-500 bg-red-500/10'
-                            : 'text-white/70 hover:text-white'
-                        } group`}
+                        href={`/tags/${name.toLowerCase()}`}
+                        className="flex items-center px-2 py-1 rounded hover:bg-white/5 text-white/70 hover:text-white group"
                         title={!shouldShowLabels ? name : undefined}
                       >
                         <div className={`flex items-center ${shouldShowLabels ? 'space-x-2' : 'justify-center'}`}>
-                          <span className="text-white/70 group-hover:text-white">
-                            {getCategoryIcon(name)}
-                          </span>
-                          {(shouldShowLabels || sidebarState === 'hidden') && <span>{name}</span>}
+                          <HashtagIcon className="w-5 h-5 text-white/70 group-hover:text-white" />
+                          {shouldShowLabels && <span>{name}</span>}
                         </div>
                       </Link>
                     ))
-                ) : (
-                  <div className="text-white/50 text-sm px-2">No categories found</div>
-                )}
-              </div>
-            )}
-          </div>
-
-          {/* Popular Tags Section */}
-          <div>
-            <button
-              onClick={() => toggleSection('Popular Tags')}
-              className="flex items-center justify-between w-full text-gray-400 hover:text-white"
-            >
-              <div className="flex items-center gap-2">
-                <TagIcon className="h-5 w-5" />
-                {sidebarState === "expanded" && <span>Popular Tags</span>}
-              </div>
-              {sidebarState === "expanded" && (
-                <ChevronDownIcon className={cn("h-4 w-4 transition-transform", sections['Popular Tags'] ? "rotate-180" : "")} />
+                  ) : (
+                    <div className="text-white/50 text-sm px-2">No tags found</div>
+                  )}
+                </div>
               )}
-            </button>
-            {sections['Popular Tags'] && (
-              <div className="mt-2 space-y-1">
-                {isLoadingTags ? (
-                  <div className="text-white/50 text-sm px-2">Loading tags...</div>
-                ) : popularTags.length > 0 ? (
-                  popularTags.map(({ id, name }) => (
-                    <Link
-                      key={id}
-                      href={`/tags/${name.toLowerCase()}`}
-                      className="flex items-center px-2 py-1 rounded hover:bg-white/5 text-white/70 hover:text-white group"
-                      title={!shouldShowLabels ? name : undefined}
-                    >
-                      <div className={`flex items-center ${shouldShowLabels ? 'space-x-2' : 'justify-center'}`}>
-                        <HashtagIcon className="w-5 h-5 text-white/70 group-hover:text-white" />
-                        {(shouldShowLabels || sidebarState === 'hidden') && <span>{name}</span>}
-                      </div>
-                    </Link>
-                  ))
-                ) : (
-                  <div className="text-white/50 text-sm px-2">No tags found</div>
-                )}
-              </div>
-            )}
-          </div>
+            </div>
+          )}
         </div>
       </div>
-    </div>
+    </>
   );
 } 
