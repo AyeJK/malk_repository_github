@@ -15,15 +15,13 @@ export async function GET(request: NextRequest) {
       const name = String(record.fields.Name || '');
       // Create URL-friendly slug by:
       // 1. Converting to lowercase
-      // 2. Replacing forward slashes and ampersands with hyphens
-      // 3. Replacing multiple spaces with single hyphens
-      // 4. Removing any remaining special characters
+      // 2. Preserving existing hyphens
+      // 3. Converting spaces to hyphens
+      // 4. Removing any special characters
       const slug = name
         .toLowerCase()
-        .replace(/\s*\/\s*/g, '-') // Replace slashes with hyphens
-        .replace(/\s*&\s*/g, '-and-') // Replace & with "and"
         .replace(/\s+/g, '-') // Replace spaces with hyphens
-        .replace(/[^a-z0-9-]/g, '') // Remove any other special characters
+        .replace(/[^a-z0-9-]/g, '') // Remove any special characters except hyphens
         .replace(/-+/g, '-') // Replace multiple hyphens with single hyphen
         .replace(/^-+|-+$/g, ''); // Remove leading/trailing hyphens
 
