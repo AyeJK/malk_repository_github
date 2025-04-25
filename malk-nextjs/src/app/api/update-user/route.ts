@@ -5,9 +5,17 @@ import { authOptions } from '@/lib/auth';
 
 export async function PUT(request: NextRequest) {
   try {
+    // Log headers for debugging
+    console.log('Request headers:', Object.fromEntries(request.headers));
+    
     const session = await getServerSession(authOptions);
     
-    // Log the session for debugging
+    // Log the session and auth options for debugging
+    console.log('Auth options:', {
+      secret: authOptions.secret ? 'present' : 'missing',
+      providers: authOptions.providers.map(p => p.name),
+      cookies: authOptions.cookies ? 'configured' : 'not configured'
+    });
     console.log('Session in update-user:', session);
     
     if (!session?.user) {
