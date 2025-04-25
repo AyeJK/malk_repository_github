@@ -49,7 +49,8 @@ export default function ProfilePage() {
         setUser(userRecord);
         
         // Get the Firebase UID from the user record
-        const userFirebaseUID = userRecord.fields?.FirebaseUID;
+        const userFirebaseUID = userRecord.fields.FirebaseUID;
+        console.log('User Firebase UID:', userFirebaseUID);
         setFirebaseUID(userFirebaseUID);
         
         if (!userFirebaseUID) {
@@ -79,38 +80,19 @@ export default function ProfilePage() {
             setFollowing(followingData.following || []);
           }
           
-          // Fetch full post data for liked posts
-          console.log('LikedPosts field:', userRecord.fields?.LikedPosts);
-          
-          // Check if LikedPosts exists and is not empty
-          if (userRecord.fields?.LikedPosts && 
-              (Array.isArray(userRecord.fields.LikedPosts) ? userRecord.fields.LikedPosts.length > 0 : true)) {
-            
-            // Get the liked post record IDs
-            const likedPostRecordIds = userRecord.fields.LikedPosts;
-            console.log('Liked post record IDs:', likedPostRecordIds);
-            
-            // Fetch the full post data for each record ID
+          // Fetch liked posts
+          if (userRecord.fields?.LikedPosts && userRecord.fields.LikedPosts.length > 0) {
             try {
-              // Use the Airtable record IDs directly to fetch the posts
-              const likedPostsResponse = await fetch(`/api/get-posts-by-record-ids?recordIds=${Array.isArray(likedPostRecordIds) ? likedPostRecordIds.join(',') : likedPostRecordIds}`);
-              console.log('Liked posts API response status:', likedPostsResponse.status);
-              
+              const likedPostsResponse = await fetch(`/api/get-posts-by-record-ids?recordIds=${userRecord.fields.LikedPosts.join(',')}`);
               if (likedPostsResponse.ok) {
                 const likedPostsData = await likedPostsResponse.json();
-                console.log('Liked posts data:', likedPostsData);
                 setLikedPosts(likedPostsData.posts || []);
-              } else {
-                const errorText = await likedPostsResponse.text();
-                console.error('Failed to fetch liked posts data:', errorText);
-                setLikedPosts([]);
               }
             } catch (error) {
               console.error('Error fetching liked posts:', error);
               setLikedPosts([]);
             }
           } else {
-            console.log('No liked posts found in user record');
             setLikedPosts([]);
           }
         }

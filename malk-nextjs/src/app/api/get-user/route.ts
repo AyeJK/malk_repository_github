@@ -1,24 +1,55 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { getUserByFirebaseUID } from '@/lib/airtable';
+import Airtable from 'airtable';
+
+// Initialize Airtable
+const base = new Airtable({
+  apiKey: process.env.AIRTABLE_PAT || process.env.NEXT_PUBLIC_AIRTABLE_PAT
+}).base(process.env.AIRTABLE_BASE_ID || process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID || '');
 
 export async function GET(request: NextRequest) {
   try {
-    // Get Firebase UID from query parameters
+    // Get ID from query parameters
     const searchParams = request.nextUrl.searchParams;
-    const firebaseUID = searchParams.get('ids');
+    const id = searchParams.get('ids');
     
-    console.log('Fetching user with Firebase UID:', firebaseUID);
+    console.log('Fetching user with ID:', id);
     
-    if (!firebaseUID) {
-      console.log('No Firebase UID provided');
+    if (!id) {
+      console.log('No ID provided');
       return NextResponse.json({ users: [] });
     }
+
+    let user = null;
     
-    // Fetch user from Airtable using Firebase UID
-    const user = await getUserByFirebaseUID(firebaseUID);
+    // First try to get user by Airtable record ID
+    if (id.startsWith('rec')) {
+      console.log('ID appears to be an Airtable record ID, fetching directly...');
+      try {
+        const records = await base('Users').select({
+          filterByFormula: `RECORD_ID() = '${id}'`,
+          maxRecords: 1
+        }).firstPage();
+        
+        if (records.length > 0) {
+          user = {
+            id: records[0].id,
+            fields: records[0].fields
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching by Airtable record ID:', error);
+      }
+    }
     
+    // If not found by record ID, try Firebase UID
     if (!user) {
-      console.log('No user found with Firebase UID:', firebaseUID);
+      console.log('Trying to fetch user by Firebase UID:', id);
+      user = await getUserByFirebaseUID(id);
+    }
+
+    if (!user) {
+      console.log('No user found with ID:', id);
       return NextResponse.json({ users: [] });
     }
     

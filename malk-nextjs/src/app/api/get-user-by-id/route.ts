@@ -3,8 +3,16 @@ import Airtable from 'airtable';
 
 // Initialize Airtable
 const base = new Airtable({
-  apiKey: process.env.AIRTABLE_PAT
-}).base(process.env.AIRTABLE_BASE_ID || '');
+  apiKey: process.env.AIRTABLE_PAT || process.env.NEXT_PUBLIC_AIRTABLE_PAT
+}).base(process.env.AIRTABLE_BASE_ID || process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID || '');
+
+// Add initialization check
+if (!process.env.AIRTABLE_PAT && !process.env.NEXT_PUBLIC_AIRTABLE_PAT) {
+  console.error('Airtable API key is missing in get-user-by-id route');
+}
+if (!process.env.AIRTABLE_BASE_ID && !process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID) {
+  console.error('Airtable Base ID is missing in get-user-by-id route');
+}
 
 export async function GET(request: NextRequest) {
   try {
