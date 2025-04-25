@@ -144,8 +144,7 @@ export async function PUT(request: NextRequest) {
             Bio: data.bio || '',
             SocialLink: data.socialLink || '',
             ProfileImage: data.profileImage || '',
-            BannerImage: data.bannerImage || '',
-            LastModified: new Date().toISOString()
+            BannerImage: data.bannerImage || ''
           }
         }
       ]);
