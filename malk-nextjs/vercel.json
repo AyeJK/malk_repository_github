@@ -3,9 +3,5 @@
   "framework": "nextjs",
   "buildCommand": "next build",
   "devCommand": "next dev",
-  "installCommand": "npm install",
-  "env": {
-    "NEXTAUTH_URL": "https://malk-git-development-ayejks-projects.vercel.app",
-    "NEXTAUTH_SECRET": "2d53c7e239c6c8f2a4e771ecb6cf95f486af837f95a41c71cc0ae26b6489c265"
-  }
+  "installCommand": "npm install"
 } 
