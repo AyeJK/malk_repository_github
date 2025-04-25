@@ -18,11 +18,11 @@ export async function GET(request: NextRequest) {
       );
     }
     
-    console.log('Fetching user with Airtable ID:', id);
+    console.log('Fetching user with Firebase UID:', id);
     
-    // Get the user record from Airtable
+    // Get the user record from Airtable by Firebase UID
     const userRecords = await base('Users').select({
-      filterByFormula: `RECORD_ID() = '${id}'`,
+      filterByFormula: `{FirebaseUID} = '${id}'`,
       maxRecords: 1
     }).firstPage();
     
