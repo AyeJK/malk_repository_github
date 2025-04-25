@@ -3,6 +3,7 @@ import { getServerSession } from 'next-auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { v4 as uuidv4 } from 'uuid';
+import { authOptions } from '@/lib/auth';
 
 // Initialize Firebase if not already initialized
 const firebaseConfig = {
@@ -20,7 +21,7 @@ const storage = getStorage(app);
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession();
+    const session = await getServerSession(authOptions);
     if (!session?.user) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
