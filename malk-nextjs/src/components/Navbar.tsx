@@ -76,20 +76,22 @@ export default function Navbar() {
                 </button>
                 <div className="relative" ref={dropdownRef}>
                   <button 
-                    className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-white font-medium hover:bg-blue-700 transition-colors"
+                    className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center hover:bg-gray-400 transition-colors"
                     onClick={toggleDropdown}
                   >
-                    {((airtableUser?.displayName || user?.email || 'U').charAt(0)).toUpperCase()}
+                    <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
                   </button>
                   
                   {isDropdownOpen && (
                     <div className="absolute right-0 mt-2 w-48 bg-black/90 border border-white/10 rounded-md shadow-lg py-1 z-50">
                       <Link 
-                        href={`/profile/${airtableUser?.id || user.uid}`}
+                        href="/settings"
                         className="block px-4 py-2 text-sm text-white hover:bg-blue-900/30"
                         onClick={() => setIsDropdownOpen(false)}
                       >
-                        Profile
+                        Settings
                       </Link>
                       <button
                         onClick={() => {
