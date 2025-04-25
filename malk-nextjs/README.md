@@ -89,4 +89,4 @@ This application can be deployed to Vercel, Netlify, or any other platform that 
 
 ## License
 
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License. // Trigger deployment
