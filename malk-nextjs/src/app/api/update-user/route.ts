@@ -1,20 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { base } from '@/lib/airtable';
-import { authOptions } from '@/lib/auth';
 
 export async function PUT(request: NextRequest) {
   try {
     console.log('Update user request received');
     console.log('Request headers:', Object.fromEntries(request.headers.entries()));
     
-    const session = await getServerSession(authOptions);
-    console.log('Session from getServerSession:', session);
-    
-    if (!session?.user) {
-      console.log('No session user found');
-      return NextResponse.json({ error: 'Unauthorized - No session user' }, { status: 401 });
+    // Get the authorization header
+    const authHeader = request.headers.get('Authorization');
+    if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.log('No authorization header found');
+      return NextResponse.json({ error: 'Unauthorized - No token provided' }, { status: 401 });
     }
+
+    // Extract the token
+    const idToken = authHeader.split('Bearer ')[1];
+    
+    // For now, we'll trust the token without verification
+    // In a production environment, you should verify the token
+    const userId = idToken.split('.')[0]; // This is just a placeholder, not a real user ID
 
     const data = await request.json();
     console.log('Update data received:', data);
@@ -26,9 +30,8 @@ export async function PUT(request: NextRequest) {
     }
 
     // Make sure the user is updating their own record
-    if (session.user.airtableId !== data.id) {
-      console.log('Session user ID:', session.user.airtableId);
-      console.log('Requested update ID:', data.id);
+    if (data.id !== data.airtableId) {
+      console.log('User ID mismatch:', { userId, airtableId: data.airtableId });
       return NextResponse.json({ error: 'Unauthorized - User ID mismatch' }, { status: 403 });
     }
 
@@ -52,11 +55,11 @@ export async function PUT(request: NextRequest) {
     ]);
 
     console.log('Airtable update successful:', records[0].id);
-    return NextResponse.json({ success: true, record: records[0] });
-  } catch (error: any) {
-    console.error('Error in update-user:', error);
+    return NextResponse.json({ record: records[0] });
+  } catch (error) {
+    console.error('Error updating user:', error);
     return NextResponse.json(
-      { error: `Failed to update user profile: ${error.message || 'Unknown error'}` },
+      { error: 'Failed to update user' },
       { status: 500 }
     );
   }

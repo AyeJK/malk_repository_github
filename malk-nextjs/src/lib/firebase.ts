@@ -1,6 +1,7 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
 import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
 import { getAnalytics } from 'firebase/analytics';
+import { getStorage } from 'firebase/storage';
 
 // Your web app's Firebase configuration
 const firebaseConfig = {
@@ -35,6 +36,7 @@ try {
 }
 
 const auth = getAuth(app);
+const storage = getStorage(app);
 
 // Initialize Analytics only in browser environment
 let analytics = null;
@@ -98,4 +100,4 @@ export function getCurrentUser(): Promise<User | null> {
   });
 }
 
-export { auth, analytics }; 
+export { auth, analytics, storage }; 

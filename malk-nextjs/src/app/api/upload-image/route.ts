@@ -1,11 +1,41 @@
 import { NextResponse } from 'next/server';
-import { getServerSession } from 'next-auth';
 import { getStorage, ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { v4 as uuidv4 } from 'uuid';
-import { authOptions } from '@/lib/auth';
+import { getAuth } from 'firebase-admin/auth';
+import { initializeApp as initializeAdminApp, cert, getApps as getAdminApps } from 'firebase-admin/app';
 
-// Initialize Firebase if not already initialized
+// Initialize Firebase Admin if not already initialized
+if (!getAdminApps().length) {
+  try {
+    // Log the environment variables (without sensitive data)
+    console.log('Firebase Admin initialization with:', {
+      projectId: process.env.FIREBASE_ADMIN_PROJECT_ID ? 'present' : 'missing',
+      clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL ? 'present' : 'missing',
+      privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY ? 'present' : 'missing',
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET ? 'present' : 'missing'
+    });
+
+    // Check if all required environment variables are present
+    if (!process.env.FIREBASE_ADMIN_PROJECT_ID || !process.env.FIREBASE_ADMIN_CLIENT_EMAIL || !process.env.FIREBASE_ADMIN_PRIVATE_KEY) {
+      throw new Error('Missing required Firebase Admin environment variables');
+    }
+
+    // Initialize Firebase Admin
+    initializeAdminApp({
+      credential: cert({
+        projectId: process.env.FIREBASE_ADMIN_PROJECT_ID,
+        clientEmail: process.env.FIREBASE_ADMIN_CLIENT_EMAIL,
+        privateKey: process.env.FIREBASE_ADMIN_PRIVATE_KEY.replace(/\\n/g, '\n'),
+      }),
+      storageBucket: process.env.NEXT_PUBLIC_FIREBASE_STORAGE_BUCKET,
+    });
+    console.log('Firebase Admin initialized successfully');
+  } catch (error) {
+    console.error('Error initializing Firebase Admin:', error);
+  }
+}
+
+// Initialize Firebase client
 const firebaseConfig = {
   apiKey: process.env.NEXT_PUBLIC_FIREBASE_API_KEY,
   authDomain: process.env.NEXT_PUBLIC_FIREBASE_AUTH_DOMAIN,
@@ -16,48 +46,64 @@ const firebaseConfig = {
   measurementId: process.env.NEXT_PUBLIC_FIREBASE_MEASUREMENT_ID,
 };
 
+// Log the client config (without sensitive data)
+console.log('Firebase client config:', {
+  authDomain: firebaseConfig.authDomain,
+  projectId: firebaseConfig.projectId,
+  apiKey: firebaseConfig.apiKey ? 'present' : 'missing',
+  appId: firebaseConfig.appId ? 'present' : 'missing',
+  storageBucket: firebaseConfig.storageBucket ? 'present' : 'missing',
+  messagingSenderId: firebaseConfig.messagingSenderId ? 'present' : 'missing',
+  measurementId: firebaseConfig.measurementId ? 'present' : 'missing'
+});
+
 const app = getApps().length > 0 ? getApp() : initializeApp(firebaseConfig);
 const storage = getStorage(app);
 
 export async function POST(request: Request) {
   try {
-    const session = await getServerSession(authOptions);
-    if (!session?.user) {
+    // Get the authorization header
+    const authHeader = request.headers.get('authorization');
+    if (!authHeader?.startsWith('Bearer ')) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    // Verify the token using Admin SDK
+    const idToken = authHeader.split('Bearer ')[1];
+    try {
+      await getAuth().verifyIdToken(idToken);
+    } catch (error) {
+      console.error('Token verification error:', error);
+      return NextResponse.json({ error: 'Invalid token' }, { status: 401 });
+    }
+
+    // Get the form data
     const formData = await request.formData();
     const file = formData.get('file') as File;
     const type = formData.get('type') as string;
 
-    if (!file || !type) {
-      return NextResponse.json({ error: 'File and type are required' }, { status: 400 });
+    if (!file) {
+      return NextResponse.json({ error: 'No file provided' }, { status: 400 });
     }
-
+    
     // Generate a unique filename
-    const fileExtension = file.name.split('.').pop();
-    const fileName = `${type}/${session.user.id}/${uuidv4()}.${fileExtension}`;
-
+    const timestamp = Date.now();
+    const filename = `${type}_${timestamp}_${file.name}`;
+    
     // Create a reference to the file location
-    const storageRef = ref(storage, fileName);
-
-    // Convert File to ArrayBuffer
-    const arrayBuffer = await file.arrayBuffer();
-    const bytes = new Uint8Array(arrayBuffer);
-
+    const storageRef = ref(storage, `uploads/${filename}`);
+    
     // Upload the file
-    await uploadBytes(storageRef, bytes, {
-      contentType: file.type,
-    });
-
+    const snapshot = await uploadBytes(storageRef, file);
+    
     // Get the download URL
-    const url = await getDownloadURL(storageRef);
+    const downloadURL = await getDownloadURL(snapshot.ref);
 
-    return NextResponse.json({ url });
+    return NextResponse.json({ url: downloadURL });
   } catch (error) {
-    console.error('Error uploading image:', error);
+    console.error('Error uploading file:', error);
     return NextResponse.json(
-      { error: 'Failed to upload image' },
+      { error: 'Failed to upload file' },
       { status: 500 }
     );
   }

@@ -86,6 +86,14 @@ export default function SettingsPage() {
     if (!file) return;
 
     try {
+      // Get the current user's ID token
+      const idToken = currentUser ? await currentUser.getIdToken() : null;
+      
+      if (!idToken) {
+        toast.error('You must be logged in to upload images');
+        return;
+      }
+
       // Create a FormData object
       const formData = new FormData();
       formData.append('file', file);
@@ -94,7 +102,11 @@ export default function SettingsPage() {
       // Upload the image
       const response = await fetch('/api/upload-image', {
         method: 'POST',
-        body: formData
+        body: formData,
+        credentials: 'include',
+        headers: {
+          'Authorization': `Bearer ${idToken}`
+        }
       });
 
       if (!response.ok) {
@@ -121,12 +133,21 @@ export default function SettingsPage() {
     setIsEditing(false);
     
     try {
+      // Get the current user's ID token
+      const idToken = currentUser ? await currentUser.getIdToken() : null;
+      
+      if (!idToken) {
+        toast.error('You must be logged in to update your profile');
+        return;
+      }
+      
       console.log('Submitting form data:', formData);
       
       const response = await fetch('/api/update-user', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
         },
         body: JSON.stringify(formData),
         credentials: 'include'  // Include cookies for authentication
