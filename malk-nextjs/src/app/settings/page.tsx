@@ -121,14 +121,17 @@ export default function SettingsPage() {
     setIsEditing(false);
     
     try {
-      console.log('Submitting form data:', formData);
+      console.log('Current user:', currentUser);
       
       // Get the current user's ID token
       const idToken = await currentUser?.getIdToken();
+      console.log('ID token obtained:', !!idToken);
+      
       if (!idToken) {
         throw new Error('Not authenticated');
       }
       
+      console.log('Making request with token...');
       const response = await fetch('/api/update-user', {
         method: 'PUT',
         headers: {
