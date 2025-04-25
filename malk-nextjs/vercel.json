@@ -4,27 +4,8 @@
   "buildCommand": "next build",
   "devCommand": "next dev",
   "installCommand": "npm install",
-  "headers": [
-    {
-      "source": "/api/(.*)",
-      "headers": [
-        {
-          "key": "Access-Control-Allow-Credentials",
-          "value": "true"
-        },
-        {
-          "key": "Access-Control-Allow-Origin",
-          "value": "*"
-        },
-        {
-          "key": "Access-Control-Allow-Methods",
-          "value": "GET,OPTIONS,PATCH,DELETE,POST,PUT"
-        },
-        {
-          "key": "Access-Control-Allow-Headers",
-          "value": "X-CSRF-Token, X-Requested-With, Accept, Accept-Version, Content-Length, Content-MD5, Content-Type, Date, X-Api-Version"
-        }
-      ]
-    }
-  ]
+  "env": {
+    "NEXTAUTH_URL": "https://malk-git-development-ayejks-projects.vercel.app",
+    "NEXTAUTH_SECRET": "2d53c7e239c6c8f2a4e771ecb6cf95f486af837f95a41c71cc0ae26b6489c265"
+  }
 } 
