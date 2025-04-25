@@ -168,7 +168,7 @@ export async function PUT(request: NextRequest) {
     console.error('Error in update-user route:', error);
     return new NextResponse(
       JSON.stringify({ 
-        error: 'Failed to update user profile',
+        error: 'Internal server error',
         details: error instanceof Error ? error.message : 'Unknown error'
       }),
       { status: 500 }
