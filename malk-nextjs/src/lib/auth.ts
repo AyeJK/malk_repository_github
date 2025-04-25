@@ -81,7 +81,8 @@ export const authOptions: AuthOptions = {
         sameSite: 'lax',
         path: '/',
         secure: true,
-        domain: '.malk.tv' // This will work for both malk.tv and any subdomain
+        // Only set domain for production environment
+        ...(process.env.NODE_ENV === 'production' ? { domain: '.malk.tv' } : {})
       }
     }
   }
