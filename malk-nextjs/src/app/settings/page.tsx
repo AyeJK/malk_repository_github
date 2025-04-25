@@ -132,7 +132,17 @@ export default function SettingsPage() {
         credentials: 'include'  // Include cookies for authentication
       });
 
-      const data = await response.json();
+      // Log the raw response for debugging
+      const responseText = await response.text();
+      console.log('Raw response:', responseText);
+
+      let data;
+      try {
+        data = JSON.parse(responseText);
+      } catch (parseError) {
+        console.error('Failed to parse response:', parseError);
+        throw new Error('Server returned invalid JSON');
+      }
       
       if (!response.ok) {
         console.error('Update failed:', data);

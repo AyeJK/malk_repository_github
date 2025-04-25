@@ -6,7 +6,8 @@ import { authOptions } from '@/lib/auth';
 export async function PUT(request: NextRequest) {
   try {
     // Log headers for debugging
-    console.log('Request headers:', Object.fromEntries(request.headers));
+    const headers = Object.fromEntries(request.headers);
+    console.log('Request headers:', headers);
     
     const session = await getServerSession(authOptions);
     
@@ -20,7 +21,13 @@ export async function PUT(request: NextRequest) {
     
     if (!session?.user) {
       console.log('No session user found');
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+      return new NextResponse(
+        JSON.stringify({ error: 'Unauthorized - No session' }),
+        { 
+          status: 401,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     const data = await request.json();
@@ -28,14 +35,30 @@ export async function PUT(request: NextRequest) {
 
     // Validate required fields
     if (!data.displayName) {
-      return NextResponse.json({ error: 'Display name is required' }, { status: 400 });
+      return new NextResponse(
+        JSON.stringify({ error: 'Display name is required' }),
+        { 
+          status: 400,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     // Make sure the user is updating their own record
-    if (session.user.airtableId !== data.id) {
+    if (!session.user.airtableId || session.user.airtableId !== data.id) {
       console.log('Session user ID:', session.user.airtableId);
       console.log('Requested update ID:', data.id);
-      return NextResponse.json({ error: 'Unauthorized to update this user' }, { status: 403 });
+      return new NextResponse(
+        JSON.stringify({ 
+          error: 'Unauthorized to update this user',
+          sessionUserId: session.user.airtableId,
+          requestedId: data.id
+        }),
+        { 
+          status: 403,
+          headers: { 'Content-Type': 'application/json' }
+        }
+      );
     }
 
     // Update user record in Airtable
@@ -56,12 +79,24 @@ export async function PUT(request: NextRequest) {
       }
     ]);
 
-    return NextResponse.json({ success: true, record: records[0] });
+    return new NextResponse(
+      JSON.stringify({ success: true, record: records[0] }),
+      { 
+        status: 200,
+        headers: { 'Content-Type': 'application/json' }
+      }
+    );
   } catch (error) {
     console.error('Error updating user:', error);
-    return NextResponse.json(
-      { error: 'Failed to update user profile' },
-      { status: 500 }
+    return new NextResponse(
+      JSON.stringify({ 
+        error: 'Failed to update user profile',
+        details: error instanceof Error ? error.message : 'Unknown error'
+      }),
+      { 
+        status: 500,
+        headers: { 'Content-Type': 'application/json' }
+      }
     );
   }
 } 
