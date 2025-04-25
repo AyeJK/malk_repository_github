@@ -123,13 +123,19 @@ export default function SettingsPage() {
     try {
       console.log('Submitting form data:', formData);
       
+      // Get the current user's ID token
+      const idToken = await currentUser?.getIdToken();
+      if (!idToken) {
+        throw new Error('Not authenticated');
+      }
+      
       const response = await fetch('/api/update-user', {
         method: 'PUT',
         headers: {
-          'Content-Type': 'application/json'
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${idToken}`
         },
-        body: JSON.stringify(formData),
-        credentials: 'include'  // Include cookies for authentication
+        body: JSON.stringify(formData)
       });
 
       // Log the raw response for debugging
