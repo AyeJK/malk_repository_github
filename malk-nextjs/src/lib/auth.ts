@@ -81,7 +81,7 @@ export const authOptions: AuthOptions = {
         sameSite: 'lax',
         path: '/',
         secure: true,
-        domain: process.env.NEXTAUTH_URL ? new URL(process.env.NEXTAUTH_URL).hostname : undefined
+        domain: '.malk.tv' // This will work for both malk.tv and any subdomain
       }
     }
   }
