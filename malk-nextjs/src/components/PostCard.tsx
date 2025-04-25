@@ -7,6 +7,7 @@ import { useAuth } from '@/lib/auth-context';
 import { useSession } from 'next-auth/react';
 import Comments from './Comments';
 import Image from 'next/image';
+import DefaultAvatar from './DefaultAvatar';
 
 interface PostCardProps {
   post: {
@@ -331,22 +332,20 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
             {/* User avatar */}
-            <div className="relative w-10 h-10 rounded-full overflow-hidden bg-gray-300">
-              {authorProfileImage ? (
-                <Image
-                  src={authorProfileImage}
-                  alt={authorName || 'User Profile'}
-                  fill
-                  className="object-cover"
-                />
-              ) : (
-                <div className="w-full h-full flex items-center justify-center">
-                  <svg xmlns="http://www.w3.org/2000/svg" className="h-6 w-6 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </div>
-              )}
-            </div>
+            <Link href={`/profile/${post.fields.FirebaseUID?.[0]}`} className="block">
+              <div className="relative w-10 h-10 rounded-full overflow-hidden">
+                {authorProfileImage ? (
+                  <Image
+                    src={authorProfileImage}
+                    alt={authorName || 'User Profile'}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <DefaultAvatar userId={authorFirebaseUID || undefined} userName={authorName} />
+                )}
+              </div>
+            </Link>
             
             {/* User name and video title */}
             <div>

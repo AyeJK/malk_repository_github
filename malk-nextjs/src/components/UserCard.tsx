@@ -1,10 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useFollow } from '@/hooks/useFollow';
 import { useAuth } from '@/lib/auth-context';
+import DefaultAvatar from './DefaultAvatar';
 
 interface UserCardProps {
   user: {
@@ -36,22 +37,20 @@ export default function UserCard({ user }: UserCardProps) {
     <div className="card p-4 hover:scale-[1.02] transition-all duration-300">
       <div className="flex items-center space-x-4">
         {/* Profile Image */}
-        <div className="user-avatar w-16 h-16">
-          {user.fields?.ProfileImage ? (
-            <Image
-              src={user.fields.ProfileImage}
-              alt={user.fields?.DisplayName || 'User Profile'}
-              fill
-              className="object-cover"
-            />
-          ) : (
-            <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-              <svg xmlns="http://www.w3.org/2000/svg" className="h-8 w-8 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-              </svg>
-            </div>
-          )}
-        </div>
+        <Link href={`/profile/${user.id}`} className="block">
+          <div className="relative w-16 h-16 rounded-full overflow-hidden">
+            {user.fields?.ProfileImage ? (
+              <Image
+                src={user.fields.ProfileImage}
+                alt={user.fields?.DisplayName || 'User Profile'}
+                fill
+                className="object-cover"
+              />
+            ) : (
+              <DefaultAvatar userId={user.fields?.FirebaseUID} userName={user.fields?.DisplayName} />
+            )}
+          </div>
+        </Link>
         
         {/* User Info */}
         <div className="flex-1 min-w-0">

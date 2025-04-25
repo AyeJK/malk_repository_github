@@ -1,11 +1,12 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import ShareVideoModal from './ShareVideoModal';
 import { Bars3Icon } from '@heroicons/react/24/outline';
 import { useSidebar } from '@/lib/sidebar-context';
+import DefaultAvatar from './DefaultAvatar';
 
 export default function Navbar() {
   const { user, airtableUser, signOut } = useAuth();
@@ -15,20 +16,12 @@ export default function Navbar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
 
   const handleSignOut = async () => {
-    try {
-      await signOut();
-    } catch (error) {
-      console.error('Error signing out:', error);
-    }
+    await signOut();
+    setIsDropdownOpen(false);
   };
 
-  const openShareModal = () => {
-    setIsShareModalOpen(true);
-  };
-
-  const closeShareModal = () => {
-    setIsShareModalOpen(false);
-  };
+  const openShareModal = () => setIsShareModalOpen(true);
+  const closeShareModal = () => setIsShareModalOpen(false);
 
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
@@ -76,49 +69,41 @@ export default function Navbar() {
                 </button>
                 <div className="relative" ref={dropdownRef}>
                   <button 
-                    className="w-8 h-8 rounded-full bg-gray-300 flex items-center justify-center hover:bg-gray-400 transition-colors overflow-hidden"
+                    className="w-8 h-8 rounded-full overflow-hidden hover:opacity-80 transition-opacity"
                     onClick={toggleDropdown}
                   >
-                    {airtableUser?.profileImage ? (
+                    {airtableUser?.fields?.ProfileImage ? (
                       <img 
-                        src={airtableUser.profileImage} 
+                        src={airtableUser.fields.ProfileImage} 
                         alt="Profile" 
                         className="w-full h-full object-cover"
                       />
                     ) : (
-                      <svg
-                        xmlns="http://www.w3.org/2000/svg"
-                        className="h-4 w-4 text-gray-600"
-                        viewBox="0 0 24 24"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2" />
-                        <circle cx="12" cy="7" r="4" />
-                      </svg>
+                      <DefaultAvatar userId={user?.uid} userName={airtableUser?.fields?.DisplayName} />
                     )}
                   </button>
                   
                   {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 bg-black/90 border border-white/10 rounded-md shadow-lg py-1 z-50">
-                      <Link 
+                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-dark-lighter ring-1 ring-black ring-opacity-5">
+                      <Link
+                        href={`/profile/${airtableUser?.id}`}
+                        className="block px-4 py-2 text-sm text-white hover:bg-white/5"
+                        onClick={() => setIsDropdownOpen(false)}
+                      >
+                        Your Profile
+                      </Link>
+                      <Link
                         href="/settings"
-                        className="block px-4 py-2 text-sm text-white hover:bg-blue-900/30"
+                        className="block px-4 py-2 text-sm text-white hover:bg-white/5"
                         onClick={() => setIsDropdownOpen(false)}
                       >
                         Settings
                       </Link>
                       <button
-                        onClick={() => {
-                          setIsDropdownOpen(false);
-                          handleSignOut();
-                        }}
-                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-blue-900/30"
+                        onClick={handleSignOut}
+                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/5"
                       >
-                        Log Out
+                        Sign Out
                       </button>
                     </div>
                   )}

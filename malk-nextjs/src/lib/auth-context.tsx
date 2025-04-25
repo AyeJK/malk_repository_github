@@ -7,18 +7,20 @@ import { getUserByFirebaseUID, UserRecord } from './airtable';
 
 interface AirtableUser {
   id: string;
-  email: string;
-  firebaseUID: string;
-  displayName?: string;
-  firstName?: string;
-  lastName?: string;
-  bio?: string;
-  socialLink?: string;
-  profileImage?: string;
-  bannerImage?: string;
-  role?: string;
-  postCount?: number;
-  profileURL?: string;
+  fields: {
+    Email: string;
+    FirebaseUID: string;
+    DisplayName?: string;
+    FirstName?: string;
+    LastName?: string;
+    Bio?: string;
+    SocialLink?: string;
+    ProfileImage?: string;
+    BannerImage?: string;
+    Role?: string;
+    PostCount?: number;
+    ProfileURL?: string;
+  };
 }
 
 interface AuthContextType {
@@ -40,18 +42,20 @@ const transformUserRecord = (record: UserRecord | null): AirtableUser | null => 
   if (!record) return null;
   return {
     id: record.id,
-    email: record.fields.Email,
-    firebaseUID: record.fields.FirebaseUID,
-    displayName: record.fields.DisplayName,
-    firstName: record.fields.FirstName,
-    lastName: record.fields.LastName,
-    bio: record.fields.Bio,
-    socialLink: record.fields.SocialLink,
-    profileImage: record.fields.ProfileImage,
-    bannerImage: record.fields.BannerImage,
-    role: record.fields.Role,
-    postCount: record.fields.PostCount,
-    profileURL: record.fields.ProfileURL,
+    fields: {
+      Email: record.fields.Email,
+      FirebaseUID: record.fields.FirebaseUID,
+      DisplayName: record.fields.DisplayName,
+      FirstName: record.fields.FirstName,
+      LastName: record.fields.LastName,
+      Bio: record.fields.Bio,
+      SocialLink: record.fields.SocialLink,
+      ProfileImage: record.fields.ProfileImage,
+      BannerImage: record.fields.BannerImage,
+      Role: record.fields.Role,
+      PostCount: record.fields.PostCount,
+      ProfileURL: record.fields.ProfileURL,
+    }
   };
 };
 

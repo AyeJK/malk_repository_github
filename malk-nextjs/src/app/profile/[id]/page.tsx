@@ -9,6 +9,7 @@ import UserCard from '@/components/UserCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useFollow } from '@/hooks/useFollow';
 import { useAuth } from '@/lib/auth-context';
+import DefaultAvatar from '@/components/DefaultAvatar';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -189,7 +190,7 @@ export default function ProfilePage() {
         <>
           {/* Full-width Banner Image - Outside of content padding */}
           <div className="relative w-full h-48 md:h-64 bg-black">
-            {user.fields?.BannerImage ? (
+            {user?.fields?.BannerImage ? (
               <Image
                 src={user.fields.BannerImage}
                 alt="Profile Banner"
@@ -201,7 +202,7 @@ export default function ProfilePage() {
               <div className="w-full h-full bg-gradient-to-br from-primary-dark to-accent"></div>
             )}
           </div>
-          
+
           {/* Content Container - With max width and padding */}
           <div className="max-w-4xl mx-auto px-4 md:px-6 lg:px-8">
             {/* Profile Header */}
@@ -209,20 +210,16 @@ export default function ProfilePage() {
               <div className="flex flex-col md:flex-row items-start md:items-center gap-4">
                 {/* Profile Image */}
                 <div className="relative w-24 h-24 md:w-32 md:h-32 rounded-full overflow-hidden border-4 border-dark-lighter -mt-16 md:-mt-20">
-                  {user.fields?.ProfileImage ? (
+                  {user?.fields?.ProfileImage ? (
                     <Image
                       src={user.fields.ProfileImage}
-                      alt={user.fields?.DisplayName || 'User Profile'}
+                      alt={user?.fields?.DisplayName || 'User Profile'}
                       fill
                       className="object-cover"
                       priority
                     />
                   ) : (
-                    <div className="w-full h-full bg-gray-300 flex items-center justify-center">
-                      <svg xmlns="http://www.w3.org/2000/svg" className="h-16 w-16 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                      </svg>
-                    </div>
+                    <DefaultAvatar userId={user?.fields?.FirebaseUID} userName={user?.fields?.DisplayName} />
                   )}
                 </div>
                 
@@ -230,7 +227,7 @@ export default function ProfilePage() {
                 <div className="flex-1">
                   <div className="flex items-center justify-between mb-2">
                     <h1 className="text-3xl font-bold text-white">
-                      {user.fields?.DisplayName || user.name || 'Anonymous'}
+                      {user?.fields?.DisplayName || user?.name || 'Anonymous'}
                     </h1>
                     {/* Follow button */}
                     {currentUser && firebaseUID && currentUser.uid !== firebaseUID && (
@@ -249,12 +246,12 @@ export default function ProfilePage() {
                   </div>
                   
                   {/* Bio */}
-                  {user.fields?.Bio && (
+                  {user?.fields?.Bio && (
                     <p className="text-gray-300 mb-4">{user.fields.Bio}</p>
                   )}
                   
                   {/* Social Link */}
-                  {user.fields?.SocialLink && (
+                  {user?.fields?.SocialLink && (
                     <a 
                       href={user.fields.SocialLink} 
                       target="_blank" 
@@ -270,7 +267,7 @@ export default function ProfilePage() {
                 </div>
               </div>
             </div>
-            
+
             {/* Tabs */}
             <div className="bg-dark-lighter rounded-lg mt-6 overflow-hidden">
               <div className="flex border-b border-gray-700">
