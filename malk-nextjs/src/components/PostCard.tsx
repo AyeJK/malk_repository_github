@@ -186,8 +186,9 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
     : 'recently';
 
   // Split caption into title and description
-  const captionLines = post.fields.UserCaption.split('\n');
-  const title = captionLines[0];
+  const userCaption = post.fields.UserCaption || '';
+  const captionLines = userCaption.split('\n');
+  const title = captionLines[0] || '';
   const description = captionLines.slice(1).join('\n');
 
   // Fetch categories
