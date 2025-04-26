@@ -17,11 +17,18 @@ export default function PostsPage() {
     const fetchPosts = async () => {
       try {
         setLoading(true);
+        console.log('Starting to fetch posts...');
         const fetchedPosts = await getAllPosts();
+        console.log('Posts fetched successfully:', fetchedPosts);
         setPosts(fetchedPosts);
         setError(null);
-      } catch (err) {
+      } catch (err: any) {
         console.error('Error fetching posts:', err);
+        console.error('Error details:', {
+          name: err?.name,
+          message: err?.message,
+          stack: err?.stack
+        });
         setError('Failed to load posts. Please try again later.');
       } finally {
         setLoading(false);
