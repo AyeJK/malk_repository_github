@@ -399,12 +399,13 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
               post.fields.UserTags.map((tagId) => {
                 const tag = tags.find(t => t.id === tagId);
                 return tag ? (
-                  <span
+                  <Link
                     key={tagId}
-                    className="px-2 py-1 bg-purple-900 text-purple-200 text-xs rounded-full"
+                    href={`/tags/${tag.name.toLowerCase()}`}
+                    className="px-2 py-1 bg-purple-900 text-purple-200 text-xs rounded-full hover:bg-purple-800 transition-colors"
                   >
                     {tag.name || tagId.substring(0, 8)}
-                  </span>
+                  </Link>
                 ) : null;
               })
             )}
