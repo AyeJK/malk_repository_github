@@ -756,4 +756,22 @@ export async function getUserLikedPosts(firebaseUID: string): Promise<PostRecord
     console.error('Error getting user liked posts:', error);
     return [];
   }
+}
+
+// Function to get the Airtable client
+export function getAirtableClient() {
+  return base;
+}
+
+export async function getPost(postId: string): Promise<PostRecord | null> {
+  try {
+    const record = await base('Posts').find(postId);
+    return {
+      id: record.id,
+      fields: record.fields as any,
+    };
+  } catch (error) {
+    console.error('Error fetching post:', error);
+    return null;
+  }
 } 
