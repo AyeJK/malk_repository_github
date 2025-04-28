@@ -363,8 +363,10 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
                   </span>
                 )}
               </div>
-              <h3 className="text-lg font-bold text-white">
-                {post.fields.VideoTitle || 'Untitled Video'}
+              <h3 className="text-lg font-bold text-white relative z-20">
+                <Link href={`/posts/${post.id}`} prefetch={true} className="hover:text-blue-400 transition-colors block">
+                  {post.fields.VideoTitle || 'Untitled Video'}
+                </Link>
               </h3>
             </div>
           </div>
@@ -414,7 +416,10 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
       </div>
       
       {/* Embedded video */}
-      <div className="relative pb-[56.25%] h-0">
+      <div className="relative aspect-video">
+        <Link href={`/posts/${post.id}`} className="absolute inset-0 z-10">
+          <span className="sr-only">View post details</span>
+        </Link>
         {videoId ? (
           <iframe
             src={`https://www.youtube.com/embed/${videoId}`}
