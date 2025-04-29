@@ -24,16 +24,37 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // First get the user data
+    const userRecords = await base('Users').select({
+      filterByFormula: `{FirebaseUID} = '${userId}'`
+    }).firstPage();
+
+    if (!userRecords || userRecords.length === 0) {
+      return NextResponse.json(
+        { error: 'User not found' },
+        { status: 404 }
+      );
+    }
+
+    const userData = userRecords[0].fields;
+
     // Get posts where FirebaseUID matches the provided userId
     const posts = await base('Posts').select({
       filterByFormula: `{FirebaseUID} = '${userId}'`,
       sort: [{ field: 'DateCreated', direction: 'desc' }]
     }).all();
 
-    // Map the records to include only necessary fields
+    // Map the records to include only necessary fields and add user data
     const formattedPosts = posts.map(record => ({
       id: record.id,
-      fields: record.fields
+      fields: {
+        ...record.fields,
+        UserName: userData.DisplayName || 'Anonymous',
+        UserAvatar: userData.ProfileImage || null,
+        ThumbnailURL: record.fields['Video ID'] ? 
+          `https://img.youtube.com/vi/${record.fields['Video ID']}/maxresdefault.jpg` : 
+          null
+      }
     }));
 
     return NextResponse.json({ posts: formattedPosts });
