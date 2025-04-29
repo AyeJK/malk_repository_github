@@ -8,15 +8,15 @@ export async function GET(request: NextRequest) {
     
     // Find the task with name "Create User Profile Component"
     let targetTask = tasks.find(task => 
-      task.fields.Name === "Create User Profile Component"
+      task.fields.Task === "Create User Profile Component"
     );
     
     // If task doesn't exist, create it
     if (!targetTask) {
       const newTask = await createTask({
         fields: {
-          Name: "Create User Profile Component",
-          Description: "Develop component to display and edit user profiles",
+          Task: "Create User Profile Component",
+          Details: "Develop component to display and edit user profiles",
           Status: "Not Started",
           Phase: "Phase 4: Frontend Development",
           Timeline: "1 day",
