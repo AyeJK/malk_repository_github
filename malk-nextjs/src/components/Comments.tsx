@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
-import { formatDistanceToNow } from 'date-fns';
+import { formatRelativeTime } from '@/lib/date-utils';
 
 interface Comment {
   id: string;
@@ -161,9 +161,7 @@ export default function Comments({ postId, postAuthorId }: CommentsProps) {
                   </div>
                 </div>
                 <span className="text-xs text-gray-500 ml-2 flex items-center">
-                  {formatDistanceToNow(new Date(comment.created_at), {
-                    addSuffix: true,
-                  })}
+                  {formatRelativeTime(comment.created_at)}
                 </span>
               </div>
             </div>

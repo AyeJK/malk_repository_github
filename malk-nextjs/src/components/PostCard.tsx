@@ -2,12 +2,13 @@
 
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { formatDistanceToNow } from 'date-fns';
 import { useAuth } from '@/lib/auth-context';
 import { useSession } from 'next-auth/react';
 import Comments from './Comments';
 import Image from 'next/image';
 import DefaultAvatar from './DefaultAvatar';
+import { formatRelativeTime } from '@/lib/date-utils';
+import { getVideoTitle } from '@/lib/video-utils';
 
 interface PostCardProps {
   post: {
@@ -62,6 +63,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
   const [comments, setComments] = useState<any[]>([]);
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(true);
+  const [videoTitle, setVideoTitle] = useState<string>(post.fields.VideoTitle || 'Untitled Video');
   
   const isOwnPost = user?.uid === authorFirebaseUID;
   
@@ -182,7 +184,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
   
   // Format the date
   const formattedDate = post.fields.DateCreated 
-    ? formatDistanceToNow(new Date(post.fields.DateCreated), { addSuffix: true })
+    ? formatRelativeTime(post.fields.DateCreated)
     : 'recently';
 
   // Split caption into title and description
@@ -326,6 +328,24 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
     onDelete(post.id);
   };
 
+  // Fetch video title if not available
+  useEffect(() => {
+    const fetchVideoTitle = async () => {
+      if (!post.fields.VideoTitle && post.fields.VideoURL) {
+        try {
+          const title = await getVideoTitle(post.fields.VideoURL);
+          if (title) {
+            setVideoTitle(title);
+          }
+        } catch (error) {
+          console.error('Error fetching video title:', error);
+        }
+      }
+    };
+
+    fetchVideoTitle();
+  }, [post.fields.VideoTitle, post.fields.VideoURL]);
+
   return (
     <div className="bg-dark-lighter rounded-lg overflow-hidden shadow-lg">
       <div className="p-4">
@@ -365,33 +385,33 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
               </div>
               <h3 className="text-lg font-bold text-white relative z-20">
                 <Link href={`/posts/${post.id}`} prefetch={true} className="hover:text-blue-400 transition-colors block">
-                  {post.fields.VideoTitle || 'Untitled Video'}
+                  {videoTitle}
                 </Link>
               </h3>
             </div>
           </div>
-          
+           
           {/* Follow button - simplified to just UI without functionality */}
-          {user && !isOwnPost && !hideFollowButton && (
+          {!hideFollowButton && !isOwnPost && (
             <button
               onClick={handleToggleFollow}
               disabled={isFollowLoading}
-              className={`follow-button ${
-                isFollowing 
-                  ? 'follow-button-following' 
-                  : 'follow-button-not-following'
+              className={`px-4 py-2 rounded-full text-sm font-medium ${
+                isFollowing
+                  ? 'bg-gray-600 text-white hover:bg-gray-700'
+                  : 'bg-red-600 text-white hover:bg-red-700'
               }`}
             >
               {isFollowLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
             </button>
           )}
         </div>
-        
+
         {/* User caption */}
         {post.fields.UserCaption && (
           <p className="text-gray-300 mb-3">{post.fields.UserCaption}</p>
         )}
-        
+
         {/* Tags */}
         {post.fields.UserTags && post.fields.UserTags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-4">
@@ -413,86 +433,91 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
             )}
           </div>
         )}
-      </div>
-      
-      {/* Embedded video */}
-      <div className="relative aspect-video">
-        <Link href={`/posts/${post.id}`} className="absolute inset-0 z-10">
-          <span className="sr-only">View post details</span>
-        </Link>
-        {videoId ? (
-          <iframe
-            src={`https://www.youtube.com/embed/${videoId}`}
-            className="absolute top-0 left-0 w-full h-full z-0"
-            allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-            allowFullScreen
-          />
-        ) : (
-          <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 text-white">
-            Invalid video URL
+       
+        {/* Embedded video */}
+        <div className="relative aspect-video">
+          <Link href={`/posts/${post.id}`} className="absolute inset-0 z-10">
+            <span className="sr-only">View post details</span>
+          </Link>
+          {videoId ? (
+            <iframe
+              src={`https://www.youtube.com/embed/${videoId}`}
+              className="absolute top-0 left-0 w-full h-full z-0"
+              allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
+              allowFullScreen
+            />
+          ) : (
+            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 text-white">
+              Invalid video URL
+            </div>
+          )}
+        </div>
+
+        {/* Action buttons (like and comment) */}
+        <div className="flex items-center justify-between mt-4">
+          <div className="flex items-center space-x-4">
+            <button
+              onClick={handleLike}
+              disabled={isLiking}
+              className={`flex items-center space-x-2 ${
+                isLiked ? 'text-blue-500' : 'text-gray-400'
+              } hover:text-blue-400`}
+            >
+              <svg
+                className="w-5 h-5"
+                fill={isLiked ? 'currentColor' : 'none'}
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z"
+                />
+              </svg>
+              <span>{likeCount}</span>
+            </button>
+            <button
+              onClick={() => setShowComments(!showComments)}
+              className="flex items-center space-x-2 text-gray-400 hover:text-blue-400"
+            >
+              <svg
+                className="w-5 h-5"
+                fill="none"
+                stroke="currentColor"
+                viewBox="0 0 24 24"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z"
+                />
+              </svg>
+              <span>{post.fields.CommentCount || 0}</span>
+            </button>
+          </div>
+          {isOwnPost && onDelete && (
+            <button
+              onClick={handleDelete}
+              className="text-red-500 hover:text-red-400"
+            >
+              Delete
+            </button>
+          )}
+        </div>
+
+        {/* Comments section */}
+        {showComments && (
+          <div className="mt-4">
+            <Comments 
+              postId={post.id} 
+              postAuthorId={post.fields.FirebaseUID?.[0] || ''} 
+            />
           </div>
         )}
       </div>
-
-      {/* Action buttons (like and comment) */}
-      <div className="p-4 flex items-center justify-between border-t border-gray-700">
-        <div className="flex items-center space-x-4">
-          {/* Like button */}
-          <button
-            onClick={handleLike}
-            disabled={isLiking}
-            className={`flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium transition-colors ${
-              isLiked
-                ? 'bg-red-600 text-white hover:bg-red-700'
-                : 'bg-gray-700 text-gray-300 hover:bg-gray-600'
-            }`}
-          >
-            {isLiking ? (
-              <svg className="animate-spin h-4 w-4" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-            ) : (
-              <>
-                <svg className="h-4 w-4" fill={isLiked ? 'currentColor' : 'none'} stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-                </svg>
-                <span>{likeCount}</span>
-              </>
-            )}
-          </button>
-
-          {/* Comment button */}
-          <button
-            onClick={() => {
-              console.log('Toggling comments for post:', post.id);
-              console.log('Post author Firebase UID:', post.fields.FirebaseUID);
-              setShowComments(!showComments);
-            }}
-            className="flex items-center space-x-1 px-3 py-1 rounded-full text-sm font-medium bg-gray-700 text-gray-300 hover:bg-gray-600"
-          >
-            <svg className="h-4 w-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
-            </svg>
-            <span>{post.fields.CommentCount || comments?.length || 0}</span>
-          </button>
-        </div>
-        
-        {/* Date */}
-        <div className="text-xs text-gray-500">
-          {formattedDate}
-        </div>
-      </div>
-
-      {/* Comments section */}
-      {showComments && (
-        <div className="px-4 pb-4">
-          <Comments 
-            postId={post.id} 
-            postAuthorId={post.fields.FirebaseUID?.[0] || ''} 
-          />
-        </div>
-      )}
     </div>
   );
 } 
