@@ -19,23 +19,25 @@ export async function listSprints(options: {
   sort?: { field: string; direction: 'asc' | 'desc' }[];
 } = {}): Promise<Sprint[]> {
   try {
-    let query = base('Sprints').select({
+    const selectOptions: any = {
       maxRecords: 100,
       view: 'Grid view',
-    });
+    };
 
     if (options.filterByFormula) {
-      query = query.filterByFormula(options.filterByFormula);
+      selectOptions.filterByFormula = options.filterByFormula;
     }
 
     if (options.sort) {
-      query = query.sort(options.sort.map(sort => ({
+      selectOptions.sort = options.sort.map(sort => ({
         field: sort.field,
         direction: sort.direction,
-      })));
+      }));
     }
 
+    const query = base('Sprints').select(selectOptions);
     const records = await query.all();
+    
     return records.map(record => ({
       id: record.id,
       fields: record.fields as Sprint['fields'],
