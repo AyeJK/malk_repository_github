@@ -98,14 +98,30 @@ export async function GET(request: NextRequest) {
       const authorId = postFields.FirebaseUID?.[0];
       const authorData = authorId ? userMap.get(authorId) : null;
 
+      // Extract video ID from VideoURL if not directly provided
+      let videoId = postFields['Video ID'];
+      const videoUrl = postFields.VideoURL;
+      if (!videoId && typeof videoUrl === 'string') {
+        try {
+          const url = new URL(videoUrl);
+          if (url.hostname.includes('youtube.com')) {
+            videoId = url.searchParams.get('v') || '';
+          } else if (url.hostname.includes('youtu.be')) {
+            videoId = url.pathname.slice(1);
+          }
+        } catch (e) {
+          console.error('Error parsing video URL:', e);
+        }
+      }
+
       return {
         id: record.id,
         fields: {
           ...postFields,
           UserName: authorData?.DisplayName || 'Anonymous',
           UserAvatar: authorData?.ProfileImage || null,
-          ThumbnailURL: postFields['Video ID'] ? 
-            `https://img.youtube.com/vi/${postFields['Video ID']}/maxresdefault.jpg` : 
+          ThumbnailURL: videoId ? 
+            `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : 
             null
         }
       };
