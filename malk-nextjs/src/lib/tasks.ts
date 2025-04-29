@@ -21,22 +21,19 @@ export async function listTasks(options: {
   maxRecords?: number;
 } = {}): Promise<Task[]> {
   try {
-    let query = base('Tasks').select({
-      maxRecords: options.maxRecords || 100,
-    });
+    const records = await base('Tasks')
+      .select({
+        maxRecords: options.maxRecords || 100,
+        ...(options.filterByFormula ? { filterByFormula: options.filterByFormula } : {}),
+        ...(options.sort ? {
+          sort: options.sort.map(sort => ({
+            field: sort.field,
+            direction: sort.direction
+          }))
+        } : {})
+      })
+      .firstPage();
 
-    if (options.filterByFormula) {
-      query = query.filterByFormula(options.filterByFormula);
-    }
-
-    if (options.sort) {
-      query = query.sort(options.sort.map(sort => ({
-        field: sort.field,
-        direction: sort.direction
-      })));
-    }
-
-    const records = await query.firstPage();
     return records.map(record => ({
       id: record.id,
       fields: record.fields as Task['fields']
