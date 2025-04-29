@@ -269,44 +269,44 @@ export default function ProfilePage() {
             </div>
 
             {/* Tabs */}
-            <div className="bg-dark-lighter rounded-lg mt-6 overflow-hidden">
-              <div className="flex border-b border-gray-700">
+            <div className="mt-6">
+              <div className="flex border-b border-gray-700 bg-dark-lighter rounded-t-lg overflow-hidden">
                 <button
                   onClick={() => setActiveTab('posts')}
-                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
+                  className={`flex-1 py-4 px-4 text-center font-medium transition-colors ${
                     activeTab === 'posts'
-                      ? 'text-white border-b-2 border-red-500'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'text-white bg-dark border-b-2 border-red-500'
+                      : 'text-gray-400 hover:text-white hover:bg-dark/50'
                   }`}
                 >
                   Posts
                 </button>
                 <button
                   onClick={() => setActiveTab('likes')}
-                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
+                  className={`flex-1 py-4 px-4 text-center font-medium transition-colors ${
                     activeTab === 'likes'
-                      ? 'text-white border-b-2 border-red-500'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'text-white bg-dark border-b-2 border-red-500'
+                      : 'text-gray-400 hover:text-white hover:bg-dark/50'
                   }`}
                 >
                   Likes
                 </button>
                 <button
                   onClick={() => setActiveTab('followers')}
-                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
+                  className={`flex-1 py-4 px-4 text-center font-medium transition-colors ${
                     activeTab === 'followers'
-                      ? 'text-white border-b-2 border-red-500'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'text-white bg-dark border-b-2 border-red-500'
+                      : 'text-gray-400 hover:text-white hover:bg-dark/50'
                   }`}
                 >
                   Followers
                 </button>
                 <button
                   onClick={() => setActiveTab('following')}
-                  className={`flex-1 py-3 px-4 text-center font-medium transition-colors ${
+                  className={`flex-1 py-4 px-4 text-center font-medium transition-colors ${
                     activeTab === 'following'
-                      ? 'text-white border-b-2 border-red-500'
-                      : 'text-gray-400 hover:text-white'
+                      ? 'text-white bg-dark border-b-2 border-red-500'
+                      : 'text-gray-400 hover:text-white hover:bg-dark/50'
                   }`}
                 >
                   Following
@@ -314,7 +314,7 @@ export default function ProfilePage() {
               </div>
               
               {/* Tab Content */}
-              <div className="p-4">
+              <div className="mt-6">
                 {renderContent()}
               </div>
             </div>
