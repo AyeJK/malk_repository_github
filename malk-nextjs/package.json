@@ -10,6 +10,7 @@
   },
   "dependencies": {
     "@heroicons/react": "^2.2.0",
+    "@prisma/client": "^6.6.0",
     "@radix-ui/react-slot": "^1.2.0",
     "@types/date-fns": "^2.5.3",
     "airtable": "^0.12.2",
@@ -25,6 +26,7 @@
     "next": "^14.1.0",
     "next-auth": "^4.24.6",
     "postcss": "^8.4.35",
+    "prisma": "^6.6.0",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
     "rimraf": "^5.0.5",
