@@ -204,14 +204,14 @@ h1, h2, h3, h4, h5, h6 {
   @apply bg-red-600 text-white hover:bg-red-700;
 }
 
-/* Hide scrollbars while maintaining scroll functionality */
+/* Hide scrollbar while maintaining scroll functionality */
 .hide-scrollbar {
-  -ms-overflow-style: none;  /* Internet Explorer and Edge */
-  scrollbar-width: none;     /* Firefox */
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
 }
 
 .hide-scrollbar::-webkit-scrollbar {
-  display: none;             /* Chrome, Safari and Opera */
+  display: none;  /* Chrome, Safari and Opera */
 }
 
 @layer base {

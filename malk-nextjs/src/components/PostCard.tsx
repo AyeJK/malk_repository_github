@@ -347,7 +347,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
   }, [post.fields.VideoTitle, post.fields.VideoURL]);
 
   return (
-    <div className="bg-dark-lighter rounded-lg overflow-hidden shadow-lg">
+    <div className="bg-dark-lighter rounded-lg overflow-hidden shadow-lg mb-6">
       <div className="p-4">
         {/* User info section with avatar, name, and follow button */}
         <div className="flex items-center justify-between mb-4">

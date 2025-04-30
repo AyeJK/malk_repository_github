@@ -4,7 +4,13 @@ const nextConfig = {
   swcMinify: true,
   trailingSlash: false,
   images: {
-    domains: ['dl.airtable.com', 'firebasestorage.googleapis.com', 'storage.googleapis.com'],
+    domains: [
+      'dl.airtable.com',
+      'firebasestorage.googleapis.com',
+      'storage.googleapis.com',
+      'img.youtube.com',
+      'i.ytimg.com'
+    ],
     dangerouslyAllowSVG: true,
     contentDispositionType: 'attachment',
     contentSecurityPolicy: "default-src 'self'; script-src 'none'; sandbox;",

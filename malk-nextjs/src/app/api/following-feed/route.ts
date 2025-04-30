@@ -3,15 +3,11 @@ import Airtable, { FieldSet } from 'airtable';
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(process.env.AIRTABLE_BASE_ID!);
 
-interface CategoryFields extends FieldSet {
-  Name: string;
-  Posts?: string[];
-}
-
 interface UserFields extends FieldSet {
   DisplayName?: string;
   ProfileImage?: string;
   FirebaseUID?: string;
+  UserIsFollowing?: string[];
 }
 
 interface PostFields extends FieldSet {
@@ -24,51 +20,65 @@ interface PostFields extends FieldSet {
 
 export async function GET(request: NextRequest) {
   try {
-    const categoryName = request.nextUrl.searchParams.get('category');
+    const userId = request.nextUrl.searchParams.get('userId');
+    console.log('Following feed requested for user:', userId);
     
-    if (!categoryName) {
+    if (!userId) {
       return NextResponse.json(
-        { error: 'Missing category parameter' },
+        { error: 'Missing userId parameter' },
         { status: 400 }
       );
     }
 
-    // First, get the category record to ensure it exists and get its linked posts
-    const categoryRecords = await base('Categories').select({
-      filterByFormula: `LOWER({Name}) = LOWER('${categoryName.replace(/'/g, "\\'")}')`
-    }).all();
+    // First get the list of users we're following
+    const followingResponse = await base('Users').select({
+      filterByFormula: `FIND('${userId}', {FirebaseUID}) > 0`,
+    }).firstPage();
+    console.log('Found user records:', followingResponse.length);
 
-    if (categoryRecords.length === 0) {
-      return NextResponse.json(
-        { error: 'Category not found' },
-        { status: 404 }
-      );
-    }
-
-    const categoryRecord = categoryRecords[0];
-    const fields = categoryRecord.fields as CategoryFields;
-    const linkedPostIds = fields.Posts || [];
-
-    if (!linkedPostIds.length) {
+    if (!followingResponse || followingResponse.length === 0) {
+      console.log('No user record found for Firebase UID:', userId);
       return NextResponse.json({ posts: [] });
     }
 
-    // Fetch the linked posts using their record IDs
+    const userFields = followingResponse[0].fields as UserFields;
+    const userIsFollowing = userFields.UserIsFollowing || [];
+    console.log('Raw UserIsFollowing data:', userIsFollowing);
+    console.log('User is following count:', userIsFollowing.length);
+    
+    if (!Array.isArray(userIsFollowing) || userIsFollowing.length === 0) {
+      console.log('User is not following anyone');
+      return NextResponse.json({ posts: [] });
+    }
+
+    // Extract record IDs from the userIsFollowing array
+    const followingRecordIds = userIsFollowing.map((record: any) => {
+      console.log('Processing following record:', record);
+      return typeof record === 'string' ? record : (record.id || record);
+    });
+    console.log('Following record IDs:', followingRecordIds);
+
+    // Get posts from all followed users
     const posts = await base('Posts').select({
-      filterByFormula: `OR(${linkedPostIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
+      filterByFormula: `OR(${followingRecordIds.map(id => 
+        `FIND('${id}', ARRAYJOIN({FirebaseUID})) > 0`
+      ).join(',')})`,
       sort: [{ field: 'DateCreated', direction: 'desc' }],
       maxRecords: 50 // Limit to 50 most recent posts
     }).all();
+    console.log('Found posts count:', posts.length);
 
     // Get all unique user IDs from the posts
     const userIds = Array.from(new Set(
       posts.flatMap(post => (post.fields as PostFields).FirebaseUID || [])
     ));
+    console.log('Unique user IDs in posts:', userIds.length);
 
     // Fetch user data for all authors
     const users = userIds.length > 0 ? await base('Users').select({
       filterByFormula: `OR(${userIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
     }).all() : [];
+    console.log('Found user data count:', users.length);
 
     // Create a map of user data
     const userMap = new Map(users.map(user => [user.id, user.fields as UserFields]));
@@ -91,12 +101,13 @@ export async function GET(request: NextRequest) {
         }
       };
     });
+    console.log('Formatted posts count:', formattedPosts.length);
 
     return NextResponse.json({ posts: formattedPosts });
   } catch (error) {
-    console.error('Error fetching category feed:', error);
+    console.error('Error fetching following feed:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch category feed' },
+      { error: 'Failed to fetch following feed' },
       { status: 500 }
     );
   }

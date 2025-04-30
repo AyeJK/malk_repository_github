@@ -45,35 +45,17 @@ export async function GET(request: NextRequest) {
     }).all();
 
     // Map the records to include only necessary fields and add user data
-    const formattedPosts = posts.map(record => {
-      // Extract video ID from VideoURL if not directly provided
-      let videoId = record.fields['Video ID'];
-      const videoUrl = record.fields.VideoURL;
-      if (!videoId && typeof videoUrl === 'string') {
-        try {
-          const url = new URL(videoUrl);
-          if (url.hostname.includes('youtube.com')) {
-            videoId = url.searchParams.get('v') || '';
-          } else if (url.hostname.includes('youtu.be')) {
-            videoId = url.pathname.slice(1);
-          }
-        } catch (e) {
-          console.error('Error parsing video URL:', e);
-        }
+    const formattedPosts = posts.map(record => ({
+      id: record.id,
+      fields: {
+        ...record.fields,
+        UserName: userData.DisplayName || 'Anonymous',
+        UserAvatar: userData.ProfileImage || null,
+        ThumbnailURL: record.fields['Video ID'] ? 
+          `https://img.youtube.com/vi/${record.fields['Video ID']}/maxresdefault.jpg` : 
+          null
       }
-
-      return {
-        id: record.id,
-        fields: {
-          ...record.fields,
-          UserName: userData.DisplayName || 'Anonymous',
-          UserAvatar: userData.ProfileImage || null,
-          ThumbnailURL: videoId ? 
-            `https://img.youtube.com/vi/${videoId}/maxresdefault.jpg` : 
-            null
-        }
-      };
-    });
+    }));
 
     return NextResponse.json({ posts: formattedPosts });
   } catch (error) {
