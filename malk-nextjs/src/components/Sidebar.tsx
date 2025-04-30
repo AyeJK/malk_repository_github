@@ -22,7 +22,8 @@ import {
   GlobeAltIcon,
   FolderIcon,
   HeartIcon,
-  HashtagIcon
+  HashtagIcon,
+  UsersIcon
 } from '@heroicons/react/24/outline';
 import { useSidebar } from '@/lib/sidebar-context';
 import { useAuth } from '@/lib/auth-context';
@@ -167,7 +168,7 @@ export default function Sidebar() {
   const mainLinks = [
     { href: '/discover', label: 'Discover', icon: <HomeIcon className="w-5 h-5" /> },
     { href: '/posts', label: 'Activity', icon: <FilmIcon className="w-5 h-5" /> },
-    { href: '/following', label: 'Following', icon: <HeartIcon className="w-5 h-5" /> },
+    { href: '/following', label: 'Following', icon: <UsersIcon className="w-5 h-5" /> },
     { href: user && airtableUser ? `/profile/${airtableUser.id}` : '/login', label: 'Profile', icon: <FolderIcon className="w-5 h-5" /> },
   ];
 

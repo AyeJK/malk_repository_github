@@ -20,7 +20,8 @@ import {
   GlobeAltIcon,
   FolderIcon,
   ChevronLeftIcon,
-  ChevronRightIcon
+  ChevronRightIcon,
+  UsersIcon
 } from '@heroicons/react/24/outline';
 import DefaultAvatar from '@/components/DefaultAvatar';
 
@@ -69,13 +70,43 @@ interface PostSliderProps {
   posts: Post[];
 }
 
+function getIconForTitle(title: string): React.ElementType {
+  if (title.toLowerCase() === 'following') {
+    return UsersIcon;
+  }
+  // Find matching category or return a default icon
+  const category = categories.find(c => c.name.toLowerCase() === title.toLowerCase());
+  if (category) {
+    return category.icon;
+  }
+  // Use FolderIcon as fallback for any unknown category
+  return FolderIcon;
+}
+
+function getSliderLink(title: string): string {
+  // For Following section
+  if (title.toLowerCase() === 'following') {
+    return '/following';
+  }
+  
+  // For category sections
+  const category = categories.find(c => c.name.toLowerCase() === title.toLowerCase());
+  if (category) {
+    return `/category/${title.toLowerCase().replace(/ /g, '-')}`;
+  }
+  
+  return '#';
+}
+
 function PostSlider({ title, posts }: PostSliderProps) {
   const sliderRef = React.useRef<HTMLDivElement>(null);
+  const Icon = getIconForTitle(title);
+  const linkHref = getSliderLink(title);
 
   const scroll = (direction: 'left' | 'right') => {
     if (!sliderRef.current) return;
     
-    const scrollAmount = 300; // Width of one card
+    const scrollAmount = 300;
     const currentScroll = sliderRef.current.scrollLeft;
     const newScroll = direction === 'left' 
       ? currentScroll - scrollAmount 
@@ -88,9 +119,12 @@ function PostSlider({ title, posts }: PostSliderProps) {
   };
 
   return (
-    <div className="mb-8">
-      <div className="flex items-center justify-between mb-4">
-        <h2 className="text-xl font-semibold text-white">{title}</h2>
+    <div className="mb-6">
+      <div className="flex items-center justify-between mb-3">
+        <Link href={linkHref} className="flex items-center gap-2 hover:opacity-80 transition-opacity">
+          <Icon className="w-6 h-6 text-white/70" />
+          <h2 className="text-xl font-semibold text-white">{title}</h2>
+        </Link>
         <div className="flex gap-2">
           <button
             onClick={() => scroll('left')}
@@ -252,11 +286,9 @@ export default function DiscoverPage() {
               <Link
                 key={category.name}
                 href={category.href}
-                className="group bg-dark-lighter hover:bg-white/5 rounded-lg p-4 transition-all duration-200 flex items-center space-x-3"
+                className="group bg-dark-lighter flex items-center gap-3 py-2.5 px-4 rounded-lg hover:bg-white/5 transition-all duration-200"
               >
-                <div className="p-2 rounded-lg bg-white/5 group-hover:bg-white/10 transition-colors">
-                  <Icon className="w-5 h-5 text-white/70 group-hover:text-white" />
-                </div>
+                <Icon className="w-7 h-7 text-white/70 group-hover:text-white transition-colors" />
                 <span className="text-base font-medium text-white/90 group-hover:text-white">
                   {category.name}
                 </span>
