@@ -81,21 +81,30 @@ async function processBatch(
 
     try {
       // Parse the line
-      const [videoURL, description, tagsStr, category, dateCreated] = line.split('\t');
+      const [videoURL, description, tagsStr, category, dateCreated] = line.split('\t').map(field => field.trim());
       
       if (!videoURL) {
         throw new Error('Missing required field: videoURL is required');
       }
 
-      console.log('Parsed fields:', { videoURL, description, tagsStr, category, dateCreated });
+      // Clean up the videoURL (remove any quotes if present)
+      const cleanVideoURL = videoURL.replace(/^["']|["']$/g, '');
+
+      console.log('Parsed fields:', {
+        videoURL: cleanVideoURL,
+        description,
+        tagsStr,
+        category,
+        dateCreated
+      });
 
       // Check if post already exists by video URL
-      const exists = await checkPostExists(videoURL);
+      const exists = await checkPostExists(cleanVideoURL);
       if (exists) {
-        console.log(`Post with URL ${videoURL} already exists, skipping...`);
-        skippedPosts.push(videoURL);
+        console.log(`Post with URL ${cleanVideoURL} already exists, skipping...`);
+        skippedPosts.push(cleanVideoURL);
         results.push({
-          videoURL,
+          videoURL: cleanVideoURL,
           success: true,
           videoTitle: 'Already exists',
           error: null,
@@ -122,7 +131,7 @@ async function processBatch(
       
       while (retryCount < maxRetries) {
         try {
-          videoTitle = await getVideoTitle(videoURL);
+          videoTitle = await getVideoTitle(cleanVideoURL);
           console.log('Successfully got video title:', videoTitle);
           break;
         } catch (error: any) {
@@ -151,7 +160,7 @@ async function processBatch(
       try {
         console.log('Creating post with data:', {
           firebaseUID,
-          videoURL,
+          videoURL: cleanVideoURL,
           userCaption: description || '',
           userTags: tags,
           categories: category ? [category] : []
@@ -160,7 +169,7 @@ async function processBatch(
         // Create the post
         const post = await createPost({
           firebaseUID,
-          videoURL,
+          videoURL: cleanVideoURL,
           userCaption: description || '',
           userTags: tags,
           categories: category ? [category] : []
@@ -176,11 +185,11 @@ async function processBatch(
             console.log('Updated post creation date:', dateCreated);
           } catch (error: any) {
             console.error('Error setting original creation date:', error);
-            errors.push(`Failed to set creation date for post ${videoURL}: ${error.message}`);
+            errors.push(`Failed to set creation date for post ${cleanVideoURL}: ${error.message}`);
           }
 
           results.push({
-            videoURL,
+            videoURL: cleanVideoURL,
             success: true,
             videoTitle,
             error: null
@@ -189,10 +198,10 @@ async function processBatch(
           throw new Error('Post creation returned null');
         }
       } catch (postError: any) {
-        console.error(`Error creating post ${videoURL}:`, postError);
-        errors.push(`Failed to create post ${videoURL}: ${postError.message}`);
+        console.error(`Error creating post ${cleanVideoURL}:`, postError);
+        errors.push(`Failed to create post ${cleanVideoURL}: ${postError.message}`);
         results.push({
-          videoURL,
+          videoURL: cleanVideoURL,
           success: false,
           videoTitle,
           error: postError.message
