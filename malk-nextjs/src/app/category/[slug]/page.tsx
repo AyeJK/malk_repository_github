@@ -17,9 +17,7 @@ export default function CategoryPage() {
     const fetchCategoryPosts = async () => {
       try {
         setLoading(true);
-        const categoryName = decodeURIComponent(categorySlug);
-        
-        const response = await fetch(`/api/get-posts-by-category?category=${encodeURIComponent(categoryName)}`);
+        const response = await fetch(`/api/get-posts-by-category?slug=${encodeURIComponent(categorySlug)}`);
         
         if (!response.ok) {
           if (response.status === 404) {

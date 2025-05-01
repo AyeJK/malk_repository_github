@@ -5,23 +5,24 @@ const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(process.env
 
 interface CategoryFields extends FieldSet {
   Name: string;
+  Slug: string;
   Posts?: string[];
 }
 
 export async function GET(request: NextRequest) {
   try {
-    const categoryName = request.nextUrl.searchParams.get('category');
+    const slug = request.nextUrl.searchParams.get('slug');
     
-    if (!categoryName) {
+    if (!slug) {
       return NextResponse.json(
-        { error: 'Missing category parameter' },
+        { error: 'Missing slug parameter' },
         { status: 400 }
       );
     }
 
-    // First, get the category record to ensure it exists and get its linked posts
+    // Get the category record using the slug field
     const categoryRecords = await base('Categories').select({
-      filterByFormula: `LOWER({Name}) = LOWER('${categoryName.replace(/'/g, "\\'")}')`
+      filterByFormula: `LOWER({Slug}) = LOWER('${slug.replace(/'/g, "\\'")}')`
     }).all();
 
     if (categoryRecords.length === 0) {
