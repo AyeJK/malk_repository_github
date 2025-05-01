@@ -39,10 +39,21 @@ export async function POST(request: NextRequest) {
 
     // Read the import file
     const fileContent = await importFile.text();
-    const lines = fileContent.split('\n');
+    console.log('File content:', fileContent.substring(0, 100)); // Log first 100 chars for debugging
+    
+    const lines = fileContent.split('\n').map(line => line.trim()).filter(line => line.length > 0);
+    console.log('Number of lines:', lines.length);
+    
+    if (lines.length < 2) {
+      return NextResponse.json(
+        { error: 'Import file must contain at least 2 lines (FirebaseUID and at least one post)' },
+        { status: 400 }
+      );
+    }
     
     // First line should be the FirebaseUID
-    const firebaseUID = lines[0].trim().replace('FirebaseUserID:', '').trim();
+    const firebaseUID = lines[0].replace('FirebaseUserID:', '').trim();
+    console.log('FirebaseUID:', firebaseUID);
 
     // Process each post
     const results = [];
@@ -50,24 +61,26 @@ export async function POST(request: NextRequest) {
     const skippedPosts = [];
     
     for (let i = 1; i < lines.length; i++) {
-      const line = lines[i].trim();
-      if (!line) continue;
+      const line = lines[i];
+      console.log(`Processing line ${i + 1}:`, line);
 
       try {
         // Parse the line
-        const [postId, videoURL, description, tagsStr, category, dateCreated] = line.split('\t');
+        const [videoURL, description, tagsStr, category, dateCreated] = line.split('\t');
         
-        if (!postId || !videoURL) {
-          throw new Error('Missing required fields: postId and videoURL are required');
+        if (!videoURL) {
+          throw new Error('Missing required field: videoURL is required');
         }
 
-        // Check if post already exists
-        const exists = await checkPostExists(postId);
+        console.log('Parsed fields:', { videoURL, description, tagsStr, category, dateCreated });
+
+        // Check if post already exists by video URL
+        const exists = await checkPostExists(videoURL);
         if (exists) {
-          console.log(`Post ${postId} already exists, skipping...`);
-          skippedPosts.push(postId);
+          console.log(`Post with URL ${videoURL} already exists, skipping...`);
+          skippedPosts.push(videoURL);
           results.push({
-            postId,
+            videoURL,
             success: true,
             videoTitle: 'Already exists',
             error: null,
@@ -82,6 +95,8 @@ export async function POST(request: NextRequest) {
           .map(tag => tag.trim())
           .map(tag => tag.startsWith('#') ? tag.substring(1) : tag)
           .filter(tag => tag.length > 0) : [];
+        
+        console.log('Extracted tags:', tags);
         
         // Get video title from YouTube API with retry logic
         let videoTitle = null;
@@ -122,8 +137,7 @@ export async function POST(request: NextRequest) {
             videoURL,
             userCaption: description || '',
             userTags: tags,
-            categories: category ? [category] : [],
-            importId: postId
+            categories: category ? [category] : []
           });
 
           if (post) {
@@ -134,11 +148,11 @@ export async function POST(request: NextRequest) {
               });
             } catch (error: any) {
               console.error('Error setting original creation date:', error);
-              errors.push(`Failed to set creation date for post ${postId}: ${error.message}`);
+              errors.push(`Failed to set creation date for post ${videoURL}: ${error.message}`);
             }
 
             results.push({
-              postId,
+              videoURL,
               success: true,
               videoTitle,
               error: null
@@ -147,10 +161,10 @@ export async function POST(request: NextRequest) {
             throw new Error('Post creation returned null');
           }
         } catch (postError: any) {
-          console.error(`Error creating post ${postId}:`, postError);
-          errors.push(`Failed to create post ${postId}: ${postError.message}`);
+          console.error(`Error creating post ${videoURL}:`, postError);
+          errors.push(`Failed to create post ${videoURL}: ${postError.message}`);
           results.push({
-            postId,
+            videoURL,
             success: false,
             videoTitle,
             error: postError.message
@@ -158,14 +172,14 @@ export async function POST(request: NextRequest) {
         }
 
         // Add a delay between posts to avoid rate limiting
-        await delay(2000); // Increased delay to 2 seconds
+        await delay(2000);
 
       } catch (error: any) {
         console.error(`Error processing post at line ${i + 1}:`, error);
         errors.push(`Line ${i + 1}: ${error.message}`);
         
         results.push({
-          postId: `Line ${i + 1}`,
+          videoURL: `Line ${i + 1}`,
           success: false,
           videoTitle: null,
           error: error.message
