@@ -61,52 +61,54 @@ export default function Navbar() {
           <div className="flex items-center space-x-6">
             {user ? (
               <>
-                <button 
-                  onClick={openShareModal}
-                  className="px-6 py-1.5 rounded-lg text-sm font-medium bg-red-800 text-red-100 hover:bg-red-700 transition-all duration-300"
-                >
-                  Share Video
-                </button>
-                <div className="relative" ref={dropdownRef}>
+                <div className="flex items-center space-x-6">
                   <button 
-                    className="w-8 h-8 rounded-full overflow-hidden hover:opacity-80 transition-opacity"
-                    onClick={toggleDropdown}
+                    onClick={openShareModal}
+                    className="px-6 py-1.5 rounded-lg text-sm font-medium bg-red-800 text-red-100 hover:bg-red-700 transition-all duration-300 h-9 flex items-center"
                   >
-                    {airtableUser?.fields?.ProfileImage ? (
-                      <img 
-                        src={airtableUser.fields.ProfileImage} 
-                        alt="Profile" 
-                        className="w-full h-full object-cover"
-                      />
-                    ) : (
-                      <DefaultAvatar userId={user?.uid} userName={airtableUser?.fields?.DisplayName} />
-                    )}
+                    Share Video
                   </button>
-                  
-                  {isDropdownOpen && (
-                    <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-dark-lighter ring-1 ring-black ring-opacity-5">
-                      <Link
-                        href={`/profile/${airtableUser?.id}`}
-                        className="block px-4 py-2 text-sm text-white hover:bg-white/5"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        Your Profile
-                      </Link>
-                      <Link
-                        href="/settings"
-                        className="block px-4 py-2 text-sm text-white hover:bg-white/5"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        Settings
-                      </Link>
-                      <button
-                        onClick={handleSignOut}
-                        className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/5"
-                      >
-                        Sign Out
-                      </button>
-                    </div>
-                  )}
+                  <div className="relative flex items-center" ref={dropdownRef}>
+                    <button 
+                      className="w-9 h-9 rounded-full overflow-hidden hover:opacity-80 transition-opacity flex items-center justify-center"
+                      onClick={toggleDropdown}
+                    >
+                      {airtableUser?.fields?.ProfileImage ? (
+                        <img 
+                          src={airtableUser.fields.ProfileImage} 
+                          alt="Profile" 
+                          className="w-full h-full object-cover"
+                        />
+                      ) : (
+                        <DefaultAvatar userId={user?.uid} userName={airtableUser?.fields?.DisplayName} />
+                      )}
+                    </button>
+                    
+                    {isDropdownOpen && (
+                      <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-dark-lighter ring-1 ring-black ring-opacity-5">
+                        <Link
+                          href={`/profile/${airtableUser?.id}`}
+                          className="block px-4 py-2 text-sm text-white hover:bg-white/5"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          Your Profile
+                        </Link>
+                        <Link
+                          href="/settings"
+                          className="block px-4 py-2 text-sm text-white hover:bg-white/5"
+                          onClick={() => setIsDropdownOpen(false)}
+                        >
+                          Settings
+                        </Link>
+                        <button
+                          onClick={handleSignOut}
+                          className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/5"
+                        >
+                          Sign Out
+                        </button>
+                      </div>
+                    )}
+                  </div>
                 </div>
               </>
             ) : (
