@@ -384,104 +384,85 @@ export async function ensurePostsTableExists(): Promise<boolean> {
   }
 }
 
-// Function to create a new post
-export async function createPost(postData: {
+interface CreatePostParams {
   firebaseUID: string;
   videoURL: string;
   userCaption: string;
   userTags?: string[];
   categories?: string[];
-}): Promise<PostRecord | null> {
-  try {
-    console.log('Creating post with data:', {
-      firebaseUID: postData.firebaseUID,
-      videoURL: postData.videoURL,
-      userCaption: postData.userCaption,
-      userTags: postData.userTags,
-      categories: postData.categories
-    });
-    
-    // Get the user record to get the user ID
-    console.log('Looking up user with Firebase UID:', postData.firebaseUID);
-    const userRecord = await getUserByFirebaseUID(postData.firebaseUID);
-    if (!userRecord) {
-      console.error('User not found:', postData.firebaseUID);
-      return null;
-    }
-    console.log('User record found:', userRecord.id);
-    
-    // Extract video ID from URL
-    const videoId = extractVideoId(postData.videoURL);
-    if (!videoId) {
-      console.error('Invalid video URL:', postData.videoURL);
-      return null;
-    }
-    console.log('Video ID extracted:', videoId);
+  importId?: string;
+}
 
-    // Get video title
-    const videoTitle = await getVideoTitle(postData.videoURL);
-    console.log('Video title fetched:', videoTitle);
-    
-    // Process tags - create or get tag IDs
-    let tagIds: string[] = [];
-    if (postData.userTags && postData.userTags.length > 0) {
-      console.log('Processing tags:', postData.userTags);
-      for (const tagName of postData.userTags) {
-        const tagId = await createTagIfNotExists(tagName);
-        if (tagId) {
-          tagIds.push(tagId);
+export async function createPost(params: CreatePostParams) {
+  try {
+    // First, create tags if they don't exist
+    const tagIds = [];
+    if (params.userTags && params.userTags.length > 0) {
+      for (const tagName of params.userTags) {
+        try {
+          const tagId = await createTagIfNotExists(tagName);
+          if (tagId) {
+            tagIds.push(tagId);
+          }
+        } catch (tagError) {
+          console.error(`Error creating tag "${tagName}":`, tagError);
         }
       }
-      console.log('Tag IDs:', tagIds);
     }
-    
-    // Process categories - create or get category IDs
-    let categoryIds: string[] = [];
-    if (postData.categories && postData.categories.length > 0) {
-      console.log('Processing categories:', postData.categories);
-      for (const categoryName of postData.categories) {
-        const categoryId = await createCategoryIfNotExists(categoryName);
-        if (categoryId) {
-          categoryIds.push(categoryId);
-        }
-      }
-      console.log('Category IDs:', categoryIds);
-    }
-    
-    // Create the post record
-    const newFields: Record<string, any> = {
-      FirebaseUID: [userRecord.id], // Link to the user record
-      VideoURL: postData.videoURL,
-      UserCaption: postData.userCaption,
-      VideoTitle: videoTitle || 'Untitled Video' // Add video title
+
+    // Create the post fields
+    const fields: any = {
+      FirebaseUID: [params.firebaseUID],
+      VideoURL: params.videoURL,
+      UserCaption: params.userCaption
     };
-    
+
     // Add tags if we have any
     if (tagIds.length > 0) {
-      newFields.UserTags = tagIds;
+      fields.UserTags = tagIds;
     }
-    
-    // Add categories if we have any
-    if (categoryIds.length > 0) {
-      newFields.Categories = categoryIds;
+
+    // Add categories if provided
+    if (params.categories && params.categories.length > 0) {
+      const categoryIds = [];
+      for (const categoryName of params.categories) {
+        try {
+          const categoryId = await createCategoryIfNotExists(categoryName);
+          if (categoryId) {
+            categoryIds.push(categoryId);
+          }
+        } catch (categoryError) {
+          console.error(`Error creating category "${categoryName}":`, categoryError);
+        }
+      }
+      if (categoryIds.length > 0) {
+        fields.Categories = categoryIds;
+      }
     }
-    
-    console.log('Creating post with fields:', newFields);
-    
-    // Create the post
-    const record = await base('Posts').create([
-      { fields: newFields }
-    ]);
-    
-    console.log('Post created successfully:', record[0].id);
-    
-    return {
-      id: record[0].id,
-      fields: record[0].fields as any,
-    };
-  } catch (error) {
-    console.error('Error creating post:', error);
-    return null;
+
+    // Add import ID if provided
+    if (params.importId) {
+      fields.ImportId = params.importId;
+    }
+
+    try {
+      const records = await base('Posts').create([{ fields }]);
+      return records[0];
+    } catch (createError: any) {
+      console.error('Error creating post record:', {
+        error: createError.message,
+        fields: fields,
+        details: createError.details || 'No additional details'
+      });
+      throw new Error(`Failed to create post: ${createError.message}`);
+    }
+  } catch (error: any) {
+    console.error('Error in createPost:', {
+      error: error.message,
+      params: params,
+      stack: error.stack
+    });
+    throw error;
   }
 }
 
@@ -612,29 +593,31 @@ export async function searchTags(query: string): Promise<string[]> {
 // Function to create a tag if it doesn't exist
 export async function createTagIfNotExists(tagName: string): Promise<string | null> {
   try {
-    // Normalize the tag name
-    const normalizedTagName = tagName.toLowerCase().trim();
-    
-    // Check if the tag already exists
+    // First check if the tag exists
     const records = await base('Tags').select({
-      filterByFormula: `{Name} = '${normalizedTagName}'`,
+      filterByFormula: `{Name} = '${tagName}'`,
       maxRecords: 1
     }).firstPage();
-    
+
     if (records.length > 0) {
-      // Tag already exists, return its ID
+      // Tag exists, return its ID
       return records[0].id;
     }
-    
+
     // Tag doesn't exist, create it
-    const newRecord = await base('Tags').create([
-      { fields: { Name: normalizedTagName } }
+    const newRecords = await base('Tags').create([
+      {
+        fields: {
+          Name: tagName,
+          Slug: tagName.toLowerCase().replace(/\s+/g, '-')
+        }
+      }
     ]);
-    
-    return newRecord[0].id;
-  } catch (error) {
-    console.error('Error creating tag:', error);
-    return null;
+
+    return newRecords[0].id;
+  } catch (error: any) {
+    console.error(`Error creating tag "${tagName}":`, error);
+    throw new Error(`Failed to create tag: ${error.message}`);
   }
 }
 
@@ -662,29 +645,31 @@ export async function ensureCategoriesTableExists(): Promise<boolean> {
 // Function to create a category if it doesn't exist
 export async function createCategoryIfNotExists(categoryName: string): Promise<string | null> {
   try {
-    // Normalize the category name
-    const normalizedCategoryName = categoryName.trim();
-    
-    // Check if the category already exists
+    // First check if the category exists
     const records = await base('Categories').select({
-      filterByFormula: `{Name} = '${normalizedCategoryName}'`,
+      filterByFormula: `{Name} = '${categoryName}'`,
       maxRecords: 1
     }).firstPage();
-    
+
     if (records.length > 0) {
-      // Category already exists, return its ID
+      // Category exists, return its ID
       return records[0].id;
     }
-    
+
     // Category doesn't exist, create it
-    const newRecord = await base('Categories').create([
-      { fields: { Name: normalizedCategoryName } }
+    const newRecords = await base('Categories').create([
+      {
+        fields: {
+          Name: categoryName,
+          Slug: categoryName.toLowerCase().replace(/\s+/g, '-')
+        }
+      }
     ]);
-    
-    return newRecord[0].id;
-  } catch (error) {
-    console.error('Error creating category:', error);
-    return null;
+
+    return newRecords[0].id;
+  } catch (error: any) {
+    console.error(`Error creating category "${categoryName}":`, error);
+    throw new Error(`Failed to create category: ${error.message}`);
   }
 }
 
