@@ -86,13 +86,6 @@ export default function Navbar() {
                   {isDropdownOpen && (
                     <div className="absolute right-0 top-full mt-2 w-48 rounded-md shadow-lg py-1 bg-dark-lighter ring-1 ring-black ring-opacity-5">
                       <Link
-                        href={`/profile/${airtableUser?.id}`}
-                        className="block px-4 py-2 text-sm text-white hover:bg-white/5"
-                        onClick={() => setIsDropdownOpen(false)}
-                      >
-                        Your Profile
-                      </Link>
-                      <Link
                         href="/settings"
                         className="block px-4 py-2 text-sm text-white hover:bg-white/5"
                         onClick={() => setIsDropdownOpen(false)}
