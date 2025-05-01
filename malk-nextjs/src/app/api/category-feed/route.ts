@@ -25,6 +25,8 @@ interface PostFields extends FieldSet {
 export async function GET(request: NextRequest) {
   try {
     const categoryName = request.nextUrl.searchParams.get('category');
+    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '10');
+    const offset = parseInt(request.nextUrl.searchParams.get('offset') || '0');
     
     if (!categoryName) {
       return NextResponse.json(
@@ -58,14 +60,19 @@ export async function GET(request: NextRequest) {
     const linkedPostIds = fields.Posts || [];
 
     if (!linkedPostIds.length) {
-      return NextResponse.json({ posts: [] });
+      return NextResponse.json({ 
+        posts: [],
+        totalCount: 0,
+        hasMore: false
+      });
     }
 
-    // Fetch the linked posts using their record IDs
+    // Fetch the linked posts using their record IDs with pagination
     const posts = await base('Posts').select({
       filterByFormula: `OR(${linkedPostIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
       sort: [{ field: 'DisplayDate', direction: 'desc' }],
-      maxRecords: 50 // Limit to 50 most recent posts
+      pageSize: limit,
+      offset: offset
     }).all();
 
     // Get all unique user IDs from the posts
@@ -100,7 +107,11 @@ export async function GET(request: NextRequest) {
       };
     });
 
-    return NextResponse.json({ posts: formattedPosts });
+    return NextResponse.json({ 
+      posts: formattedPosts,
+      totalCount: linkedPostIds.length,
+      hasMore: offset + limit < linkedPostIds.length
+    });
   } catch (error) {
     console.error('Error fetching category feed:', error);
     return NextResponse.json(
