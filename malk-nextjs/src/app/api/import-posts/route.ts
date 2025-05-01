@@ -14,14 +14,53 @@ const delay = (ms: number) => new Promise(resolve => setTimeout(resolve, ms));
 // Helper function to check if a post exists by video URL
 async function checkPostExists(videoURL: string): Promise<boolean> {
   try {
+    // Extract video ID from URL for more accurate comparison
+    const videoId = extractVideoId(videoURL);
+    if (!videoId) {
+      console.error('Could not extract video ID from URL:', videoURL);
+      return false;
+    }
+
+    // Check for existing post with same video ID
     const records = await base('Posts').select({
-      filterByFormula: `{VideoURL} = '${videoURL}'`,
+      filterByFormula: `OR(FIND('${videoId}', {VideoURL}) > 0, FIND('${videoId}', {Video ID}) > 0)`,
       maxRecords: 1
     }).firstPage();
-    return records.length > 0;
+
+    const exists = records.length > 0;
+    if (exists) {
+      console.log(`Found existing post with video ID ${videoId}`);
+    } else {
+      console.log(`No existing post found with video ID ${videoId}`);
+    }
+    return exists;
   } catch (error) {
     console.error('Error checking for existing post:', error);
     return false;
+  }
+}
+
+// Helper function to extract video ID from YouTube URL
+function extractVideoId(url: string): string | null {
+  try {
+    const patterns = [
+      /(?:youtube\.com\/watch\?v=|youtu\.be\/)([^&\n?#]+)/,
+      /youtube\.com\/embed\/([^&\n?#]+)/,
+      /youtube\.com\/v\/([^&\n?#]+)/
+    ];
+
+    for (const pattern of patterns) {
+      const match = url.match(pattern);
+      if (match && match[1]) {
+        return match[1];
+      }
+    }
+
+    console.error('Could not extract video ID from URL:', url);
+    return null;
+  } catch (error) {
+    console.error('Error extracting video ID:', error);
+    return null;
   }
 }
 
@@ -38,7 +77,7 @@ async function processBatch(
   
   for (let i = startIndex; i < Math.min(startIndex + batchSize, posts.length); i++) {
     const line = posts[i];
-    console.log(`Processing line ${i + 1}:`, line);
+    console.log(`\nProcessing line ${i + 1}:`, line);
 
     try {
       // Parse the line
@@ -65,6 +104,8 @@ async function processBatch(
         continue;
       }
 
+      console.log('Post does not exist, proceeding with creation...');
+
       // Extract tags from the tags string - handle #tags with spaces
       const tags = tagsStr ? tagsStr
         .split(',')
@@ -82,6 +123,7 @@ async function processBatch(
       while (retryCount < maxRetries) {
         try {
           videoTitle = await getVideoTitle(videoURL);
+          console.log('Successfully got video title:', videoTitle);
           break;
         } catch (error: any) {
           retryCount++;
@@ -107,6 +149,14 @@ async function processBatch(
       }
       
       try {
+        console.log('Creating post with data:', {
+          firebaseUID,
+          videoURL,
+          userCaption: description || '',
+          userTags: tags,
+          categories: category ? [category] : []
+        });
+
         // Create the post
         const post = await createPost({
           firebaseUID,
@@ -117,11 +167,13 @@ async function processBatch(
         });
 
         if (post) {
+          console.log('Post created successfully:', post.id);
           // Update the post with the original creation date
           try {
             await base('Posts').update(post.id, {
               'OriginalDateCreated': dateCreated
             });
+            console.log('Updated post creation date:', dateCreated);
           } catch (error: any) {
             console.error('Error setting original creation date:', error);
             errors.push(`Failed to set creation date for post ${videoURL}: ${error.message}`);
