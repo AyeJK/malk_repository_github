@@ -48,6 +48,14 @@ async function getYouTubeVideoTitle(videoId: string): Promise<string | null> {
 
     return video.snippet.title;
   } catch (error: any) {
+    if (error.response?.status === 403) {
+      console.error('YouTube API quota exceeded');
+      throw new Error('YouTube API quota exceeded. Please try again later.');
+    }
+    if (error.response?.status === 429) {
+      console.error('YouTube API rate limit exceeded');
+      throw new Error('YouTube API rate limit exceeded. Please try again later.');
+    }
     console.error('Error fetching YouTube video title:', {
       error: error.message,
       response: error.response?.data,
@@ -84,6 +92,10 @@ async function getVimeoVideoTitle(videoId: string): Promise<string | null> {
 
     return video.title;
   } catch (error: any) {
+    if (error.response?.status === 429) {
+      console.error('Vimeo API rate limit exceeded');
+      throw new Error('Vimeo API rate limit exceeded. Please try again later.');
+    }
     console.error('Error fetching Vimeo video title:', {
       error: error.message,
       response: error.response?.data,

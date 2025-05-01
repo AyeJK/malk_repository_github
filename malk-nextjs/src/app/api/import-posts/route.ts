@@ -95,11 +95,22 @@ export async function POST(request: NextRequest) {
           } catch (error: any) {
             retryCount++;
             console.error(`Attempt ${retryCount} failed to get video title:`, error.message);
+            
+            // Check for rate limit errors
+            if (error.message.includes('quota exceeded') || error.message.includes('rate limit exceeded')) {
+              console.error('API rate limit reached, continuing with default title');
+              videoTitle = 'Title unavailable (API limit reached)';
+              break;
+            }
+            
             if (retryCount === maxRetries) {
               console.error(`Failed to get video title after ${maxRetries} attempts:`, error);
               videoTitle = 'Title unavailable';
             } else {
-              await delay(1000 * Math.pow(2, retryCount)); // Exponential backoff
+              // Exponential backoff with jitter
+              const backoffTime = Math.min(1000 * Math.pow(2, retryCount) + Math.random() * 1000, 10000);
+              console.log(`Waiting ${backoffTime}ms before retry...`);
+              await delay(backoffTime);
             }
           }
         }
@@ -147,7 +158,7 @@ export async function POST(request: NextRequest) {
         }
 
         // Add a delay between posts to avoid rate limiting
-        await delay(1000);
+        await delay(2000); // Increased delay to 2 seconds
 
       } catch (error: any) {
         console.error(`Error processing post at line ${i + 1}:`, error);
