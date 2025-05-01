@@ -63,7 +63,7 @@ export default function Navbar() {
               <>
                 <button 
                   onClick={openShareModal}
-                  className="btn-primary px-4 py-2 rounded-lg text-sm font-medium"
+                  className="px-6 py-1.5 rounded-lg text-sm font-medium bg-red-800 text-red-100 hover:bg-red-700 transition-all duration-300"
                 >
                   Share Video
                 </button>

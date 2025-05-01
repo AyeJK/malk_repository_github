@@ -57,7 +57,7 @@ export default function LazyPostCard({ post, onDelete, hideFollowButton = false 
       {(isVisible || hasBeenVisible) ? (
         <PostCard post={post} onDelete={onDelete} hideFollowButton={hideFollowButton} />
       ) : (
-        <div className="bg-dark-lighter rounded-lg overflow-hidden shadow-lg mb-6 animate-pulse">
+        <div className="mb-6">
           <div className="p-4">
             <div className="flex items-center justify-between mb-4">
               <div className="flex items-center space-x-3">
@@ -68,7 +68,7 @@ export default function LazyPostCard({ post, onDelete, hideFollowButton = false 
                 </div>
               </div>
             </div>
-            <div className="aspect-video bg-gray-700 rounded-lg mb-4" />
+            <div className="aspect-video bg-gray-700 rounded-xl mb-4" />
             <div className="h-4 w-32 bg-gray-700 rounded" />
           </div>
         </div>

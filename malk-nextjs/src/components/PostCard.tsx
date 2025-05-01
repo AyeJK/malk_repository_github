@@ -9,6 +9,7 @@ import Image from 'next/image';
 import DefaultAvatar from './DefaultAvatar';
 import { formatRelativeTime } from '@/lib/date-utils';
 import { getVideoTitle } from '@/lib/video-utils';
+import { CheckIcon } from '@heroicons/react/24/outline';
 
 interface PostCardProps {
   post: {
@@ -348,7 +349,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
   }, [post.fields.VideoTitle, post.fields.VideoURL]);
 
   return (
-    <div className="bg-dark-lighter rounded-lg overflow-hidden shadow-lg mb-6">
+    <div className="mb-6">
       <div className="p-4">
         {/* User info section with avatar, name, and follow button */}
         <div className="flex items-center justify-between mb-4">
@@ -378,14 +379,14 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
                   <span>Anonymous shared</span>
                 ) : (
                   <span>
-                    <Link href={`/profile/${post.fields.FirebaseUID?.[0]}`} className="text-blue-400 hover:text-blue-300 hover:underline">
+                    <Link href={`/profile/${post.fields.FirebaseUID?.[0]}`} className="text-red-400 hover:text-red-300 hover:underline">
                       {authorName}
                     </Link> shared
                   </span>
                 )}
               </div>
               <h3 className="text-lg font-bold text-white relative z-20">
-                <Link href={`/posts/${post.id}`} prefetch={true} className="hover:text-blue-400 transition-colors block">
+                <Link href={`/posts/${post.id}`} prefetch={true} className="hover:text-red-400 transition-colors block">
                   {videoTitle}
                 </Link>
               </h3>
@@ -397,13 +398,22 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
             <button
               onClick={handleToggleFollow}
               disabled={isFollowLoading}
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
+              className={`py-1.5 text-sm font-medium min-w-[100px] inline-flex items-center justify-center ${
                 isFollowing
-                  ? 'bg-gray-600 text-white hover:bg-gray-700'
-                  : 'bg-red-600 text-white hover:bg-red-700'
-              }`}
+                  ? 'bg-red-950 text-red-100 hover:bg-red-900 pl-2 pr-4'
+                  : 'bg-red-800 text-red-100 hover:bg-red-700 px-6'
+              } rounded-lg`}
             >
-              {isFollowLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
+              {isFollowLoading ? (
+                '...'
+              ) : isFollowing ? (
+                <>
+                  <CheckIcon className="w-4 h-4" />
+                  <span className="ml-1.5">Following</span>
+                </>
+              ) : (
+                'Follow'
+              )}
             </button>
           )}
         </div>
@@ -425,9 +435,9 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
                   <Link
                     key={tagId}
                     href={`/tags/${tag.name.toLowerCase()}`}
-                    className="px-2 py-1 bg-purple-900 text-purple-200 text-xs rounded-full hover:bg-purple-800 transition-colors"
+                    className="px-3 py-1.5 bg-red-950/50 text-red-400 text-sm rounded-lg hover:bg-red-900/50 transition-colors"
                   >
-                    {tag.name || tagId.substring(0, 8)}
+                    #{tag.name || tagId.substring(0, 8)}
                   </Link>
                 ) : null;
               })
@@ -436,10 +446,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
         )}
        
         {/* Embedded video */}
-        <div className="relative aspect-video">
-          <Link href={`/posts/${post.id}`} className="absolute inset-0 z-10">
-            <span className="sr-only">View post details</span>
-          </Link>
+        <div className="relative aspect-video rounded-xl overflow-hidden">
           {videoId ? (
             <iframe
               src={`https://www.youtube.com/embed/${videoId}`}
@@ -448,7 +455,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
               allowFullScreen
             />
           ) : (
-            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 text-white">
+            <div className="absolute top-0 left-0 w-full h-full flex items-center justify-center bg-gray-800 text-white rounded-xl">
               Invalid video URL
             </div>
           )}
@@ -461,8 +468,8 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
               onClick={handleLike}
               disabled={isLiking}
               className={`flex items-center space-x-2 ${
-                isLiked ? 'text-blue-500' : 'text-gray-400'
-              } hover:text-blue-400`}
+                isLiked ? 'text-red-500' : 'text-gray-400'
+              } hover:text-red-400`}
             >
               <svg
                 className="w-5 h-5"
@@ -481,7 +488,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
             </button>
             <button
               onClick={() => setShowComments(!showComments)}
-              className="flex items-center space-x-2 text-gray-400 hover:text-blue-400"
+              className="flex items-center space-x-2 text-gray-400 hover:text-red-400"
             >
               <svg
                 className="w-5 h-5"
