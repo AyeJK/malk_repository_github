@@ -49,7 +49,7 @@ export async function GET(request: NextRequest) {
     // Fetch the linked posts using their record IDs
     const posts = await base('Posts').select({
       filterByFormula: `OR(${linkedPostIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
-      sort: [{ field: 'DateCreated', direction: 'desc' }]
+      sort: [{ field: 'DisplayDate', direction: 'desc' }]
     }).all();
 
     // Map the records to include only necessary fields

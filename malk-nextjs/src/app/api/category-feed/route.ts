@@ -33,9 +33,17 @@ export async function GET(request: NextRequest) {
       );
     }
 
+    // Normalize the category name for comparison
+    const normalizedSearchName = categoryName
+      .replace(/-/g, ' / ')  // Convert hyphens to slashes
+      .replace(/\s+/g, ' ')  // Normalize spaces
+      .replace(/\s*\/\s*/g, ' / ')  // Normalize spaces around slashes
+      .trim()
+      .toLowerCase();
+
     // First, get the category record to ensure it exists and get its linked posts
     const categoryRecords = await base('Categories').select({
-      filterByFormula: `LOWER({Name}) = LOWER('${categoryName.replace(/'/g, "\\'")}')`
+      filterByFormula: `LOWER(SUBSTITUTE(SUBSTITUTE({Name}, '-', ' / '), '  ', ' ')) = '${normalizedSearchName.replace(/'/g, "\\'")}'`
     }).all();
 
     if (categoryRecords.length === 0) {
@@ -56,7 +64,7 @@ export async function GET(request: NextRequest) {
     // Fetch the linked posts using their record IDs
     const posts = await base('Posts').select({
       filterByFormula: `OR(${linkedPostIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
-      sort: [{ field: 'DateCreated', direction: 'desc' }],
+      sort: [{ field: 'DisplayDate', direction: 'desc' }],
       maxRecords: 50 // Limit to 50 most recent posts
     }).all();
 
