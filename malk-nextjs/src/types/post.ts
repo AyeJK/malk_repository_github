@@ -1,20 +1,27 @@
 export interface Post {
-  Title: string;
-  Description?: string;
-  Content?: string;
-  ImageURL?: string;
-  Tags?: string[];
-  Categories?: string[];
-  Author?: string;
-  DateCreated?: string;
-  Likes?: number;
-  Comments?: number;
-  VideoURL?: string;
-  UserCaption?: string;
-  UserTags?: string[];
-  FirebaseUID?: string[];
-  VideoTitle?: string;
-  UserLikes?: string[];
-  LikeCount?: number;
-  CommentCount?: number;
+  id: string;
+  fields: {
+    PostId?: string;
+    FirebaseUID: string[];
+    DisplayName?: string;
+    PostCount?: number;
+    Slug?: string;
+    VideoTitle?: string;
+    VideoURL: string;
+    'Video ID'?: string;
+    UserCaption: string;
+    UserTags?: string[];
+    Categories?: string[];
+    UserLikes?: string[];
+    LikeCount?: number;
+    Playlists?: string[];
+    PlaylistCount?: number;
+    LikeFieldLastModified?: string;
+    LastModified?: string;
+    DateCreated?: string;
+    DisplayDate?: string;
+    ThumbnailURL?: string;
+    'Post URL'?: string;
+    [key: string]: any;
+  };
 } 

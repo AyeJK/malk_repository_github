@@ -25,6 +25,7 @@ interface Post {
     CommentCount?: number;
     UserAvatar?: string;
     UserName?: string;
+    DisplayDate?: string;
   };
 }
 
@@ -399,7 +400,7 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
             </div>
             <div>
               <h2 className="text-lg font-semibold text-white">{authorName || 'Anonymous'}</h2>
-              <p className="text-sm text-gray-400">{formatDate(post.fields.DateCreated)}</p>
+              <p className="text-sm text-gray-400">{formatDate(post.fields.DisplayDate || post.fields.DateCreated)}</p>
             </div>
           </div>
           {!hideFollowButton && !isOwnPost && (

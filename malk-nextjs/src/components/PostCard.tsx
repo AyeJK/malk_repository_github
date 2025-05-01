@@ -24,6 +24,7 @@ interface PostCardProps {
       UserLikes?: string[];
       LikeCount?: number;
       CommentCount?: number;
+      DisplayDate?: string;
     };
   };
   onDelete?: (postId: string) => void;
@@ -183,8 +184,8 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
   const videoId = getVideoId(post.fields.VideoURL);
   
   // Format the date
-  const formattedDate = post.fields.DateCreated 
-    ? formatRelativeTime(post.fields.DateCreated)
+  const formattedDate = post.fields.DisplayDate || post.fields.DateCreated
+    ? formatRelativeTime(post.fields.DisplayDate || post.fields.DateCreated || '')
     : 'recently';
 
   // Split caption into title and description

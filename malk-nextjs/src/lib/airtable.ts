@@ -511,7 +511,7 @@ export async function getUserPosts(firebaseUID: string): Promise<PostRecord[]> {
     // Get all posts for this user by filtering on the FirebaseUID field
     const posts = await base('Posts').select({
       filterByFormula: `{FirebaseUID} = '${firebaseUID}'`,
-      sort: [{ field: 'DateCreated', direction: 'desc' }]
+      sort: [{ field: 'DisplayDate', direction: 'desc' }]
     }).all();
     
     console.log(`Found ${posts.length} posts for user with Firebase UID: ${firebaseUID}`);
@@ -696,9 +696,9 @@ export async function getAllPosts(): Promise<PostRecord[]> {
     // Ensure the Posts table exists
     await ensurePostsTableExists();
     
-    // Get all records from the Posts table, sorted by DateCreated in descending order
+    // Get all records from the Posts table, sorted by DisplayDate in descending order
     const records = await base('Posts').select({
-      sort: [{ field: 'DateCreated', direction: 'desc' }],
+      sort: [{ field: 'DisplayDate', direction: 'desc' }],
       view: 'Grid view'
     }).all();
     
@@ -743,7 +743,7 @@ export async function getUserLikedPosts(firebaseUID: string): Promise<PostRecord
     // Fetch the posts using the liked post IDs
     const posts = await base('Posts').select({
       filterByFormula: `OR(${likedPostIds.map(id => `RECORD_ID() = '${id}'`).join(',')})`,
-      sort: [{ field: 'DateCreated', direction: 'desc' }]
+      sort: [{ field: 'DisplayDate', direction: 'desc' }]
     }).all();
     
     console.log(`Found ${posts.length} liked posts for user with Firebase UID: ${firebaseUID}`);
