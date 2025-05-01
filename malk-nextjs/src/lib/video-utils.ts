@@ -24,6 +24,9 @@ async function getYouTubeVideoTitle(videoId: string): Promise<string | null> {
         part: 'snippet',
         id: videoId,
         key: YOUTUBE_API_KEY
+      },
+      headers: {
+        'Accept': 'application/json'
       }
     });
 
@@ -57,7 +60,11 @@ async function getYouTubeVideoTitle(videoId: string): Promise<string | null> {
 // Function to get video title from Vimeo
 async function getVimeoVideoTitle(videoId: string): Promise<string | null> {
   try {
-    const response = await axios.get(`https://vimeo.com/api/v2/video/${videoId}.json`);
+    const response = await axios.get(`https://vimeo.com/api/v2/video/${videoId}.json`, {
+      headers: {
+        'Accept': 'application/json'
+      }
+    });
     
     if (!response.data) {
       console.error('Vimeo API returned no data');
@@ -88,15 +95,21 @@ async function getVimeoVideoTitle(videoId: string): Promise<string | null> {
 
 // Main function to get video title from URL
 export async function getVideoTitle(url: string): Promise<string | null> {
-  const youtubeId = extractYouTubeVideoId(url);
-  if (youtubeId) {
-    return getYouTubeVideoTitle(youtubeId);
-  }
+  try {
+    const youtubeId = extractYouTubeVideoId(url);
+    if (youtubeId) {
+      return await getYouTubeVideoTitle(youtubeId);
+    }
 
-  const vimeoId = extractVimeoVideoId(url);
-  if (vimeoId) {
-    return getVimeoVideoTitle(vimeoId);
-  }
+    const vimeoId = extractVimeoVideoId(url);
+    if (vimeoId) {
+      return await getVimeoVideoTitle(vimeoId);
+    }
 
-  return null;
+    console.error('Unsupported video URL format:', url);
+    return null;
+  } catch (error: any) {
+    console.error('Error getting video title:', error);
+    throw error;
+  }
 } 
