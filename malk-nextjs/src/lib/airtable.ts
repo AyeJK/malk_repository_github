@@ -85,6 +85,15 @@ export interface PostRecord {
   };
 }
 
+interface CreatePostParams {
+  firebaseUID: string;
+  videoURL: string;
+  userCaption: string;
+  userTags?: string[];
+  categories?: string[];
+  importId?: string;
+}
+
 // Function to list all tables in the base
 export async function listTables(): Promise<string[]> {
   try {
@@ -384,18 +393,42 @@ export async function ensurePostsTableExists(): Promise<boolean> {
   }
 }
 
-interface CreatePostParams {
-  firebaseUID: string;
-  videoURL: string;
-  userCaption: string;
-  userTags?: string[];
-  categories?: string[];
-  importId?: string;
-}
-
+// Function to create a new post
 export async function createPost(params: CreatePostParams) {
   try {
-    // First, create tags if they don't exist
+    console.log('Creating post with data:', {
+      firebaseUID: params.firebaseUID,
+      videoURL: params.videoURL,
+      userCaption: params.userCaption,
+      userTags: params.userTags,
+      categories: params.categories
+    });
+
+    // First, find the user's Airtable record ID using their Firebase UID
+    console.log('Looking up user with Firebase UID:', params.firebaseUID);
+    const userRecords = await base('Users').select({
+      filterByFormula: `{FirebaseUID} = '${params.firebaseUID}'`,
+      maxRecords: 1
+    }).firstPage();
+
+    if (userRecords.length === 0) {
+      throw new Error(`User with Firebase UID ${params.firebaseUID} not found in Airtable`);
+    }
+
+    console.log('User record found:', userRecords[0].id);
+    const userAirtableId = userRecords[0].id;
+
+    // Get video title
+    let videoTitle;
+    try {
+      videoTitle = await getVideoTitle(params.videoURL);
+      console.log('Successfully got video title:', videoTitle);
+    } catch (titleError) {
+      console.error('Error getting video title:', titleError);
+      videoTitle = 'Title unavailable';
+    }
+
+    // Create tags if they don't exist
     const tagIds = [];
     if (params.userTags && params.userTags.length > 0) {
       for (const tagName of params.userTags) {
@@ -408,23 +441,12 @@ export async function createPost(params: CreatePostParams) {
           console.error(`Error creating tag "${tagName}":`, tagError);
         }
       }
-    }
-
-    // Create the post fields
-    const fields: any = {
-      FirebaseUID: [params.firebaseUID],
-      VideoURL: params.videoURL,
-      UserCaption: params.userCaption
-    };
-
-    // Add tags if we have any
-    if (tagIds.length > 0) {
-      fields.UserTags = tagIds;
+      console.log('Tag IDs:', tagIds);
     }
 
     // Add categories if provided
+    const categoryIds = [];
     if (params.categories && params.categories.length > 0) {
-      const categoryIds = [];
       for (const categoryName of params.categories) {
         try {
           const categoryId = await createCategoryIfNotExists(categoryName);
@@ -435,9 +457,24 @@ export async function createPost(params: CreatePostParams) {
           console.error(`Error creating category "${categoryName}":`, categoryError);
         }
       }
-      if (categoryIds.length > 0) {
-        fields.Categories = categoryIds;
-      }
+    }
+
+    // Create the post fields
+    const fields: any = {
+      FirebaseUID: [userAirtableId], // Use the Airtable record ID instead of Firebase UID
+      VideoURL: params.videoURL,
+      UserCaption: params.userCaption,
+      VideoTitle: videoTitle // Add video title
+    };
+
+    // Add tags if we have any
+    if (tagIds.length > 0) {
+      fields.UserTags = tagIds;
+    }
+
+    // Add categories if we have any
+    if (categoryIds.length > 0) {
+      fields.Categories = categoryIds;
     }
 
     // Add import ID if provided
@@ -593,31 +630,29 @@ export async function searchTags(query: string): Promise<string[]> {
 // Function to create a tag if it doesn't exist
 export async function createTagIfNotExists(tagName: string): Promise<string | null> {
   try {
-    // First check if the tag exists
+    // Normalize the tag name
+    const normalizedTagName = tagName.toLowerCase().trim();
+    
+    // Check if the tag already exists
     const records = await base('Tags').select({
-      filterByFormula: `{Name} = '${tagName}'`,
+      filterByFormula: `{Name} = '${normalizedTagName}'`,
       maxRecords: 1
     }).firstPage();
-
+    
     if (records.length > 0) {
-      // Tag exists, return its ID
+      // Tag already exists, return its ID
       return records[0].id;
     }
-
+    
     // Tag doesn't exist, create it
-    const newRecords = await base('Tags').create([
-      {
-        fields: {
-          Name: tagName,
-          Slug: tagName.toLowerCase().replace(/\s+/g, '-')
-        }
-      }
+    const newRecord = await base('Tags').create([
+      { fields: { Name: normalizedTagName } }
     ]);
-
-    return newRecords[0].id;
-  } catch (error: any) {
-    console.error(`Error creating tag "${tagName}":`, error);
-    throw new Error(`Failed to create tag: ${error.message}`);
+    
+    return newRecord[0].id;
+  } catch (error) {
+    console.error('Error creating tag:', error);
+    return null;
   }
 }
 
@@ -645,31 +680,29 @@ export async function ensureCategoriesTableExists(): Promise<boolean> {
 // Function to create a category if it doesn't exist
 export async function createCategoryIfNotExists(categoryName: string): Promise<string | null> {
   try {
-    // First check if the category exists
+    // Normalize the category name
+    const normalizedCategoryName = categoryName.trim();
+    
+    // Check if the category already exists
     const records = await base('Categories').select({
-      filterByFormula: `{Name} = '${categoryName}'`,
+      filterByFormula: `{Name} = '${normalizedCategoryName}'`,
       maxRecords: 1
     }).firstPage();
-
+    
     if (records.length > 0) {
-      // Category exists, return its ID
+      // Category already exists, return its ID
       return records[0].id;
     }
-
+    
     // Category doesn't exist, create it
-    const newRecords = await base('Categories').create([
-      {
-        fields: {
-          Name: categoryName,
-          Slug: categoryName.toLowerCase().replace(/\s+/g, '-')
-        }
-      }
+    const newRecord = await base('Categories').create([
+      { fields: { Name: normalizedCategoryName } }
     ]);
-
-    return newRecords[0].id;
-  } catch (error: any) {
-    console.error(`Error creating category "${categoryName}":`, error);
-    throw new Error(`Failed to create category: ${error.message}`);
+    
+    return newRecord[0].id;
+  } catch (error) {
+    console.error('Error creating category:', error);
+    return null;
   }
 }
 

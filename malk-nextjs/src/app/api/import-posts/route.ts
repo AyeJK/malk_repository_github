@@ -277,27 +277,32 @@ export async function POST(request: NextRequest) {
     let allErrors: string[] = [];
     let allSkippedPosts: string[] = [];
 
+    // Process all batches
     while (processedCount < totalPosts) {
+      console.log(`Processing batch starting at index ${processedCount}`);
       const batchResult = await processBatch(firebaseUID, posts, processedCount, BATCH_SIZE);
       allResults = allResults.concat(batchResult.results);
       allErrors = allErrors.concat(batchResult.errors);
       allSkippedPosts = allSkippedPosts.concat(batchResult.skippedPosts);
       processedCount = batchResult.processedCount;
 
-      // Return progress update
-      return NextResponse.json({
-        success: true,
-        progress: {
-          processed: processedCount,
-          total: totalPosts,
-          percentage: Math.round((processedCount / totalPosts) * 100)
-        },
-        results: allResults,
-        errors: allErrors.length > 0 ? allErrors : null,
-        skippedPosts: allSkippedPosts.length > 0 ? allSkippedPosts : null,
-        completed: processedCount >= totalPosts
-      });
+      // Add a small delay between batches to avoid rate limiting
+      await delay(1000);
     }
+
+    // Return final results after all batches are processed
+    return NextResponse.json({
+      success: true,
+      progress: {
+        processed: processedCount,
+        total: totalPosts,
+        percentage: Math.round((processedCount / totalPosts) * 100)
+      },
+      results: allResults,
+      errors: allErrors.length > 0 ? allErrors : null,
+      skippedPosts: allSkippedPosts.length > 0 ? allSkippedPosts : null,
+      completed: true
+    });
 
   } catch (error: any) {
     console.error('Error importing posts:', error);
