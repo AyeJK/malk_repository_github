@@ -27,13 +27,30 @@ async function getYouTubeVideoTitle(videoId: string): Promise<string | null> {
       }
     });
 
-    if (response.data.items && response.data.items.length > 0) {
-      return response.data.items[0].snippet.title;
+    if (!response.data) {
+      console.error('YouTube API returned no data');
+      return null;
     }
-    return null;
-  } catch (error) {
-    console.error('Error fetching YouTube video title:', error);
-    return null;
+
+    if (!response.data.items || !Array.isArray(response.data.items) || response.data.items.length === 0) {
+      console.error('YouTube API returned no items');
+      return null;
+    }
+
+    const video = response.data.items[0];
+    if (!video.snippet || !video.snippet.title) {
+      console.error('YouTube API response missing title');
+      return null;
+    }
+
+    return video.snippet.title;
+  } catch (error: any) {
+    console.error('Error fetching YouTube video title:', {
+      error: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    throw new Error(`Failed to get YouTube video title: ${error.message}`);
   }
 }
 
@@ -41,13 +58,31 @@ async function getYouTubeVideoTitle(videoId: string): Promise<string | null> {
 async function getVimeoVideoTitle(videoId: string): Promise<string | null> {
   try {
     const response = await axios.get(`https://vimeo.com/api/v2/video/${videoId}.json`);
-    if (response.data && response.data.length > 0) {
-      return response.data[0].title;
+    
+    if (!response.data) {
+      console.error('Vimeo API returned no data');
+      return null;
     }
-    return null;
-  } catch (error) {
-    console.error('Error fetching Vimeo video title:', error);
-    return null;
+
+    if (!Array.isArray(response.data) || response.data.length === 0) {
+      console.error('Vimeo API returned no items');
+      return null;
+    }
+
+    const video = response.data[0];
+    if (!video.title) {
+      console.error('Vimeo API response missing title');
+      return null;
+    }
+
+    return video.title;
+  } catch (error: any) {
+    console.error('Error fetching Vimeo video title:', {
+      error: error.message,
+      response: error.response?.data,
+      status: error.response?.status
+    });
+    throw new Error(`Failed to get Vimeo video title: ${error.message}`);
   }
 }
 
