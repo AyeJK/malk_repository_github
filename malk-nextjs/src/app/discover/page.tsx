@@ -408,7 +408,13 @@ export default function DiscoverPage() {
     if (!loadingQueue.current.includes(sectionName) && 
         !loadedSections.has(sectionName) && 
         !emptySections.has(sectionName)) {
-      loadingQueue.current.push(sectionName);
+      if (sectionName === 'following') {
+        // Add Following section to the front of the queue
+        loadingQueue.current.unshift(sectionName);
+      } else {
+        // Add other sections to the end of the queue
+        loadingQueue.current.push(sectionName);
+      }
       processQueue();
     }
   };
