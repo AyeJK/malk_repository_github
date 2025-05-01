@@ -427,15 +427,24 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
         {/* Tags */}
         {tags.length > 0 && (
           <div className="flex flex-wrap gap-2 mb-6">
-            {tags.map((tag) => (
-              <Link
-                key={tag.id}
-                href={`/tags/${tag.fields?.Name?.toLowerCase() || tag.name.toLowerCase()}`}
-                className="px-2 py-1 bg-purple-900 text-purple-200 text-xs rounded-full hover:bg-purple-800 transition-colors"
-              >
-                {tag.fields?.Name || tag.name}
-              </Link>
-            ))}
+            {tags.map((tag, index) => {
+              const gradientClasses = [
+                'bg-red-950/50 text-red-400 hover:bg-red-900/50',
+                'bg-orange-950/50 text-orange-400 hover:bg-orange-900/50',
+                'bg-amber-950/50 text-amber-400 hover:bg-amber-900/50',
+                'bg-rose-950/50 text-rose-400 hover:bg-rose-900/50',
+                'bg-pink-950/50 text-pink-400 hover:bg-pink-900/50'
+              ];
+              return (
+                <Link
+                  key={tag.id}
+                  href={`/tags/${tag.fields?.Name?.toLowerCase() || tag.name.toLowerCase()}`}
+                  className={`px-3 py-1.5 ${gradientClasses[index % 5]} text-sm rounded-lg transition-colors`}
+                >
+                  #{tag.fields?.Name || tag.name}
+                </Link>
+              );
+            })}
           </div>
         )}
 

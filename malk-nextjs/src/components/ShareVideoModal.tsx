@@ -394,21 +394,30 @@ export default function ShareVideoModal({ isOpen, onClose }: ShareVideoModalProp
             
             {formData.tags.length > 0 && (
               <div className="flex flex-wrap gap-2 mt-2">
-                {formData.tags.map(tag => (
-                  <span 
-                    key={tag}
-                    className="bg-blue-900/30 text-blue-300 px-3 py-1 rounded-full text-sm flex items-center"
-                  >
-                    {tag}
-                    <button
-                      type="button"
-                      onClick={() => removeTag(tag)}
-                      className="ml-2 text-blue-300 hover:text-white"
+                {formData.tags.map((tag, index) => {
+                  const gradientClasses = [
+                    'bg-red-950/50 text-red-400 hover:bg-red-900/50',
+                    'bg-orange-950/50 text-orange-400 hover:bg-orange-900/50',
+                    'bg-amber-950/50 text-amber-400 hover:bg-amber-900/50',
+                    'bg-rose-950/50 text-rose-400 hover:bg-rose-900/50',
+                    'bg-pink-950/50 text-pink-400 hover:bg-pink-900/50'
+                  ];
+                  return (
+                    <span 
+                      key={tag}
+                      className={`px-3 py-1.5 ${gradientClasses[index % 5]} rounded-lg text-sm flex items-center`}
                     >
-                      ×
-                    </button>
-                  </span>
-                ))}
+                      {tag}
+                      <button
+                        type="button"
+                        onClick={() => removeTag(tag)}
+                        className="ml-2 opacity-75 hover:opacity-100"
+                      >
+                        ×
+                      </button>
+                    </span>
+                  );
+                })}
               </div>
             )}
           </div>
