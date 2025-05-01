@@ -1,5 +1,5 @@
 import { useEffect, useState } from 'react';
-import PostCard from './PostCard';
+import LazyPostCard from './LazyPostCard';
 
 export function LatestPost() {
   const [post, setPost] = useState<any>(null);
@@ -52,7 +52,7 @@ export function LatestPost() {
   return (
     <div className="max-w-4xl mx-auto">
       <h2 className="text-2xl font-bold mb-4">Latest Post</h2>
-      <PostCard post={post} />
+      <LazyPostCard post={post} />
     </div>
   );
 } 

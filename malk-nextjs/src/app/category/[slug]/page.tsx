@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams } from 'next/navigation';
-import PostCard from '@/components/PostCard';
+import LazyPostCard from '@/components/LazyPostCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 
 export default function CategoryPage() {
@@ -92,7 +92,7 @@ export default function CategoryPage() {
       ) : (
         <div className="space-y-6">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <LazyPostCard key={post.id} post={post} />
           ))}
         </div>
       )}

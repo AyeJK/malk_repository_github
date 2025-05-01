@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import PostCard from '@/components/PostCard';
+import LazyPostCard from '@/components/LazyPostCard';
 import { getAllPosts } from '@/lib/airtable';
 import ShareVideoModal from '@/components/ShareVideoModal';
 import { useAuth } from '@/lib/auth-context';
@@ -89,7 +89,7 @@ export default function PostsPage() {
       </div>
       <div className="space-y-6">
         {posts.map((post) => (
-          <PostCard key={post.id} post={post} />
+          <LazyPostCard key={post.id} post={post} />
         ))}
       </div>
       

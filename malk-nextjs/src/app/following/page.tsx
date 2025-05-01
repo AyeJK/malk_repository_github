@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useRouter } from 'next/navigation';
-import PostCard from '@/components/PostCard';
+import LazyPostCard from '@/components/LazyPostCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
 import { useAuth } from '@/lib/auth-context';
 
@@ -110,7 +110,7 @@ export default function FollowingPage() {
       ) : (
         <div className="space-y-6">
           {posts.map((post) => (
-            <PostCard key={post.id} post={post} />
+            <LazyPostCard key={post.id} post={post} />
           ))}
         </div>
       )}
