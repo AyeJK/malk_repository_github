@@ -14,6 +14,7 @@ import { CheckIcon } from '@heroicons/react/24/outline';
 import PostSlider from '@/components/PostSlider';
 import CustomProfileSection from '@/components/CustomProfileSection';
 import LazyPostCard from '@/components/LazyPostCard';
+import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -32,6 +33,20 @@ export default function ProfilePage() {
   const [error, setError] = useState<string | null>(null);
   const [layout, setLayout] = useState<'grid' | 'feed'>('feed');
   const [sort, setSort] = useState<'latest' | 'popular' | 'oldest'>('latest');
+  const [showAddSectionModal, setShowAddSectionModal] = useState(false);
+  const [selectedType, setSelectedType] = useState<'category' | 'tag'>('category');
+  const [selectedValue, setSelectedValue] = useState('');
+  const [search, setSearch] = useState('');
+  const [filteredOptions, setFilteredOptions] = useState<{ id: string; name: string }[]>([]);
+  const [isLoadingOptions, setIsLoadingOptions] = useState(false);
+  const [userCategories, setUserCategories] = useState<{ id: string; name: string }[]>([]);
+  const [userTags, setUserTags] = useState<{ id: string; name: string }[]>([]);
+  const [userPosts, setUserPosts] = useState<any[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [tags, setTags] = useState<{ id: string; name: string }[]>([]);
+  const [categoriesLoaded, setCategoriesLoaded] = useState(false);
+  const [tagsLoaded, setTagsLoaded] = useState(false);
+  const [sections, setSections] = useState<any[]>([]);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -117,6 +132,140 @@ export default function ProfilePage() {
     }
   }, [userId]);
 
+  useEffect(() => {
+    if (!showAddSectionModal) return;
+    const fetchData = async () => {
+      setIsLoadingOptions(true);
+      try {
+        const categoriesResponse = await fetch('/api/get-categories');
+        const categoriesData = await categoriesResponse.json();
+        setCategories(categoriesData.categories || []);
+        setCategoriesLoaded(true);
+
+        const tagsResponse = await fetch('/api/get-top-tags?limit=1000');
+        const tagsData = await tagsResponse.json();
+        setTags(tagsData.tags || []);
+        setTagsLoaded(true);
+      } catch (error) {
+        setCategoriesLoaded(true);
+        setTagsLoaded(true);
+      } finally {
+        setIsLoadingOptions(false);
+      }
+    };
+    fetchData();
+  }, [showAddSectionModal]);
+
+  useEffect(() => {
+    if (!showAddSectionModal || !firebaseUID) return;
+    setIsLoadingOptions(true);
+    const fetchUserPosts = async () => {
+      try {
+        const response = await fetch(`/api/get-user-posts?userId=${firebaseUID}`);
+        if (!response.ok) throw new Error('Failed to fetch user posts');
+        const data = await response.json();
+        setUserPosts(data.posts || []);
+      } catch (error) {
+        setUserPosts([]);
+      } finally {
+        setIsLoadingOptions(false);
+      }
+    };
+    fetchUserPosts();
+  }, [showAddSectionModal, firebaseUID]);
+
+  useEffect(() => {
+    if (!showAddSectionModal || !categoriesLoaded || !tagsLoaded || isLoadingOptions) return;
+    let cats: { id: string; name: string }[] = [];
+    let tagsArr: { id: string; name: string }[] = [];
+    for (const post of userPosts) {
+      // Categories
+      if (post.fields.Categories && Array.isArray(post.fields.Categories)) {
+        for (const catId of post.fields.Categories) {
+          const cat = categories.find(c => c.id === catId);
+          if (cat) cats.push(cat);
+        }
+      }
+      // Tags
+      if (post.fields.UserTags && Array.isArray(post.fields.UserTags)) {
+        for (const tagId of post.fields.UserTags) {
+          const tag = tags.find(t => t.id === tagId);
+          if (tag) tagsArr.push(tag);
+        }
+      }
+    }
+    // Remove duplicates
+    function uniqBy<T>(arr: T[], key: (item: T) => any): T[] {
+      const seen = new Set();
+      return arr.filter((item: T) => {
+        const k = key(item);
+        if (seen.has(k)) return false;
+        seen.add(k);
+        return true;
+      });
+    }
+    setUserCategories(uniqBy(cats, (c) => c.id));
+    setUserTags(uniqBy(tagsArr, (t) => t.id));
+  }, [showAddSectionModal, categoriesLoaded, tagsLoaded, isLoadingOptions, userPosts, categories, tags]);
+
+  useEffect(() => {
+    if (selectedType === 'category') {
+      setFilteredOptions(userCategories.filter(opt => opt.name.toLowerCase().includes(search.toLowerCase())));
+    } else {
+      setFilteredOptions(userTags.filter(opt => opt.name.toLowerCase().includes(search.toLowerCase())));
+    }
+  }, [search, selectedType, userCategories, userTags]);
+
+  useEffect(() => {
+    if (!firebaseUID) return;
+    // Fetch current sections for the user
+    const fetchSections = async () => {
+      try {
+        const response = await fetch(`/api/profile-sections?userId=${firebaseUID}`);
+        if (!response.ok) throw new Error('Failed to fetch sections');
+        const data = await response.json();
+        setSections(data.sections || []);
+      } catch (error) {
+        setSections([]);
+      }
+    };
+    fetchSections();
+  }, [firebaseUID, showAddSectionModal]);
+
+  const handleAddSection = async () => {
+    if (!selectedValue) return;
+    const selectedItem = selectedType === 'category'
+      ? userCategories.find(c => c.id === selectedValue)
+      : userTags.find(t => t.id === selectedValue);
+    if (!selectedItem) return;
+    const newSection = {
+      id: `${selectedType}-${selectedValue}`,
+      type: selectedType,
+      value: selectedValue,
+      name: selectedItem.name
+    };
+    const updatedSections = [...sections, newSection];
+    try {
+      const response = await fetch('/api/profile-sections', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({
+          userId: firebaseUID,
+          sections: updatedSections
+        })
+      });
+      if (!response.ok) throw new Error('Failed to save section');
+      setSections(updatedSections);
+      setShowAddSectionModal(false);
+      setSelectedValue('');
+      setSearch('');
+    } catch (error) {
+      // Optionally show error
+    }
+  };
+
   const renderLayoutToggle = () => (
     <div className="flex gap-2">
       <button
@@ -200,6 +349,8 @@ export default function ProfilePage() {
               posts={posts.slice(0, 10)}
               isLoading={isLoading}
               hideIcon={true}
+              userAvatar={user?.fields?.ProfileImage}
+              userName={user?.fields?.DisplayName || user?.name || 'Anonymous'}
               emptyMessage={
                 isOwnProfile ? (
                   <div className="flex flex-col items-center justify-center">
@@ -219,6 +370,8 @@ export default function ProfilePage() {
               <CustomProfileSection
                 userId={firebaseUID}
                 isOwnProfile={currentUser?.uid === firebaseUID}
+                userAvatar={user?.fields?.ProfileImage}
+                userName={user?.fields?.DisplayName || user?.name || 'Anonymous'}
               />
             )}
           </div>
@@ -256,26 +409,7 @@ export default function ProfilePage() {
                           </div>
                         )}
                       </div>
-                      <div className="mt-2 flex items-center gap-2 mb-1">
-                        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                          {post.fields.UserAvatar ? (
-                            <Image
-                              src={post.fields.UserAvatar}
-                              alt={post.fields.UserName || post.fields.DisplayName || 'User'}
-                              width={32}
-                              height={32}
-                              className="object-cover"
-                            />
-                          ) : (
-                            <DefaultAvatar userId={post.fields.FirebaseUID} userName={post.fields.UserName || post.fields.DisplayName || 'Anonymous'} />
-                          )}
-                        </div>
-                        <div className="text-sm text-gray-300 truncate">
-                          <span className="font-semibold">{post.fields.UserName || post.fields.DisplayName || 'Anonymous'}</span>
-                          <span className="ml-1">shared:</span>
-                        </div>
-                      </div>
-                      <h3 className="font-medium text-white text-sm line-clamp-2">
+                      <h3 className="mt-3 text-base font-semibold text-white line-clamp-2">
                         {post.fields.VideoTitle || 'Untitled Video'}
                       </h3>
                     </Link>
@@ -285,7 +419,7 @@ export default function ProfilePage() {
             ) : (
               <div className="space-y-6">
                 {sortedPosts.map((post: any) => (
-                  <LazyPostCard key={post.id} post={post} />
+                  <LazyPostCard key={post.id} post={post} hideFollowButton={true} />
                 ))}
               </div>
             )}
@@ -340,12 +474,12 @@ export default function ProfilePage() {
                         <DefaultAvatar userId={post.fields.FirebaseUID} userName={post.fields.UserName || post.fields.DisplayName || 'Anonymous'} />
                       )}
                     </div>
-                    <div className="text-sm text-gray-300 truncate">
-                      <span className="font-semibold">{post.fields.UserName || post.fields.DisplayName || 'Anonymous'}</span>
-                      <span className="ml-1">shared:</span>
+                    <div className="text-base text-gray-300 truncate">
+                      <span className="font-semibold text-base">{post.fields.UserName || post.fields.DisplayName || 'Anonymous'}</span>
+                      <span className="ml-1 text-base">shared:</span>
                     </div>
                   </div>
-                  <h3 className="font-medium text-white text-sm line-clamp-2">
+                  <h3 className="font-semibold text-base text-white line-clamp-2">
                     {post.fields.VideoTitle || 'Untitled Video'}
                   </h3>
                 </Link>
@@ -407,6 +541,8 @@ export default function ProfilePage() {
         <>
           {/* Full-width Banner Image - Outside of content padding */}
           <div className="relative w-full h-48 md:h-64 bg-black">
+            {/* Banner overlay for readability */}
+            <div className="absolute inset-0 bg-black/30 z-10 pointer-events-none" />
             {user?.fields?.BannerImage ? (
               <Image
                 src={user.fields.BannerImage}
@@ -423,7 +559,7 @@ export default function ProfilePage() {
           {/* Content Container - With wider max width */}
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
             {/* Profile Header - Overlapping Avatar Layout */}
-            <div className="relative flex flex-row items-center px-0 pt-0 pb-1 -mt-16 md:-mt-20" style={{ minHeight: '60px' }}>
+            <div className="relative flex flex-row items-center px-0 pt-0 pb-1 -mt-16 md:-mt-20 z-20" style={{ minHeight: '60px' }}>
               {/* Avatar overlaps banner, left-aligned */}
               <div className="relative z-20">
                 <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-black/70 bg-black/60 shadow-xl">
@@ -444,7 +580,7 @@ export default function ProfilePage() {
               <div className="flex-1 flex flex-col justify-between min-w-0 ml-8 h-36 md:h-44">
                 {/* Display name and social link row */}
                 <div className="flex flex-row items-end justify-between gap-4 mb-0 mt-[0px]">
-                  <span className="text-5xl md:text-6xl font-bold text-white truncate leading-[1.1] pb-1">
+                  <span className="text-5xl md:text-6xl font-bold text-white truncate leading-[1.1] pb-1 drop-shadow-[0_2px_8px_rgba(0,0,0,0.7)]">
                     {user?.fields?.DisplayName || user?.name || 'Anonymous'}
                   </span>
                   <div className="flex items-center gap-2 self-end">
@@ -504,7 +640,7 @@ export default function ProfilePage() {
             </div>
 
             {/* Tabs - Updated Style */}
-            <div className="border-b border-white/10 mt-8">
+            <div className="border-b border-white/10 mt-8 flex items-center justify-between">
               <div className="flex space-x-8">
                 <button
                   onClick={() => setActiveTab('home' as 'home')}
@@ -557,7 +693,112 @@ export default function ProfilePage() {
                   <span className="font-medium">Following</span>
                 </button>
               </div>
+              {currentUser && firebaseUID && currentUser.uid === firebaseUID && (
+                <button
+                  onClick={() => setShowAddSectionModal(true)}
+                  className="flex items-center gap-2 px-5 py-2 bg-white/10 hover:bg-red-700 text-white rounded-lg shadow-lg transition-all duration-200 font-bold text-lg ml-auto"
+                >
+                  <PlusIcon className="w-6 h-6" />
+                  <span>Add Section</span>
+                </button>
+              )}
             </div>
+
+            {/* Add Section Modal */}
+            {showAddSectionModal && (
+              <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/80">
+                <div className="bg-[#101418] rounded-xl p-8 shadow-2xl space-y-6 flex flex-col items-stretch w-full max-w-lg mx-auto">
+                  {/* Header */}
+                  <div className="text-xl font-bold text-white mb-2">Display your posts from a specific category or tag</div>
+                  {/* Toggle for Category/Tag */}
+                  <div className="flex gap-4 mb-4">
+                    <button
+                      className={`px-6 py-2 rounded-lg font-bold text-lg transition-all duration-200 shadow-sm ${selectedType === 'category' ? 'bg-red-600/20 text-red-500' : 'bg-white/10 text-white hover:bg-red-600/20 hover:text-red-500'}`}
+                      onClick={() => { setSelectedType('category'); setSelectedValue(''); setSearch(''); }}
+                    >
+                      Category
+                    </button>
+                    <button
+                      className={`px-6 py-2 rounded-lg font-bold text-lg transition-all duration-200 shadow-sm ${selectedType === 'tag' ? 'bg-red-600/20 text-red-500' : 'bg-white/10 text-white hover:bg-red-600/20 hover:text-red-500'}`}
+                      onClick={() => { setSelectedType('tag'); setSelectedValue(''); setSearch(''); }}
+                    >
+                      Tag
+                    </button>
+                  </div>
+                  {/* Searchable Dropdown */}
+                  <div className="flex flex-col gap-3">
+                    {selectedType === 'category' && (
+                      <>
+                        <div className="text-white/80 text-base font-semibold mb-1">Available Categories:</div>
+                        <div className="flex flex-wrap gap-2">
+                          {userCategories.length === 0 && (
+                            <div className="text-red-500 text-base">No categories found. You need to post with a category first.</div>
+                          )}
+                          {userCategories.map(opt => (
+                            <button
+                              key={opt.id}
+                              type="button"
+                              onClick={() => setSelectedValue(opt.id)}
+                              className={`px-4 py-2 rounded-lg text-base font-semibold transition-all duration-150 ${selectedValue === opt.id ? 'bg-red-600 text-white' : 'bg-[#181c20] text-white hover:bg-red-700/60'}`}
+                            >
+                              {opt.name}
+                            </button>
+                          ))}
+                        </div>
+                      </>
+                    )}
+                    {selectedType === 'tag' && (
+                      <>
+                        <div className="text-white/80 text-base font-semibold mb-1">Available Tags:</div>
+                        <div className="flex flex-wrap gap-2">
+                          {(() => {
+                            // Count tag usage
+                            const tagCounts: { [id: string]: number } = {};
+                            userPosts.forEach(post => {
+                              if (post.fields.UserTags && Array.isArray(post.fields.UserTags)) {
+                                post.fields.UserTags.forEach((tagId: string) => {
+                                  tagCounts[tagId] = (tagCounts[tagId] || 0) + 1;
+                                });
+                              }
+                            });
+                            // Sort tags by usage
+                            const sortedTags = [...userTags].sort((a, b) => (tagCounts[b.id] || 0) - (tagCounts[a.id] || 0)).slice(0, 10);
+                            if (sortedTags.length === 0) {
+                              return <div className="text-red-500 text-base">No tags found. You need to post with a tag first.</div>;
+                            }
+                            return sortedTags.map(opt => (
+                              <button
+                                key={opt.id}
+                                type="button"
+                                onClick={() => setSelectedValue(opt.id)}
+                                className={`px-4 py-2 rounded-lg text-base font-semibold transition-all duration-150 ${selectedValue === opt.id ? 'bg-red-600 text-white' : 'bg-[#181c20] text-white hover:bg-red-700/60'}`}
+                              >
+                                #{opt.name}
+                              </button>
+                            ));
+                          })() || null}
+                        </div>
+                      </>
+                    )}
+                  </div>
+                  <div className="flex justify-end gap-4 mt-6">
+                    <button
+                      onClick={() => { setShowAddSectionModal(false); setSearch(''); }}
+                      className="px-6 py-2 text-lg font-bold text-white bg-white/10 hover:bg-red-500/10 hover:text-red-500 rounded-lg shadow transition-all duration-200"
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      onClick={handleAddSection}
+                      disabled={!selectedValue}
+                      className="px-6 py-2 text-lg font-bold text-white bg-red-950 hover:bg-red-900 rounded-lg shadow transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
+                    >
+                      Add Section
+                    </button>
+                  </div>
+                </div>
+              </div>
+            )}
 
             {/* Tab Content */}
             <div className="py-8">

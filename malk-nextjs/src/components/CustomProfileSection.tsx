@@ -5,6 +5,8 @@ import PostSlider from './PostSlider';
 interface CustomProfileSectionProps {
   userId: string;
   isOwnProfile: boolean;
+  userAvatar?: string;
+  userName?: string;
 }
 
 function uniqBy<T>(arr: T[], key: (item: T) => any): T[] {
@@ -17,7 +19,7 @@ function uniqBy<T>(arr: T[], key: (item: T) => any): T[] {
   });
 }
 
-export default function CustomProfileSection({ userId, isOwnProfile }: CustomProfileSectionProps) {
+export default function CustomProfileSection({ userId, isOwnProfile, userAvatar, userName }: CustomProfileSectionProps) {
   const [sections, setSections] = useState<Array<{
     id: string;
     type: 'category' | 'tag';
@@ -230,10 +232,12 @@ export default function CustomProfileSection({ userId, isOwnProfile }: CustomPro
         return (
           <div key={section.id} className="relative">
             <PostSlider
-              title={section.name}
+              title={section.type === 'tag' ? `#${section.name}` : section.name}
               posts={posts[section.id] || []}
               isLoading={!posts[section.id]}
               hideIcon={!isKnownCategory}
+              userAvatar={userAvatar}
+              userName={userName}
               onRenderActions={isOwnProfile ? (
                 <button
                   onClick={() => handleRemoveSection(section.id)}
@@ -247,84 +251,6 @@ export default function CustomProfileSection({ userId, isOwnProfile }: CustomPro
           </div>
         );
       })}
-
-      {isOwnProfile && (
-        <div className="mt-8">
-          {/* Limit to 8 sections */}
-          {sections.length >= 8 ? (
-            <div className="text-red-500 font-semibold text-center py-4">You can only create up to 8 sections.</div>
-          ) : isAddingSection ? (
-            <div className="bg-[#1a232b] border border-white/10 rounded-2xl p-8 shadow-2xl space-y-6 flex flex-col items-stretch w-full">
-              {/* Header */}
-              <div className="text-xl font-bold text-white mb-2">Display your posts from a specific category or tag</div>
-              {/* Toggle for Category/Tag */}
-              <div className="flex gap-4 mb-4">
-                <button
-                  className={`px-6 py-2 rounded-lg font-bold text-lg transition-all duration-200 shadow-sm ${selectedType === 'category' ? 'bg-red-600/20 text-red-500' : 'bg-white/10 text-white hover:bg-red-600/20 hover:text-red-500'}`}
-                  onClick={() => { setSelectedType('category'); setSelectedValue(''); setSearch(''); }}
-                >
-                  Category
-                </button>
-                <button
-                  className={`px-6 py-2 rounded-lg font-bold text-lg transition-all duration-200 shadow-sm ${selectedType === 'tag' ? 'bg-red-600/20 text-red-500' : 'bg-white/10 text-white hover:bg-red-600/20 hover:text-red-500'}`}
-                  onClick={() => { setSelectedType('tag'); setSelectedValue(''); setSearch(''); }}
-                >
-                  Tag
-                </button>
-              </div>
-              {/* Searchable Dropdown */}
-              <div className="flex flex-col gap-3">
-                <input
-                  type="text"
-                  placeholder={`Search ${selectedType}...`}
-                  value={search}
-                  onChange={e => setSearch(e.target.value)}
-                  className="bg-[#11161b] border border-white/10 rounded-lg px-4 py-3 text-white text-lg focus:outline-none focus:ring-2 focus:ring-red-600 placeholder-gray-400"
-                  disabled={isLoadingOptions}
-                />
-                <select
-                  value={selectedValue}
-                  onChange={e => setSelectedValue(e.target.value)}
-                  className="bg-[#11161b] border border-white/10 rounded-lg px-4 py-3 text-white text-lg focus:outline-none focus:ring-2 focus:ring-red-600"
-                  disabled={isLoadingOptions || filteredOptions.length === 0}
-                >
-                  <option value="">Select {selectedType}...</option>
-                  {filteredOptions.map(opt => (
-                    <option key={opt.id} value={opt.id}>{opt.name}</option>
-                  ))}
-                </select>
-                {isLoadingOptions && <div className="text-red-500 text-base">Loading options...</div>}
-                {!isLoadingOptions && filteredOptions.length === 0 && (
-                  <div className="text-red-500 text-base">No {selectedType}s found. You need to post with a {selectedType} first.</div>
-                )}
-              </div>
-              <div className="flex justify-end gap-4 mt-6">
-                <button
-                  onClick={() => { setIsAddingSection(false); setSearch(''); }}
-                  className="px-6 py-2 text-lg font-bold text-white bg-white/10 hover:bg-red-500/10 hover:text-red-500 rounded-lg shadow transition-all duration-200"
-                >
-                  Cancel
-                </button>
-                <button
-                  onClick={handleAddSection}
-                  disabled={!selectedValue}
-                  className="px-6 py-2 text-lg font-bold text-white bg-red-950 hover:bg-red-900 rounded-lg shadow transition-all duration-200 disabled:opacity-50 disabled:cursor-not-allowed"
-                >
-                  Add Section
-                </button>
-              </div>
-            </div>
-          ) : (
-            <button
-              onClick={() => setIsAddingSection(true)}
-              className="flex items-center gap-3 px-6 py-3 bg-white/10 hover:bg-red-700 text-white rounded-lg shadow-lg transition-all duration-200 font-bold text-lg"
-            >
-              <PlusIcon className="w-7 h-7" />
-              <span>Add Section</span>
-            </button>
-          )}
-        </div>
-      )}
     </div>
   );
 } 

@@ -61,6 +61,8 @@ export interface PostSliderProps {
   hideIcon?: boolean;
   onRenderActions?: React.ReactNode;
   emptyMessage?: React.ReactNode;
+  userAvatar?: string;
+  userName?: string;
 }
 
 export default function PostSlider({
@@ -73,7 +75,9 @@ export default function PostSlider({
   hasMore = false,
   hideIcon = false,
   onRenderActions,
-  emptyMessage
+  emptyMessage,
+  userAvatar,
+  userName
 }: PostSliderProps) {
   const sliderRef = React.useRef<HTMLDivElement>(null);
   const [canScrollLeft, setCanScrollLeft] = React.useState(false);
@@ -197,9 +201,26 @@ export default function PostSlider({
     <div className="mb-6 relative">
       <div className="flex items-center justify-between mb-3">
         <div className="flex items-center gap-2">
-          {isRecentPosts && <FilmIcon className="w-6 h-6 text-white/70" />}
-          {showIcon && <Icon className="w-6 h-6 text-white/70" />}
-          {isTag && !isRecentPosts && <HashtagIcon className="w-6 h-6 text-white/70" />}
+          {userAvatar ? (
+            <div className="relative w-10 h-10 rounded-full overflow-hidden">
+              <Image
+                src={userAvatar}
+                alt={userName || 'User'}
+                fill
+                className="object-cover"
+              />
+            </div>
+          ) : userAvatar === '' ? (
+            <div className="relative w-10 h-10 rounded-full overflow-hidden">
+              <DefaultAvatar userName={userName} />
+            </div>
+          ) : isRecentPosts ? (
+            <FilmIcon className="w-6 h-6 text-white/70" />
+          ) : showIcon ? (
+            <Icon className="w-6 h-6 text-white/70" />
+          ) : isTag && !isRecentPosts ? (
+            <HashtagIcon className="w-6 h-6 text-white/70" />
+          ) : null}
           <h2 className="text-xl font-semibold text-white">{title}</h2>
         </div>
         <div className="flex items-center gap-2">
@@ -267,26 +288,7 @@ export default function PostSlider({
                       </div>
                     )}
                   </div>
-                  <div className="mt-3 flex items-center gap-3 mb-1.5">
-                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                      {post.fields.UserAvatar ? (
-                        <Image
-                          src={post.fields.UserAvatar}
-                          alt={post.fields.UserName || 'User'}
-                          width={32}
-                          height={32}
-                          className="object-cover"
-                        />
-                      ) : (
-                        <DefaultAvatar />
-                      )}
-                    </div>
-                    <div className="text-sm text-gray-300 truncate">
-                      <span className="font-semibold">{post.fields.UserName || 'Anonymous'}</span>
-                      <span className="ml-1">shared:</span>
-                    </div>
-                  </div>
-                  <h3 className="font-medium text-white text-sm line-clamp-2">
+                  <h3 className="mt-3 text-base font-semibold text-white line-clamp-2">
                     {post.fields.VideoTitle || 'Untitled Video'}
                   </h3>
                 </Link>
