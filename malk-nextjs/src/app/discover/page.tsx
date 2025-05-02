@@ -681,7 +681,7 @@ export default function DiscoverPage() {
 
         {/* Post Sliders */}
         <div className="space-y-8">
-          {user && (
+          {user && followingPosts.length > 0 && (
             <PostSlider 
               title="Following"
               posts={followingPosts}
