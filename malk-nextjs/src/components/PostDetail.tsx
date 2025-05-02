@@ -7,7 +7,7 @@ import { useSession } from 'next-auth/react';
 import Comments from './Comments';
 import Image from 'next/image';
 import DefaultAvatar from './DefaultAvatar';
-import { HeartIcon, ChatBubbleLeftIcon, ShareIcon } from '@heroicons/react/24/outline';
+import { HeartIcon, ChatBubbleLeftIcon, ShareIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { getVideoTitle } from '@/lib/video-utils';
 
 interface Post {
@@ -387,19 +387,24 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
         {/* Author Info */}
         <div className="flex items-center justify-between mb-6">
           <div className="flex items-center space-x-4">
-            <div className="w-12 h-12 rounded-full bg-gray-300 overflow-hidden">
-              {authorProfileImage ? (
-                <img
-                  src={authorProfileImage}
-                  alt={authorName}
-                  className="w-full h-full object-cover"
-                />
-              ) : (
-                <DefaultAvatar userId={authorFirebaseUID || undefined} userName={authorName} />
-              )}
-            </div>
+            <Link href={`/profile/${post.fields.FirebaseUID?.[0]}`} className="block">
+              <div className="relative w-12 h-12 rounded-full overflow-hidden">
+                {authorProfileImage ? (
+                  <Image
+                    src={authorProfileImage}
+                    alt={authorName}
+                    fill
+                    className="object-cover"
+                  />
+                ) : (
+                  <DefaultAvatar userId={authorFirebaseUID || undefined} userName={authorName} />
+                )}
+              </div>
+            </Link>
             <div>
-              <h2 className="text-lg font-semibold text-white">{authorName || 'Anonymous'}</h2>
+              <Link href={`/profile/${post.fields.FirebaseUID?.[0]}`} className="block">
+                <h2 className="text-lg font-semibold text-white hover:text-red-400 transition-colors">{authorName || 'Anonymous'}</h2>
+              </Link>
               <p className="text-sm text-gray-400">{formatDate(post.fields.DisplayDate || post.fields.DateCreated)}</p>
             </div>
           </div>
@@ -407,13 +412,22 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
             <button
               onClick={handleToggleFollow}
               disabled={isFollowLoading}
-              className={`px-4 py-2 rounded-full text-sm font-medium ${
+              className={`py-1.5 text-sm font-medium min-w-[100px] inline-flex items-center justify-center ${
                 isFollowing
-                  ? 'bg-gray-600 text-white hover:bg-gray-700'
-                  : 'bg-red-600 text-white hover:bg-red-700'
-              }`}
+                  ? 'bg-red-950 text-red-100 hover:bg-red-900 pl-2 pr-4'
+                  : 'bg-red-800 text-red-100 hover:bg-red-700 px-6'
+              } rounded-lg`}
             >
-              {isFollowLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
+              {isFollowLoading ? (
+                '...'
+              ) : isFollowing ? (
+                <>
+                  <CheckIcon className="w-4 h-4" />
+                  <span className="ml-1.5">Following</span>
+                </>
+              ) : (
+                'Follow'
+              )}
             </button>
           )}
         </div>
