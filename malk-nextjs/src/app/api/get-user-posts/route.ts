@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Airtable from 'airtable';
+import { getYouTubeThumbnailUrl } from '@/lib/video-utils';
 
 const base = new Airtable({ 
   apiKey: process.env.AIRTABLE_PAT || process.env.NEXT_PUBLIC_AIRTABLE_PAT 
@@ -45,16 +46,23 @@ export async function GET(request: NextRequest) {
     }).all();
 
     // Map the records to include only necessary fields and add user data
-    const formattedPosts = posts.map(record => ({
-      id: record.id,
-      fields: {
-        ...record.fields,
-        UserName: userData.DisplayName || 'Anonymous',
-        UserAvatar: userData.ProfileImage || null,
-        ThumbnailURL: record.fields['Video ID'] ? 
-          `https://img.youtube.com/vi/${record.fields['Video ID']}/maxresdefault.jpg` : 
-          null
+    const formattedPosts = await Promise.all(posts.map(async record => {
+      // Get the best available thumbnail URL
+      let thumbnailUrl = null;
+      const videoId = record.fields['Video ID'];
+      if (videoId && typeof videoId === 'string') {
+        thumbnailUrl = await getYouTubeThumbnailUrl(videoId);
       }
+
+      return {
+        id: record.id,
+        fields: {
+          ...record.fields,
+          UserName: userData.DisplayName || 'Anonymous',
+          UserAvatar: userData.ProfileImage || null,
+          ThumbnailURL: thumbnailUrl
+        }
+      };
     }));
 
     return NextResponse.json({ posts: formattedPosts });

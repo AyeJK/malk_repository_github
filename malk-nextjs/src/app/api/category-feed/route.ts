@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Airtable, { FieldSet } from 'airtable';
+import { getYouTubeThumbnailUrl } from '@/lib/video-utils';
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(process.env.AIRTABLE_BASE_ID!);
 
@@ -25,6 +26,8 @@ interface PostFields extends FieldSet {
 export async function GET(request: NextRequest) {
   try {
     const categoryName = request.nextUrl.searchParams.get('category');
+    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '10');
+    const offset = parseInt(request.nextUrl.searchParams.get('offset') || '0');
     
     if (!categoryName) {
       return NextResponse.json(
@@ -58,53 +61,74 @@ export async function GET(request: NextRequest) {
     const linkedPostIds = fields.Posts || [];
 
     if (!linkedPostIds.length) {
-      return NextResponse.json({ posts: [] });
+      return NextResponse.json({ 
+        posts: [],
+        totalCount: 0,
+        hasMore: false
+      });
     }
 
-    // Fetch the linked posts using their record IDs
-    const posts = await base('Posts').select({
-      filterByFormula: `OR(${linkedPostIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
-      sort: [{ field: 'DisplayDate', direction: 'desc' }],
-      maxRecords: 50 // Limit to 50 most recent posts
-    }).all();
+    // Fetch the linked posts using their record IDs with pagination
+    try {
+      const posts = await base('Posts').select({
+        filterByFormula: `OR(${linkedPostIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
+        sort: [{ field: 'DisplayDate', direction: 'desc' }],
+        pageSize: limit,
+        offset: offset
+      }).all();
 
-    // Get all unique user IDs from the posts
-    const userIds = Array.from(new Set(
-      posts.flatMap(post => (post.fields as PostFields).FirebaseUID || [])
-    ));
+      // Get all unique user IDs from the posts
+      const userIds = Array.from(new Set(
+        posts.flatMap(post => (post.fields as PostFields).FirebaseUID || [])
+      ));
 
-    // Fetch user data for all authors
-    const users = userIds.length > 0 ? await base('Users').select({
-      filterByFormula: `OR(${userIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
-    }).all() : [];
+      // Fetch user data for all authors
+      const users = userIds.length > 0 ? await base('Users').select({
+        filterByFormula: `OR(${userIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
+      }).all() : [];
 
-    // Create a map of user data
-    const userMap = new Map(users.map(user => [user.id, user.fields as UserFields]));
+      // Create a map of user data
+      const userMap = new Map(users.map(user => [user.id, user.fields as UserFields]));
 
-    // Map the records to include only necessary fields and add user data
-    const formattedPosts = posts.map(record => {
-      const postFields = record.fields as PostFields;
-      const authorId = postFields.FirebaseUID?.[0];
-      const authorData = authorId ? userMap.get(authorId) : null;
+      // Map the records to include only necessary fields and add user data
+      const formattedPosts = await Promise.all(posts.map(async record => {
+        const postFields = record.fields as PostFields;
+        const authorId = postFields.FirebaseUID?.[0];
+        const authorData = authorId ? userMap.get(authorId) : null;
 
-      return {
-        id: record.id,
-        fields: {
-          ...postFields,
-          UserName: authorData?.DisplayName || 'Anonymous',
-          UserAvatar: authorData?.ProfileImage || null,
-          ThumbnailURL: postFields['Video ID'] ? 
-            `https://img.youtube.com/vi/${postFields['Video ID']}/maxresdefault.jpg` : 
-            null
+        // Get the best available thumbnail URL
+        let thumbnailUrl = null;
+        if (postFields['Video ID']) {
+          thumbnailUrl = await getYouTubeThumbnailUrl(postFields['Video ID']);
         }
-      };
-    });
 
-    return NextResponse.json({ posts: formattedPosts });
+        return {
+          id: record.id,
+          fields: {
+            ...postFields,
+            UserName: authorData?.DisplayName || 'Anonymous',
+            UserAvatar: authorData?.ProfileImage || null,
+            ThumbnailURL: thumbnailUrl
+          }
+        };
+      }));
+
+      return NextResponse.json({ 
+        posts: formattedPosts,
+        totalCount: linkedPostIds.length,
+        hasMore: offset + limit < linkedPostIds.length
+      });
+    } catch (error) {
+      console.error('Error fetching posts:', error);
+      return NextResponse.json(
+        { error: 'Failed to fetch posts', details: error },
+        { status: 500 }
+      );
+    }
   } catch (error) {
-    console.error('Error fetching category feed:', error);
+    console.error('Error in category-feed:', error);
     return NextResponse.json(
-      { error: 'Failed to fetch category feed' },
+      { error: 'Failed to fetch category feed', details: error },
       { status: 500 }
     );
   }

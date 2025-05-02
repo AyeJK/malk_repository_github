@@ -124,4 +124,31 @@ export async function getVideoTitle(url: string): Promise<string | null> {
     console.error('Error getting video title:', error);
     throw error;
   }
+}
+
+// Function to get YouTube thumbnail URL with fallbacks
+export async function getYouTubeThumbnailUrl(videoId: string): Promise<string> {
+  const qualities = [
+    'maxresdefault.jpg',
+    'sddefault.jpg',
+    'hqdefault.jpg',
+    'mqdefault.jpg',
+    'default.jpg'
+  ];
+
+  // Try each quality in order until one works
+  for (const quality of qualities) {
+    const url = `https://img.youtube.com/vi/${videoId}/${quality}`;
+    try {
+      const response = await axios.head(url);
+      if (response.status === 200) {
+        return url;
+      }
+    } catch (error) {
+      continue; // Try next quality if this one fails
+    }
+  }
+
+  // If all qualities fail, return the most reliable one (hqdefault)
+  return `https://img.youtube.com/vi/${videoId}/hqdefault.jpg`;
 } 

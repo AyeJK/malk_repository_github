@@ -29,9 +29,7 @@ function createSlug(name: string): string {
 export async function GET(request: NextRequest) {
   try {
     // Get all categories from the Categories table
-    const categories = await base('Categories').select({
-      sort: [{ field: 'Name', direction: 'asc' }]
-    }).all();
+    const categories = await base('Categories').select().all();
 
     // Map the records to include only necessary fields
     const formattedCategories = categories.map(record => {
@@ -52,7 +50,41 @@ export async function GET(request: NextRequest) {
       new Map(formattedCategories.map(cat => [cat.name.toLowerCase(), cat])).values()
     );
 
-    return NextResponse.json({ categories: uniqueCategories });
+    // Define the desired order of categories
+    const categoryOrder = [
+      'Music',
+      'Comedy',
+      'Gaming',
+      'Food',
+      'Film / TV / Movies',
+      'Beauty / Fashion',
+      'Learning',
+      'Nature',
+      'Crafting / Tech',
+      'Podcasts',
+      'Sports',
+      'Travel'
+    ];
+
+    // Sort categories according to the predefined order
+    const sortedCategories = uniqueCategories.sort((a, b) => {
+      const indexA = categoryOrder.indexOf(a.name);
+      const indexB = categoryOrder.indexOf(b.name);
+      
+      // If both categories are in the order list, sort by their position
+      if (indexA !== -1 && indexB !== -1) {
+        return indexA - indexB;
+      }
+      
+      // If only one category is in the order list, put it first
+      if (indexA !== -1) return -1;
+      if (indexB !== -1) return 1;
+      
+      // If neither category is in the order list, sort alphabetically
+      return a.name.localeCompare(b.name);
+    });
+
+    return NextResponse.json({ categories: sortedCategories });
   } catch (error) {
     console.error('Error fetching categories:', error);
     return NextResponse.json(
