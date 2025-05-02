@@ -133,43 +133,37 @@ function PostSlider({
     setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 1);
   }, []);
 
-  // Initialize scroll buttons state
+  // Initialize scroll buttons state and add resize observer
   React.useEffect(() => {
     updateScrollButtons();
     
-    const handleResize = () => {
+    const resizeObserver = new ResizeObserver(() => {
       updateScrollButtons();
-    };
-    window.addEventListener('resize', handleResize);
-    return () => window.removeEventListener('resize', handleResize);
-  }, [updateScrollButtons]);
+    });
 
-  // Intersection Observer for the slider with debouncing
+    if (sliderRef.current) {
+      resizeObserver.observe(sliderRef.current);
+    }
+
+    return () => resizeObserver.disconnect();
+  }, [updateScrollButtons, posts]);
+
+  // Intersection Observer for the slider with improved visibility detection
   React.useEffect(() => {
     const observer = new IntersectionObserver(
       ([entry]) => {
         if (entry.isIntersecting) {
           const now = Date.now();
-          if (now - lastIntersectionTime.current > 1000) { // 1 second debounce
+          if (now - lastIntersectionTime.current > 1000) {
             lastIntersectionTime.current = now;
-            
-            // Clear any existing timeout
-            if (visibilityDebounceTimeout.current) {
-              clearTimeout(visibilityDebounceTimeout.current);
-            }
-            
-            // Set a new timeout
-            visibilityDebounceTimeout.current = setTimeout(() => {
-              setIsVisible(true);
-              onVisible?.();
-              observer.disconnect();
-            }, 100);
+            setIsVisible(true);
+            onVisible?.();
           }
         }
       },
       { 
         threshold: 0.1,
-        rootMargin 
+        rootMargin: '100px 0px 100px 0px' // Increased vertical margins
       }
     );
 
@@ -183,80 +177,26 @@ function PostSlider({
         clearTimeout(visibilityDebounceTimeout.current);
       }
     };
-  }, [onVisible, rootMargin]);
+  }, [onVisible]);
 
-  // Intersection Observer for posts with optimized tracking
+  // Update visible posts when posts array changes
   React.useEffect(() => {
-    if (!isVisible || isLoading) return;
-
-    const observedPosts = new Set<string>();
-    const postObserver = new IntersectionObserver(
-      (entries) => {
-        let shouldLoadMore = false;
-        const newVisiblePosts = new Set<Post>();
-
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            const postId = entry.target.getAttribute('data-post-id');
-            if (postId) {
-              const post = posts.find(p => p.id === postId);
-              if (post) {
-                newVisiblePosts.add(post);
-                
-                // Check if we need to load more posts
-                if (hasMore && onLoadMore && !isLoadingMore) {
-                  const lastPost = posts[posts.length - 1];
-                  if (postId === lastPost.id) {
-                    shouldLoadMore = true;
-                  }
-                }
-              }
-            }
-          }
-        });
-
-        if (newVisiblePosts.size > 0) {
-          setVisiblePosts(prev => {
-            const uniquePosts = Array.from(new Set([...prev, ...Array.from(newVisiblePosts)]));
-            return uniquePosts;
-          });
-        }
-
-        if (shouldLoadMore) {
-          setIsLoadingMore(true);
-          onLoadMore?.();
-        }
-      },
-      { threshold: 0.1 }
-    );
-
-    const postElements = sliderRef.current?.querySelectorAll('[data-post-id]');
-    postElements?.forEach(el => {
-      const postId = el.getAttribute('data-post-id');
-      if (postId && !observedPosts.has(postId)) {
-        postObserver.observe(el);
-        observedPosts.add(postId);
-      }
-    });
-
-    return () => postObserver.disconnect();
-  }, [isVisible, isLoading, posts, hasMore, onLoadMore, isLoadingMore]);
+    if (!isLoading && posts.length > 0) {
+      setVisiblePosts(posts);
+    }
+  }, [posts, isLoading]);
 
   const scroll = (direction: 'left' | 'right') => {
     if (!sliderRef.current) return;
     
     const container = sliderRef.current;
-    const scrollAmount = container.clientWidth * 0.8; // Scroll 80% of container width
-    const currentScroll = container.scrollLeft;
-    const newScroll = direction === 'left' 
-      ? Math.max(0, currentScroll - scrollAmount)
-      : Math.min(
-          container.scrollWidth - container.clientWidth,
-          currentScroll + scrollAmount
-        );
+    const scrollAmount = Math.max(container.clientWidth * 0.8, 300); // At least 300px or 80% of container width
+    const targetScroll = direction === 'left' 
+      ? container.scrollLeft - scrollAmount
+      : container.scrollLeft + scrollAmount;
     
     container.scrollTo({
-      left: newScroll,
+      left: targetScroll,
       behavior: 'smooth'
     });
 
@@ -271,11 +211,25 @@ function PostSlider({
 
     const handleScroll = () => {
       updateScrollButtons();
+      
+      // Check if we need to load more posts
+      if (hasMore && onLoadMore && !isLoadingMore) {
+        const { scrollLeft, scrollWidth, clientWidth } = container;
+        if (scrollWidth - (scrollLeft + clientWidth) < clientWidth * 0.5) {
+          setIsLoadingMore(true);
+          onLoadMore();
+        }
+      }
     };
 
-    container.addEventListener('scroll', handleScroll);
+    container.addEventListener('scroll', handleScroll, { passive: true });
     return () => container.removeEventListener('scroll', handleScroll);
-  }, []);
+  }, [updateScrollButtons, hasMore, onLoadMore, isLoadingMore]);
+
+  // Reset isLoadingMore when new posts are added
+  React.useEffect(() => {
+    setIsLoadingMore(false);
+  }, [posts.length]);
 
   // Generate placeholder posts when loading
   const placeholderPosts = Array(5).fill(null).map((_, i) => ({
@@ -304,7 +258,7 @@ function PostSlider({
             onClick={() => scroll('left')}
             className={`p-2 rounded-full transition-colors ${
               canScrollLeft 
-                ? 'bg-white/5 hover:bg-white/10 text-white' 
+                ? 'bg-white/5 hover:bg-white/10 text-white cursor-pointer' 
                 : 'bg-white/5 text-white/30 cursor-not-allowed'
             }`}
             aria-label="Scroll left"
@@ -316,7 +270,7 @@ function PostSlider({
             onClick={() => scroll('right')}
             className={`p-2 rounded-full transition-colors ${
               canScrollRight 
-                ? 'bg-white/5 hover:bg-white/10 text-white' 
+                ? 'bg-white/5 hover:bg-white/10 text-white cursor-pointer' 
                 : 'bg-white/5 text-white/30 cursor-not-allowed'
             }`}
             aria-label="Scroll right"
@@ -330,13 +284,13 @@ function PostSlider({
         ref={sliderRef} 
         className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar scroll-smooth"
       >
-        {isVisible && displayPosts.map((post) => (
+        {displayPosts.map((post) => (
           <div
             key={post.id}
             data-post-id={post.id}
             className="flex-none w-[300px]"
           >
-            {(!isLoading && visiblePosts.some(p => p.id === post.id)) ? (
+            {(!isLoading) ? (
               <Link
                 href={`/posts/${post.id}`}
                 className="block overflow-hidden group"
@@ -423,12 +377,18 @@ export default function DiscoverPage() {
   const [loadedSections, setLoadedSections] = useState<Set<string>>(new Set());
   const [currentlyLoading, setCurrentlyLoading] = useState<string | null>(null);
   const loadingQueue = React.useRef<string[]>([]);
-  const [emptySections, setEmptySections] = useState<Set<string>>(new Set());
   const categoryCache = React.useRef<Map<string, { timestamp: number, data: any }>>(new Map());
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+  const lastRequestTime = React.useRef<Map<string, number>>(new Map());
+  const REQUEST_DEBOUNCE = 1000; // 1 second
 
   const loadFollowingPosts = React.useCallback(async () => {
     if (!user?.uid || loadedSections.has('following')) return;
+    
+    const now = Date.now();
+    const lastRequest = lastRequestTime.current.get('following') || 0;
+    if (now - lastRequest < REQUEST_DEBOUNCE) return;
+    lastRequestTime.current.set('following', now);
     
     setFollowingLoading(true);
     try {
@@ -441,7 +401,12 @@ export default function DiscoverPage() {
           const followedUserIds = following.map((f: any) => f.fields.FirebaseUID).filter(Boolean);
           
           if (followedUserIds.length > 0) {
+            // Batch the user posts requests
             const postsPromises = followedUserIds.map(async (uid: string) => {
+              const lastRequest = lastRequestTime.current.get(`user-${uid}`) || 0;
+              if (now - lastRequest < REQUEST_DEBOUNCE) return [];
+              
+              lastRequestTime.current.set(`user-${uid}`, now);
               const response = await fetch(`/api/get-user-posts?userId=${uid}`);
               if (!response.ok) return [];
               const data = await response.json();
@@ -461,30 +426,10 @@ export default function DiscoverPage() {
 
             // Update cache
             categoryCache.current.set('following', {
-              timestamp: Date.now(),
+              timestamp: now,
               data: flattenedPosts
             });
-
-            if (flattenedPosts.length === 0) {
-              setEmptySections(prev => {
-                const newSet = new Set(Array.from(prev));
-                newSet.add('following');
-                return newSet;
-              });
-            }
-          } else {
-            setEmptySections(prev => {
-              const newSet = new Set(Array.from(prev));
-              newSet.add('following');
-              return newSet;
-            });
           }
-        } else {
-          setEmptySections(prev => {
-            const newSet = new Set(Array.from(prev));
-            newSet.add('following');
-            return newSet;
-          });
         }
       }
       setLoadedSections(prev => {
@@ -494,18 +439,18 @@ export default function DiscoverPage() {
       });
     } catch (error) {
       console.error('Error fetching following posts:', error);
-      setEmptySections(prev => {
-        const newSet = new Set(Array.from(prev));
-        newSet.add('following');
-        return newSet;
-      });
     } finally {
       setFollowingLoading(false);
     }
   }, [user?.uid, loadedSections]);
 
   const loadCategoryPosts = React.useCallback(async (categoryName: string) => {
-    if (loadedSections.has(categoryName) || emptySections.has(categoryName)) return;
+    if (loadedSections.has(categoryName)) return;
+
+    const now = Date.now();
+    const lastRequest = lastRequestTime.current.get(categoryName) || 0;
+    if (now - lastRequest < REQUEST_DEBOUNCE) return;
+    lastRequestTime.current.set(categoryName, now);
 
     setCategoriesWithPosts(prev => 
       prev.map(cat => 
@@ -524,57 +469,37 @@ export default function DiscoverPage() {
         const data = await response.json();
         const posts = data.posts || [];
         
-        if (!posts.length) {
-          setEmptySections(prev => {
-            const newSet = new Set(Array.from(prev));
-            newSet.add(categoryName);
-            return newSet;
-          });
-        } else {
-          setCategoriesWithPosts(prev =>
-            prev.map(cat =>
-              cat.name === categoryName
-                ? {
-                    ...cat,
-                    posts,
-                    isLoading: false,
-                    offset: 10,
-                    hasMore: data.hasMore
-                  }
-                : cat
-            )
-          );
+        setCategoriesWithPosts(prev =>
+          prev.map(cat =>
+            cat.name === categoryName
+              ? {
+                  ...cat,
+                  posts,
+                  isLoading: false,
+                  offset: 10,
+                  hasMore: data.hasMore
+                }
+              : cat
+          )
+        );
 
-          // Update cache
-          categoryCache.current.set(categoryName, {
-            timestamp: Date.now(),
-            data: {
-              posts,
-              offset: 10,
-              hasMore: data.hasMore
-            }
-          });
-        }
-        
-        setLoadedSections(prev => {
-          const newSet = new Set(Array.from(prev));
-          newSet.add(categoryName);
-          return newSet;
-        });
-      } else {
-        setEmptySections(prev => {
-          const newSet = new Set(Array.from(prev));
-          newSet.add(categoryName);
-          return newSet;
+        // Update cache
+        categoryCache.current.set(categoryName, {
+          timestamp: now,
+          data: {
+            posts,
+            offset: 10,
+            hasMore: data.hasMore
+          }
         });
       }
-    } catch (error) {
-      console.error(`Error fetching posts for ${categoryName}:`, error);
-      setEmptySections(prev => {
+      setLoadedSections(prev => {
         const newSet = new Set(Array.from(prev));
         newSet.add(categoryName);
         return newSet;
       });
+    } catch (error) {
+      console.error(`Error fetching posts for ${categoryName}:`, error);
     } finally {
       setCategoriesWithPosts(prev =>
         prev.map(cat =>
@@ -584,7 +509,7 @@ export default function DiscoverPage() {
         )
       );
     }
-  }, [loadedSections, emptySections]);
+  }, [loadedSections]);
 
   const processQueue = React.useCallback(async () => {
     if (loadingQueue.current.length === 0 || currentlyLoading) {
@@ -593,12 +518,6 @@ export default function DiscoverPage() {
 
     const nextSection = loadingQueue.current[0];
     
-    if (emptySections.has(nextSection)) {
-      loadingQueue.current = loadingQueue.current.filter(s => s !== nextSection);
-      processQueue();
-      return;
-    }
-
     // Check cache before loading
     const cached = categoryCache.current.get(nextSection);
     if (cached && Date.now() - cached.timestamp < CACHE_DURATION) {
@@ -638,11 +557,6 @@ export default function DiscoverPage() {
       }
     } catch (error) {
       console.error(`Error processing queue for ${nextSection}:`, error);
-      setEmptySections(prev => {
-        const newSet = new Set(Array.from(prev));
-        newSet.add(nextSection);
-        return newSet;
-      });
     } finally {
       loadingQueue.current = loadingQueue.current.filter(s => s !== nextSection);
       setCurrentlyLoading(null);
@@ -652,8 +566,7 @@ export default function DiscoverPage() {
 
   const addToLoadingQueue = React.useCallback((sectionName: string) => {
     if (!loadingQueue.current.includes(sectionName) && 
-        !loadedSections.has(sectionName) && 
-        !emptySections.has(sectionName)) {
+        !loadedSections.has(sectionName)) {
       if (sectionName === 'following') {
         loadingQueue.current.unshift(sectionName);
       } else {
@@ -661,11 +574,16 @@ export default function DiscoverPage() {
       }
       processQueue();
     }
-  }, [loadedSections, emptySections, processQueue]);
+  }, [loadedSections, processQueue]);
 
   const loadMorePosts = React.useCallback(async (categoryName: string) => {
     const category = categoriesWithPosts.find(c => c.name === categoryName);
     if (!category || !category.hasMore) return;
+
+    const now = Date.now();
+    const lastRequest = lastRequestTime.current.get(`more-${categoryName}`) || 0;
+    if (now - lastRequest < REQUEST_DEBOUNCE) return;
+    lastRequestTime.current.set(`more-${categoryName}`, now);
 
     try {
       const response = await fetch(
@@ -691,7 +609,7 @@ export default function DiscoverPage() {
 
         // Update cache
         categoryCache.current.set(categoryName, {
-          timestamp: Date.now(),
+          timestamp: now,
           data: {
             posts: [...(category.posts || []), ...newPosts],
             offset: category.offset + 10,
@@ -720,12 +638,6 @@ export default function DiscoverPage() {
   useEffect(() => {
     const timeoutId = setTimeout(() => {
       if (currentlyLoading) {
-        // If something is stuck loading, mark it as empty and clear the loading state
-        setEmptySections(prev => {
-          const newSet = new Set(Array.from(prev));
-          newSet.add(currentlyLoading);
-          return newSet;
-        });
         setCurrentlyLoading(null);
         
         // Clear any stuck loading states in categoriesWithPosts
@@ -769,7 +681,7 @@ export default function DiscoverPage() {
 
         {/* Post Sliders */}
         <div className="space-y-8">
-          {user && !emptySections.has('following') && (
+          {user && followingPosts.length > 0 && (
             <PostSlider 
               title="Following"
               posts={followingPosts}
@@ -779,20 +691,18 @@ export default function DiscoverPage() {
             />
           )}
           
-          {categoriesWithPosts
-            .filter(category => !emptySections.has(category.name) || currentlyLoading === category.name)
-            .map((category) => (
-              <PostSlider
-                key={category.name}
-                title={category.name}
-                posts={category.posts || []}
-                isLoading={category.isLoading || currentlyLoading === category.name}
-                onVisible={() => onSectionVisible(category.name)}
-                rootMargin="100px"
-                onLoadMore={() => loadMorePosts(category.name)}
-                hasMore={category.hasMore}
-              />
-            ))}
+          {categoriesWithPosts.map((category) => (
+            <PostSlider
+              key={category.name}
+              title={category.name}
+              posts={category.posts || []}
+              isLoading={category.isLoading || currentlyLoading === category.name}
+              onVisible={() => onSectionVisible(category.name)}
+              rootMargin="100px"
+              onLoadMore={() => loadMorePosts(category.name)}
+              hasMore={category.hasMore}
+            />
+          ))}
         </div>
       </div>
     </div>
