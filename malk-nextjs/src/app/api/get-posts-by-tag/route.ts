@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Airtable from 'airtable';
+import { getUserByFirebaseUID } from '@/lib/airtable';
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(process.env.AIRTABLE_BASE_ID!);
 
@@ -7,6 +8,7 @@ export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
     const tagName = searchParams.get('tag');
+    const userId = searchParams.get('userId');
 
     if (!tagName) {
       return NextResponse.json(
@@ -34,7 +36,7 @@ export async function GET(request: NextRequest) {
 
     // Then, find all posts that have this tag
     const postsTable = base('Posts');
-    const postRecords = await postsTable.select({
+    let postRecords = await postsTable.select({
       filterByFormula: `OR(
         SEARCH('${tagId}', ARRAYJOIN({UserTags}, ',')),
         SEARCH('${tagName.toLowerCase()}', LOWER(ARRAYJOIN({UserTags}, ',')))
@@ -42,11 +44,52 @@ export async function GET(request: NextRequest) {
       sort: [{ field: 'DateCreated', direction: 'desc' }]
     }).all();
 
-    // Map the records to post objects
-    const posts = postRecords.map(record => ({
-      id: record.id,
-      fields: record.fields
-    }));
+    // If userId is provided, filter posts to only those by that user
+    if (userId) {
+      // Map Firebase UID to Airtable record ID
+      const userRecord = await getUserByFirebaseUID(userId);
+      if (!userRecord) {
+        postRecords = [];
+      } else {
+        const airtableUserId = userRecord.id;
+        postRecords = postRecords.filter(post => {
+          const fuid = post.fields.FirebaseUID;
+          if (Array.isArray(fuid)) return fuid.includes(airtableUserId);
+          return fuid === airtableUserId;
+        });
+      }
+    }
+
+    // Get all unique user IDs from the posts
+    const userIds = Array.from(new Set(
+      postRecords.flatMap(post =>
+        (Array.isArray(post.fields.FirebaseUID) ? post.fields.FirebaseUID : [post.fields.FirebaseUID])
+          .filter(id => typeof id === 'string')
+      )
+    ));
+
+    // Fetch user data for all authors
+    const users = userIds.length > 0 ? await base('Users').select({
+      filterByFormula: `OR(${userIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
+    }).all() : [];
+
+    // Create a map of user data
+    const userMap = new Map(users.map(user => [user.id, user.fields]));
+
+    // Map the records to post objects, adding user info
+    const posts = postRecords.map(record => {
+      const postFields = record.fields;
+      const authorId = Array.isArray(postFields.FirebaseUID) ? postFields.FirebaseUID[0] : postFields.FirebaseUID;
+      const authorData = authorId ? userMap.get(authorId) : null;
+      return {
+        id: record.id,
+        fields: {
+          ...postFields,
+          UserName: authorData?.DisplayName || 'Anonymous',
+          UserAvatar: authorData?.ProfileImage || null
+        }
+      };
+    });
 
     // Return the tag info and posts
     return NextResponse.json({
