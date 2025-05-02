@@ -307,51 +307,51 @@ export default function ProfilePage() {
               </div>
             </div>
             {layout === 'grid' ? (
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-3">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-3">
                 {sortedLikes.map((post: any) => (
-                  <div key={post.id} className="bg-black rounded-xl p-1 shadow w-full h-full flex flex-col">
-                    <Link href={`/posts/${post.id}`} className="block overflow-hidden group h-full">
-                      <div className="relative aspect-video rounded-lg overflow-hidden w-full">
-                        {post.fields.ThumbnailURL ? (
-                          <Image
-                            src={post.fields.ThumbnailURL}
-                            alt={post.fields.VideoTitle || 'Video thumbnail'}
-                            fill
-                            className="object-cover absolute top-0 left-0 group-hover:scale-105 transition-transform duration-300"
-                            sizes="300px"
-                          />
-                        ) : (
-                          <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                            <span className="text-gray-400">No thumbnail</span>
-                          </div>
-                        )}
+              <div key={post.id} className="bg-black rounded-xl p-1 shadow w-full h-full flex flex-col">
+                <Link href={`/posts/${post.id}`} className="block overflow-hidden group h-full">
+                  <div className="relative aspect-video rounded-lg overflow-hidden w-full">
+                    {post.fields.ThumbnailURL ? (
+                      <Image
+                        src={post.fields.ThumbnailURL}
+                        alt={post.fields.VideoTitle || 'Video thumbnail'}
+                        fill
+                        className="object-cover absolute top-0 left-0 group-hover:scale-105 transition-transform duration-300"
+                        sizes="300px"
+                      />
+                    ) : (
+                      <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                        <span className="text-gray-400">No thumbnail</span>
                       </div>
-                      <div className="mt-2 flex items-center gap-2 mb-1">
-                        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                          {post.fields.UserAvatar ? (
-                            <Image
-                              src={post.fields.UserAvatar}
-                              alt={post.fields.UserName || post.fields.DisplayName || 'User'}
-                              width={32}
-                              height={32}
-                              className="object-cover"
-                            />
-                          ) : (
-                            <DefaultAvatar userId={post.fields.FirebaseUID} userName={post.fields.UserName || post.fields.DisplayName || 'Anonymous'} />
-                          )}
-                        </div>
-                        <div className="text-sm text-gray-300 truncate">
-                          <span className="font-semibold">{post.fields.UserName || post.fields.DisplayName || 'Anonymous'}</span>
-                          <span className="ml-1">shared:</span>
-                        </div>
-                      </div>
-                      <h3 className="font-medium text-white text-sm line-clamp-2">
-                        {post.fields.VideoTitle || 'Untitled Video'}
-                      </h3>
-                    </Link>
+                    )}
                   </div>
-                ))}
+                  <div className="mt-2 flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                      {post.fields.UserAvatar ? (
+                        <Image
+                          src={post.fields.UserAvatar}
+                          alt={post.fields.UserName || post.fields.DisplayName || 'User'}
+                          width={32}
+                          height={32}
+                          className="object-cover"
+                        />
+                      ) : (
+                        <DefaultAvatar userId={post.fields.FirebaseUID} userName={post.fields.UserName || post.fields.DisplayName || 'Anonymous'} />
+                      )}
+                    </div>
+                    <div className="text-sm text-gray-300 truncate">
+                      <span className="font-semibold">{post.fields.UserName || post.fields.DisplayName || 'Anonymous'}</span>
+                      <span className="ml-1">shared:</span>
+                    </div>
+                  </div>
+                  <h3 className="font-medium text-white text-sm line-clamp-2">
+                    {post.fields.VideoTitle || 'Untitled Video'}
+                  </h3>
+                </Link>
               </div>
+            ))}
+          </div>
             ) : (
               <div className="space-y-6">
                 {sortedLikes.map((post: any) => (
@@ -427,24 +427,24 @@ export default function ProfilePage() {
               {/* Avatar overlaps banner, left-aligned */}
               <div className="relative z-20 ml-4 md:ml-8">
                 <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-black/70 bg-black/60 shadow-xl">
-                  {user?.fields?.ProfileImage ? (
-                    <Image
-                      src={user.fields.ProfileImage}
-                      alt={user?.fields?.DisplayName || 'User Profile'}
-                      fill
-                      className="object-cover"
-                      priority
-                    />
-                  ) : (
-                    <DefaultAvatar userId={user?.fields?.FirebaseUID} userName={user?.fields?.DisplayName} />
-                  )}
+                    {user?.fields?.ProfileImage ? (
+                      <Image
+                        src={user.fields.ProfileImage}
+                        alt={user?.fields?.DisplayName || 'User Profile'}
+                        fill
+                        className="object-cover"
+                        priority
+                      />
+                    ) : (
+                      <DefaultAvatar userId={user?.fields?.FirebaseUID} userName={user?.fields?.DisplayName} />
+                    )}
+                  </div>
                 </div>
-              </div>
               {/* Info Center (display name, username, stats, bio, social icon) */}
               <div className="flex-1 flex flex-col justify-center min-w-0">
                 <div className="flex flex-row items-center gap-3">
                   <span className="text-3xl md:text-4xl font-bold text-white truncate">
-                    {user?.fields?.DisplayName || user?.name || 'Anonymous'}
+                        {user?.fields?.DisplayName || user?.name || 'Anonymous'}
                   </span>
                   {user?.fields?.Username && (
                     <span className="text-lg text-white/80 truncate">@{user.fields.Username}</span>
@@ -467,34 +467,34 @@ export default function ProfilePage() {
                   <span><b>{followers.length}</b> Followers</span>
                   <span><b>{posts.length}</b> Posts</span>
                 </div>
-                {user?.fields?.Bio && (
+                      {user?.fields?.Bio && (
                   <div className="mt-1 text-white/80 text-base max-w-2xl whitespace-pre-line">{user.fields.Bio}</div>
-                )}
-              </div>
+                      )}
+                    </div>
               {/* Follow Button Far Right */}
               <div className="flex flex-col items-end justify-center min-w-[120px] z-10">
-                {currentUser && firebaseUID && currentUser.uid !== firebaseUID && (
-                  <button
-                    onClick={toggleFollow}
-                    disabled={isFollowLoading}
+                      {currentUser && firebaseUID && currentUser.uid !== firebaseUID && (
+                        <button
+                          onClick={toggleFollow}
+                          disabled={isFollowLoading}
                     className={`py-2 text-base font-medium min-w-[100px] inline-flex items-center justify-center ${
-                      isFollowing
-                        ? 'bg-red-950 text-red-100 hover:bg-red-900 pl-2 pr-4'
-                        : 'bg-red-800 text-red-100 hover:bg-red-700 px-6'
-                    } rounded-lg`}
-                  >
-                    {isFollowLoading ? (
-                      '...'
-                    ) : isFollowing ? (
-                      <>
+                            isFollowing
+                              ? 'bg-red-950 text-red-100 hover:bg-red-900 pl-2 pr-4'
+                              : 'bg-red-800 text-red-100 hover:bg-red-700 px-6'
+                          } rounded-lg`}
+                        >
+                          {isFollowLoading ? (
+                            '...'
+                          ) : isFollowing ? (
+                            <>
                         <CheckIcon className="w-5 h-5" />
-                        <span className="ml-1.5">Following</span>
-                      </>
-                    ) : (
-                      'Follow'
-                    )}
-                  </button>
-                )}
+                              <span className="ml-1.5">Following</span>
+                            </>
+                          ) : (
+                            'Follow'
+                          )}
+                        </button>
+                      )}
               </div>
             </div>
 
