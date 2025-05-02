@@ -423,78 +423,83 @@ export default function ProfilePage() {
           {/* Content Container - With wider max width */}
           <div className="max-w-[1400px] mx-auto px-4 sm:px-6 lg:px-8">
             {/* Profile Header - Overlapping Avatar Layout */}
-            <div className="relative flex flex-row items-center gap-6 px-0 pt-0 pb-1 -mt-16 md:-mt-20" style={{ minHeight: '60px' }}>
+            <div className="relative flex flex-row items-center px-0 pt-0 pb-1 -mt-16 md:-mt-20" style={{ minHeight: '60px' }}>
               {/* Avatar overlaps banner, left-aligned */}
-              <div className="relative z-20 ml-4 md:ml-8">
+              <div className="relative z-20">
                 <div className="relative w-36 h-36 md:w-44 md:h-44 rounded-full overflow-hidden border-4 border-black/70 bg-black/60 shadow-xl">
-                    {user?.fields?.ProfileImage ? (
-                      <Image
-                        src={user.fields.ProfileImage}
-                        alt={user?.fields?.DisplayName || 'User Profile'}
-                        fill
-                        className="object-cover"
-                        priority
-                      />
-                    ) : (
-                      <DefaultAvatar userId={user?.fields?.FirebaseUID} userName={user?.fields?.DisplayName} />
+                  {user?.fields?.ProfileImage ? (
+                    <Image
+                      src={user.fields.ProfileImage}
+                      alt={user?.fields?.DisplayName || 'User Profile'}
+                      fill
+                      className="object-cover"
+                      priority
+                    />
+                  ) : (
+                    <DefaultAvatar userId={user?.fields?.FirebaseUID} userName={user?.fields?.DisplayName} />
+                  )}
+                </div>
+              </div>
+              {/* Info Center */}
+              <div className="flex-1 flex flex-col justify-between min-w-0 ml-8 h-36 md:h-44">
+                {/* Display name and social link row */}
+                <div className="flex flex-row items-end justify-between gap-4 mb-0 mt-[0px]">
+                  <span className="text-5xl md:text-6xl font-bold text-white truncate leading-[1.1] pb-1">
+                    {user?.fields?.DisplayName || user?.name || 'Anonymous'}
+                  </span>
+                  <div className="flex items-center gap-2 self-end">
+                    {user?.fields?.SocialLink && (
+                      <a
+                        href={user.fields.SocialLink}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="flex items-center bg-black/60 hover:bg-black/80 rounded-full p-2 transition-colors"
+                        title="Social Link"
+                      >
+                        <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5 4.03 5 9s-2.245 9-5 9-5-4.03-5-9 2.245-9 5-9zm0 0c4.418 0 8 4.03 8 9s-3.582 9-8 9-8-4.03-8-9 3.582-9 8-9zm0 0v18" />
+                        </svg>
+                      </a>
                     )}
                   </div>
                 </div>
-              {/* Info Center (display name, username, stats, bio, social icon) */}
-              <div className="flex-1 flex flex-col justify-center min-w-0">
-                <div className="flex flex-row items-center gap-3">
-                  <span className="text-3xl md:text-4xl font-bold text-white truncate">
-                        {user?.fields?.DisplayName || user?.name || 'Anonymous'}
-                  </span>
-                  {user?.fields?.Username && (
-                    <span className="text-lg text-white/80 truncate">@{user.fields.Username}</span>
-                  )}
-                  {user?.fields?.SocialLink && (
-                    <a
-                      href={user.fields.SocialLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="ml-2 flex items-center bg-black/60 hover:bg-black/80 rounded-full p-2 transition-colors"
-                      title="Social Link"
-                    >
-                      <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
-                        <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5 4.03 5 9s-2.245 9-5 9-5-4.03-5-9 2.245-9 5-9zm0 0c4.418 0 8 4.03 8 9s-3.582 9-8 9-8-4.03-8-9 3.582-9 8-9zm0 0v18" />
-                      </svg>
-                    </a>
-                  )}
-                </div>
-                <div className="flex gap-6 mt-1 text-white/70 text-base">
-                  <span><b>{followers.length}</b> Followers</span>
-                  <span><b>{posts.length}</b> Posts</span>
-                </div>
-                      {user?.fields?.Bio && (
-                  <div className="mt-1 text-white/80 text-base max-w-2xl whitespace-pre-line">{user.fields.Bio}</div>
-                      )}
+                {/* Stats, bio, and follow button container */}
+                <div className="flex flex-row items-center justify-between gap-8 mt-4 mb-4">
+                  <div className="flex flex-col gap-1">
+                    <div className="flex gap-6 text-white/70 text-lg pt-2">
+                      <span><b>{followers.length}</b> Followers</span>
+                      <span><b>{posts.length}</b> Posts</span>
                     </div>
-              {/* Follow Button Far Right */}
-              <div className="flex flex-col items-end justify-center min-w-[120px] z-10">
-                      {currentUser && firebaseUID && currentUser.uid !== firebaseUID && (
-                        <button
-                          onClick={toggleFollow}
-                          disabled={isFollowLoading}
-                    className={`py-2 text-base font-medium min-w-[100px] inline-flex items-center justify-center ${
-                            isFollowing
-                              ? 'bg-red-950 text-red-100 hover:bg-red-900 pl-2 pr-4'
-                              : 'bg-red-800 text-red-100 hover:bg-red-700 px-6'
-                          } rounded-lg`}
-                        >
-                          {isFollowLoading ? (
-                            '...'
-                          ) : isFollowing ? (
-                            <>
-                        <CheckIcon className="w-5 h-5" />
-                              <span className="ml-1.5">Following</span>
-                            </>
-                          ) : (
-                            'Follow'
-                          )}
-                        </button>
-                      )}
+                    {user?.fields?.Bio && (
+                      <div className="mt-1 italic text-white/80 text-xl max-w-2xl whitespace-pre-line">{user.fields.Bio}</div>
+                    )}
+                  </div>
+                  {/* Follow Button Far Right in this row */}
+                  <div className="flex flex-col items-end justify-center min-w-[120px] z-10 ml-8">
+                    {currentUser && firebaseUID && currentUser.uid !== firebaseUID && (
+                      <button
+                        onClick={toggleFollow}
+                        disabled={isFollowLoading}
+                        className={`py-2 text-base font-medium min-w-[100px] inline-flex items-center justify-center ${
+                          isFollowing
+                            ? 'bg-red-950 text-red-100 hover:bg-red-900 pl-2 pr-4'
+                            : 'bg-red-800 text-red-100 hover:bg-red-700 px-6'
+                        } rounded-lg`}
+                      >
+                        {isFollowLoading ? (
+                          '...'
+                        ) : isFollowing ? (
+                          <>
+                            <CheckIcon className="w-5 h-5" />
+                            <span className="ml-1.5">Following</span>
+                          </>
+                        ) : (
+                          'Follow'
+                        )}
+                      </button>
+                    )}
+                  </div>
+                </div>
               </div>
             </div>
 
