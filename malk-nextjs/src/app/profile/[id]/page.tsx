@@ -10,6 +10,7 @@ import LoadingSpinner from '@/components/LoadingSpinner';
 import { useFollow } from '@/hooks/useFollow';
 import { useAuth } from '@/lib/auth-context';
 import DefaultAvatar from '@/components/DefaultAvatar';
+import { CheckIcon } from '@heroicons/react/24/outline';
 
 export default function ProfilePage() {
   const params = useParams();
@@ -234,13 +235,22 @@ export default function ProfilePage() {
                       <button
                         onClick={toggleFollow}
                         disabled={isFollowLoading}
-                        className={`px-4 py-1 rounded-full text-sm font-medium transition-colors ${
-                          isFollowing 
-                            ? 'bg-gray-600 text-white hover:bg-gray-700' 
-                            : 'bg-red-600 text-white hover:bg-red-700'
-                        }`}
+                        className={`py-1.5 text-sm font-medium min-w-[100px] inline-flex items-center justify-center ${
+                          isFollowing
+                            ? 'bg-red-950 text-red-100 hover:bg-red-900 pl-2 pr-4'
+                            : 'bg-red-800 text-red-100 hover:bg-red-700 px-6'
+                        } rounded-lg`}
                       >
-                        {isFollowLoading ? '...' : isFollowing ? 'Following' : 'Follow'}
+                        {isFollowLoading ? (
+                          '...'
+                        ) : isFollowing ? (
+                          <>
+                            <CheckIcon className="w-4 h-4" />
+                            <span className="ml-1.5">Following</span>
+                          </>
+                        ) : (
+                          'Follow'
+                        )}
                       </button>
                     )}
                   </div>
