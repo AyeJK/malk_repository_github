@@ -286,7 +286,10 @@ export default function Sidebar() {
                     <div className="text-white/50 text-sm px-2">Loading categories...</div>
                   ) : categories.length > 0 ? (
                     categories
-                      .filter(category => category.name.toLowerCase() !== 'test category')
+                      .filter(category => {
+                        const lowerName = category.name.toLowerCase();
+                        return lowerName !== 'test category' && lowerName !== 'other';
+                      })
                       .map(({ id, name, slug }) => (
                         <Link
                           key={id}
