@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User, sendEmailVerification } from 'firebase/auth';
 import { getAnalytics } from 'firebase/analytics';
 import { getStorage } from 'firebase/storage';
 
@@ -74,9 +74,11 @@ export async function signIn(email: string, password: string) {
 export async function signUp(email: string, password: string) {
   try {
     const userCredential = await createUserWithEmailAndPassword(auth, email, password);
-    return { user: userCredential.user, error: null };
+    // Send email verification
+    await sendEmailVerification(userCredential.user);
+    return { user: userCredential.user, error: null, verificationSent: true };
   } catch (error: any) {
-    return { user: null, error: error.message };
+    return { user: null, error: error.message, verificationSent: false };
   }
 }
 

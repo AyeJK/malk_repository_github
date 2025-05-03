@@ -3,270 +3,89 @@
 import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { signUp } from '@/lib/firebase';
-import { upsertUser } from '@/lib/airtable';
+import { signIn } from 'next-auth/react';
 
 export default function SignUpPage() {
   const router = useRouter();
-  const [formData, setFormData] = useState({
-    email: '',
-    password: '',
-    confirmPassword: '',
-    displayName: '',
-    firstName: '',
-    lastName: '',
-    bio: '',
-  });
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [success, setSuccess] = useState(false);
 
-  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-    const { name, value } = e.target;
-    setFormData(prev => ({
-      ...prev,
-      [name]: value
-    }));
-  };
-
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
+  const handleOAuthSignUp = async (provider: 'google' | 'facebook') => {
     setError('');
     setLoading(true);
-    
-    // Basic validation
-    if (formData.password !== formData.confirmPassword) {
-      setError('Passwords do not match');
-      setLoading(false);
-      return;
-    }
-    
-    if (formData.password.length < 6) {
-      setError('Password must be at least 6 characters');
-      setLoading(false);
-      return;
-    }
-    
     try {
-      console.log('Attempting to sign up user:', formData.email);
-      
-      // Call Firebase auth to create a user
-      const { user, error } = await signUp(formData.email, formData.password);
-      
-      if (error) {
-        console.error('Firebase signup error:', error);
-        setError(error);
-      } else if (user) {
-        console.log('Firebase user created successfully:', user.uid);
-        
-        // Generate a profile URL based on display name or email
-        const profileURL = formData.displayName 
-          ? formData.displayName.toLowerCase().replace(/\s+/g, '-')
-          : formData.email.split('@')[0];
-        
-        console.log('Attempting to store user data in Airtable');
-        
-        // Store user information in Airtable
-        const airtableUser = await upsertUser({
-          email: user.email!,
-          firebaseUID: user.uid,
-          displayName: formData.displayName || formData.email.split('@')[0],
-          firstName: formData.firstName,
-          lastName: formData.lastName,
-          bio: formData.bio,
-          postCount: 0,
-          profileURL: profileURL
-        });
-
-        if (!airtableUser) {
-          console.error('Failed to store user data in Airtable');
-          // Continue with signup even if Airtable storage fails
-        } else {
-          console.log('User data stored in Airtable successfully:', airtableUser.id);
-        }
-
-        setSuccess(true);
-        // Redirect to dashboard after a short delay
-        setTimeout(() => {
-          router.push('/dashboard');
-        }, 2000);
-      }
+      await signIn(provider, { callbackUrl: '/dashboard' });
     } catch (err: any) {
-      console.error('Signup error:', err);
-      setError('Failed to create account. Please try again.');
+      setError('Failed to sign up with ' + provider.charAt(0).toUpperCase() + provider.slice(1));
     } finally {
       setLoading(false);
     }
   };
 
-  return (
-    <div className="min-h-screen bg-dark-lighter flex items-center justify-center py-12 px-4 sm:px-6 lg:px-8">
-      <div className="max-w-md w-full space-y-8 bg-dark p-8 rounded-lg shadow-lg">
-        <div>
-          <h2 className="mt-6 text-center text-3xl font-extrabold text-white">
-            Create your account
-          </h2>
-          <p className="mt-2 text-center text-sm text-gray-400">
-            Or{' '}
-            <Link href="/login" className="font-medium text-primary hover:text-primary-light">
-              sign in to your existing account
-            </Link>
-          </p>
-        </div>
-        
-        {success ? (
-          <div className="rounded-md bg-green-900/30 p-4">
-            <div className="flex">
-              <div className="flex-shrink-0">
-                <svg className="h-5 w-5 text-green-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                  <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clipRule="evenodd" />
-                </svg>
-              </div>
-              <div className="ml-3">
-                <h3 className="text-sm font-medium text-green-400">Account created successfully!</h3>
-                <div className="mt-2 text-sm text-green-300">
-                  <p>Redirecting you to the dashboard...</p>
-                </div>
-              </div>
-            </div>
-          </div>
-        ) : (
-          <form className="mt-8 space-y-6" onSubmit={handleSubmit}>
-            {error && (
-              <div className="rounded-md bg-red-900/30 p-4">
-                <div className="flex">
-                  <div className="flex-shrink-0">
-                    <svg className="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" aria-hidden="true">
-                      <path fillRule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z" clipRule="evenodd" />
-                    </svg>
-                  </div>
-                  <div className="ml-3">
-                    <h3 className="text-sm font-medium text-red-400">Error</h3>
-                    <div className="mt-2 text-sm text-red-300">
-                      <p>{error}</p>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            
-            <div className="rounded-md shadow-sm -space-y-px">
-              <div>
-                <label htmlFor="email" className="sr-only">Email address</label>
-                <input
-                  id="email"
-                  name="email"
-                  type="email"
-                  autoComplete="email"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-dark-lighter placeholder-gray-500 text-white rounded-t-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                  placeholder="Email address"
-                  value={formData.email}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="displayName" className="sr-only">Display Name</label>
-                <input
-                  id="displayName"
-                  name="displayName"
-                  type="text"
-                  autoComplete="nickname"
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-dark-lighter placeholder-gray-500 text-white focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                  placeholder="Display Name (optional)"
-                  value={formData.displayName}
-                  onChange={handleChange}
-                />
-              </div>
-              <div className="grid grid-cols-2 gap-0">
-                <div>
-                  <label htmlFor="firstName" className="sr-only">First Name</label>
-                  <input
-                    id="firstName"
-                    name="firstName"
-                    type="text"
-                    autoComplete="given-name"
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-dark-lighter placeholder-gray-500 text-white focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                    placeholder="First Name (optional)"
-                    value={formData.firstName}
-                    onChange={handleChange}
-                  />
-                </div>
-                <div>
-                  <label htmlFor="lastName" className="sr-only">Last Name</label>
-                  <input
-                    id="lastName"
-                    name="lastName"
-                    type="text"
-                    autoComplete="family-name"
-                    className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-dark-lighter placeholder-gray-500 text-white focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                    placeholder="Last Name (optional)"
-                    value={formData.lastName}
-                    onChange={handleChange}
-                  />
-                </div>
-              </div>
-              <div>
-                <label htmlFor="bio" className="sr-only">Bio</label>
-                <textarea
-                  id="bio"
-                  name="bio"
-                  rows={2}
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-dark-lighter placeholder-gray-500 text-white focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                  placeholder="Bio (optional)"
-                  value={formData.bio}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="password" className="sr-only">Password</label>
-                <input
-                  id="password"
-                  name="password"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-dark-lighter placeholder-gray-500 text-white focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                  placeholder="Password"
-                  value={formData.password}
-                  onChange={handleChange}
-                />
-              </div>
-              <div>
-                <label htmlFor="confirmPassword" className="sr-only">Confirm Password</label>
-                <input
-                  id="confirmPassword"
-                  name="confirmPassword"
-                  type="password"
-                  autoComplete="new-password"
-                  required
-                  className="appearance-none rounded-none relative block w-full px-3 py-2 border border-gray-700 bg-dark-lighter placeholder-gray-500 text-white rounded-b-md focus:outline-none focus:ring-primary focus:border-primary focus:z-10 sm:text-sm"
-                  placeholder="Confirm Password"
-                  value={formData.confirmPassword}
-                  onChange={handleChange}
-                />
-              </div>
-            </div>
+  const handleCreateAccount = () => {
+    // This will trigger the next step/modal for email/password (to be implemented)
+  };
 
-            <div>
-              <button
-                type="submit"
-                disabled={loading}
-                className="group relative w-full flex justify-center py-2 px-4 border border-transparent text-sm font-medium rounded-md text-white bg-primary hover:bg-primary-dark focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-primary"
-              >
-                {loading ? (
-                  <span className="absolute left-0 inset-y-0 flex items-center pl-3">
-                    <svg className="animate-spin h-5 w-5 text-white" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24">
-                      <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4"></circle>
-                      <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                    </svg>
-                  </span>
-                ) : null}
-                {loading ? 'Creating account...' : 'Sign up'}
-              </button>
+  return (
+    <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4 py-8">
+      {/* Header Row - Centered, Huge */}
+      <div className="flex flex-col items-center mb-2">
+        <div className="flex flex-row items-baseline justify-center gap-4">
+          <span className="text-[5rem] sm:text-[7rem] md:text-[9rem] lg:text-[11rem] font-lobster text-white leading-none">Malk</span>
+          <span className="text-blue-400 italic font-semibold align-baseline mb-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl">beta</span>
+        </div>
+              </div>
+      {/* Subheader */}
+      <div className="w-full max-w-md text-center mb-16">
+        <h2 className="text-2xl font-light text-gray-200 lowercase tracking-wide">watch what the world is watching</h2>
+                </div>
+      {/* Social sign-in */}
+      <div className="w-full max-w-md flex flex-row gap-4 mb-6">
+        <button
+          type="button"
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-zinc-900 text-white hover:bg-zinc-800 transition font-semibold text-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
+          onClick={() => handleOAuthSignUp('google')}
+          disabled={loading}
+        >
+          <svg className="w-6 h-6" viewBox="0 0 48 48"><g><path fill="#4285F4" d="M24 9.5c3.54 0 6.73 1.22 9.24 3.23l6.9-6.9C36.68 2.36 30.7 0 24 0 14.82 0 6.71 5.06 2.69 12.44l8.06 6.26C12.33 13.13 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.1 24.55c0-1.64-.15-3.22-.42-4.74H24v9.01h12.42c-.54 2.9-2.18 5.36-4.65 7.01l7.19 5.6C43.99 37.13 46.1 31.3 46.1 24.55z"/><path fill="#FBBC05" d="M10.75 28.7c-1.13-3.36-1.13-6.98 0-10.34l-8.06-6.26C.7 16.13 0 19.97 0 24c0 4.03.7 7.87 2.69 12.44l8.06-6.26z"/><path fill="#EA4335" d="M24 48c6.7 0 12.68-2.36 17.14-6.43l-7.19-5.6c-2.01 1.35-4.6 2.13-7.95 2.13-6.26 0-11.67-3.63-13.25-8.7l-8.06 6.26C6.71 42.94 14.82 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></g></svg>
+          Google
+        </button>
+        <button
+          type="button"
+          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-zinc-900 text-white hover:bg-zinc-800 transition font-semibold text-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
+          onClick={() => handleOAuthSignUp('facebook')}
+          disabled={loading}
+        >
+          <svg className="w-6 h-6" viewBox="0 0 32 32"><path fill="#1877F3" d="M32 16c0-8.837-7.163-16-16-16S0 7.163 0 16c0 7.837 5.657 14.307 13 15.742V20.844h-3.922v-4.844H13V12.5c0-3.066 1.792-4.75 4.533-4.75 1.312 0 2.686.235 2.686.235v2.953h-1.513c-1.491 0-1.954.926-1.954 1.875v2.25h3.328l-.532 4.844h-2.796v10.898C26.343 30.307 32 23.837 32 16z"/><path fill="#FFF" d="M22.468 20.844l.532-4.844h-3.328v-2.25c0-.949.463-1.875 1.954-1.875h1.513V8.985s-1.374-.235-2.686-.235C14.792 8.75 13 10.434 13 13.5v2.5H9.078v4.844H13v10.898a16.06 16.06 0 002.001.129c.682 0 1.354-.045 2.001-.129V20.844h2.796z"/></svg>
+          Facebook
+        </button>
+              </div>
+      {/* Divider */}
+      <div className="w-full max-w-md flex items-center gap-2 mb-6">
+        <div className="flex-grow border-t border-gray-600" />
+        <span className="mx-2 text-gray-400 font-medium">or</span>
+        <div className="flex-grow border-t border-gray-600" />
             </div>
-          </form>
-        )}
+      {/* Create Account button */}
+              <button
+        type="button"
+        onClick={handleCreateAccount}
+        className="w-full max-w-md py-3 rounded-2xl bg-zinc-700 hover:bg-zinc-600 text-white font-bold text-lg transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 mb-4"
+                disabled={loading}
+      >
+        Create Account
+              </button>
+      {/* Terms and sign-in */}
+      <div className="w-full max-w-md text-xs text-gray-400 text-center mb-8">
+        By signing up, you agree to the <a href="#" className="underline hover:text-primary">Terms of Service</a> and <a href="#" className="underline hover:text-primary">Privacy Policy</a>.
+            </div>
+      <div className="w-full max-w-md flex flex-col items-center gap-2">
+        <span className="text-gray-200 text-base mb-1">Already have an account?</span>
+        <Link href="/login" className="w-full">
+          <button className="w-full py-3 rounded-2xl bg-zinc-700 hover:bg-zinc-600 text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
+            Sign In
+          </button>
+        </Link>
       </div>
     </div>
   );
