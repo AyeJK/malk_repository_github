@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Airtable, { FieldSet } from 'airtable';
 import { getYouTubeThumbnailUrl } from '@/lib/video-utils';
+import { getUserByFirebaseUID } from '@/lib/airtable';
 
 const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(process.env.AIRTABLE_BASE_ID!);
 
@@ -28,6 +29,7 @@ export async function GET(request: NextRequest) {
     const categoryName = request.nextUrl.searchParams.get('category');
     const limit = parseInt(request.nextUrl.searchParams.get('limit') || '10');
     const offset = parseInt(request.nextUrl.searchParams.get('offset') || '0');
+    const userId = request.nextUrl.searchParams.get('userId');
     
     if (!categoryName) {
       return NextResponse.json(
@@ -70,12 +72,27 @@ export async function GET(request: NextRequest) {
 
     // Fetch the linked posts using their record IDs with pagination
     try {
-      const posts = await base('Posts').select({
+      let posts = await base('Posts').select({
         filterByFormula: `OR(${linkedPostIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
         sort: [{ field: 'DisplayDate', direction: 'desc' }],
         pageSize: limit,
         offset: offset
       }).all();
+
+      // If userId is provided, filter posts to only those by that user
+      if (userId) {
+        // Map Firebase UID to Airtable record ID
+        const userRecord = await getUserByFirebaseUID(userId);
+        if (!userRecord) {
+          return NextResponse.json({ posts: [], totalCount: 0, hasMore: false });
+        }
+        const airtableUserId = userRecord.id;
+        posts = posts.filter(post => {
+          const fuid = post.fields.FirebaseUID;
+          if (Array.isArray(fuid)) return fuid.includes(airtableUserId);
+          return fuid === airtableUserId;
+        });
+      }
 
       // Get all unique user IDs from the posts
       const userIds = Array.from(new Set(

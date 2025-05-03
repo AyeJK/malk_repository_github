@@ -350,7 +350,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
 
   return (
     <div className="mb-6">
-      <div className="p-4">
+      <div className="py-4">
         {/* User info section with avatar, name, and follow button */}
         <div className="flex items-center justify-between mb-4">
           <div className="flex items-center space-x-3">
