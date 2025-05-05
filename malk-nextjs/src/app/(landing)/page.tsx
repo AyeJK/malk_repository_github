@@ -1,33 +1,216 @@
+'use client';
+
 import Link from 'next/link';
+import { Button } from '@/components/ui/button';
+import { motion } from 'framer-motion';
+import { Lobster } from 'next/font/google';
+import React, { useEffect, useState } from 'react';
+import { useMotionValue, useTransform } from 'framer-motion';
+
+const lobster = Lobster({ 
+  weight: '400',
+  subsets: ['latin'],
+});
+
+// Define color pairs for each section [text/accent color, background color]
+const colorPairs = {
+  discovery: ['#ff8178', '#2a0f0f'],
+  shouldnt: ['#ff9d47', '#2a1505'],
+  mission: ['#ffb61a', '#2a1f05'],
+};
+
+// Add type for AccentBar props
+interface AccentBarProps {
+  accentColor: string;
+  bgColor: string;
+  children: React.ReactNode;
+  intensity?: number;
+  gradient?: string;
+  animationName?: string;
+}
+
+// Animated gradient keyframes
+const gradientKeyframes = `
+@keyframes gradient-move-1 {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+@keyframes gradient-move-2 {
+  0% { background-position: 100% 0%; }
+  100% { background-position: 0% 100%; }
+}
+@keyframes gradient-move-3 {
+  0% { background-position: 50% 0%; }
+  100% { background-position: 50% 100%; }
+}
+`;
+
+// Add keyframes for button gradient border
+const buttonGradientKeyframes = `
+@keyframes button-gradient-move {
+  0% { background-position: 0% 50%; }
+  100% { background-position: 100% 50%; }
+}
+`;
+
+if (typeof window !== 'undefined') {
+  // Inject keyframes only once
+  if (!document.getElementById('animated-gradient-keyframes')) {
+    const style = document.createElement('style');
+    style.id = 'animated-gradient-keyframes';
+    style.innerHTML = gradientKeyframes;
+    document.head.appendChild(style);
+  }
+  if (!document.getElementById('button-gradient-keyframes')) {
+    const style = document.createElement('style');
+    style.id = 'button-gradient-keyframes';
+    style.innerHTML = buttonGradientKeyframes;
+    document.head.appendChild(style);
+  }
+}
+
+function AccentBar({ accentColor, bgColor, children, intensity = 1, gradient, animationName }: AccentBarProps) {
+  return (
+    <div className="relative inline-block" style={{ perspective: 600 }}>
+      <div
+        className="absolute -top-1 -right-1 rounded"
+        style={{
+          background: gradient || accentColor,
+          backgroundSize: '200% 200%',
+          animation: animationName ? `${animationName} 4s linear infinite alternate` : undefined,
+          height: '100%',
+          width: '100%',
+          zIndex: 1,
+        }}
+      />
+      <div
+        className="relative rounded"
+        style={{
+          background: bgColor,
+          zIndex: 2,
+        }}
+      >
+        {children}
+      </div>
+    </div>
+  );
+}
 
 export default function LandingPage() {
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4 py-8">
-      {/* Header Row - Centered, Huge */}
-      <div className="flex flex-col items-center mb-2">
-        <div className="flex flex-row items-baseline justify-center gap-4">
-          <span className="text-[5rem] sm:text-[7rem] md:text-[9rem] lg:text-[11rem] font-lobster text-white leading-none">Malk</span>
-          <span className="text-blue-400 italic font-semibold align-baseline mb-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl">beta</span>
+    <div className="min-h-screen flex flex-col bg-black">
+      <div className="flex-1 flex flex-col px-16 md:px-24 py-6 md:py-8">
+        {/* Logo */}
+        <motion.div
+          initial={{ opacity: 0, y: -20 }}
+          animate={{ opacity: 1, y: 0 }}
+          transition={{ duration: 0.5 }}
+        >
+          <h1 className={`${lobster.className} text-4xl md:text-5xl text-white mb-12`}>
+            Malk.tv
+            <span className="ml-3 text-sm font-mono bg-white/10 text-white/70 px-2 py-1 rounded align-top">
+              BETA
+            </span>
+          </h1>
+        </motion.div>
+
+        {/* Main Content */}
+        <div className="flex-1 flex flex-col justify-center">
+          <div className="max-w-4xl">
+            {/* Text Content */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7 }}
+              className="flex flex-col gap-6"
+            >
+              <AccentBar
+                accentColor="#ff8178"
+                bgColor="#2a0f0f"
+                intensity={1}
+                gradient="linear-gradient(90deg, #ff8178, #ffb6b6, #ff8178)"
+                animationName="gradient-move-1"
+              >
+                <h2 className="text-4xl md:text-6xl font-extrabold uppercase text-[#ff8178] px-6 py-4 tracking-tight">
+                  VIDEO DISCOVERY
+                </h2>
+              </AccentBar>
+              <AccentBar
+                accentColor="#ff9d47"
+                bgColor="#2a1505"
+                intensity={0.8}
+                gradient="linear-gradient(120deg, #ff9d47, #ffe29a, #ff9d47)"
+                animationName="gradient-move-2"
+              >
+                <h2 className="text-4xl md:text-6xl font-extrabold uppercase text-[#ff9d47] px-6 py-4 tracking-tight">
+                  SHOULDNʼT BE A
+                </h2>
+              </AccentBar>
+              <AccentBar
+                accentColor="#ffb61a"
+                bgColor="#2a1f05"
+                intensity={0.6}
+                gradient="linear-gradient(135deg, #ffb61a, #fff6b6, #ffb61a)"
+                animationName="gradient-move-3"
+              >
+                <h2 className="text-4xl md:text-6xl font-extrabold uppercase text-[#ffb61a] px-6 py-4 tracking-tight">
+                  SOLO MISSION
+                </h2>
+              </AccentBar>
+            </motion.div>
+
+            {/* Subtext */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.2 }}
+              className="mt-12"
+            >
+              <p className="text-2xl md:text-3xl text-white leading-relaxed">
+                The best <span className="font-semibold">video recommendations</span> come<br />
+                from real people – not algorithms
+              </p>
+            </motion.div>
+
+            {/* Buttons */}
+            <motion.div
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.7, delay: 0.3 }}
+              className="mt-12 flex gap-6"
+            >
+              <Link href="/signup">
+                <div
+                  className="relative rounded-xl p-[3px]"
+                  style={{
+                    background: 'linear-gradient(90deg, #ff8178, #ffb6b6, #ff8178)',
+                    backgroundSize: '200% 200%',
+                    animation: 'button-gradient-move 3s linear infinite alternate',
+                    display: 'inline-block',
+                  }}
+                >
+                  <Button className="bg-white hover:bg-gray-100 text-black font-semibold text-xl px-8 py-6 rounded-xl relative z-10">
+                    JOIN THE BETA
+                  </Button>
+                  <span className="absolute inset-0 rounded-xl pointer-events-none" style={{ boxShadow: '0 0 16px 2px #ff817880' }} />
+                </div>
+              </Link>
+              <Link href="/login">
+                <div
+                  className="relative rounded-xl p-[3px]"
+                  style={{
+                    background: 'transparent',
+                    display: 'inline-block',
+                  }}
+                >
+                  <Button className="bg-[#2a0f0f] hover:bg-[#3a1f1f] text-white font-semibold text-xl px-8 py-6 rounded-xl relative z-10">
+                    LOGIN
+                  </Button>
+                </div>
+              </Link>
+            </motion.div>
+          </div>
         </div>
-      </div>
-      {/* Subheader */}
-      <div className="w-full max-w-3xl text-center mb-16">
-        <h2 className="italic text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-gray-200 lowercase tracking-wide" style={{ fontStyle: 'italic' }}>
-          watch what the world is watching
-        </h2>
-      </div>
-      {/* Buttons */}
-      <div className="flex flex-row gap-6 w-full max-w-xs">
-        <Link href="/signup" className="w-1/2">
-          <button className="w-full py-3 rounded-2xl bg-primary hover:bg-primary-dark text-white font-bold text-lg transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-            Sign Up
-          </button>
-        </Link>
-        <Link href="/login" className="w-1/2">
-          <button className="w-full py-3 rounded-2xl bg-zinc-700 hover:bg-zinc-600 text-white font-bold text-lg transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-            Log In
-          </button>
-        </Link>
       </div>
     </div>
   );
