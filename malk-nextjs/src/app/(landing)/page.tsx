@@ -2,7 +2,7 @@
 
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
-import { motion } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { Lobster } from 'next/font/google';
 import React, { useEffect, useState } from 'react';
 import { useMotionValue, useTransform } from 'framer-motion';
@@ -97,6 +97,27 @@ function AccentBar({ accentColor, bgColor, children, intensity = 1, gradient, an
 }
 
 export default function LandingPage() {
+  const [showInviteInput, setShowInviteInput] = useState(false);
+  const [inviteCode, setInviteCode] = useState('');
+  const [inputError, setInputError] = useState('');
+
+  const handleBetaClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setShowInviteInput(true);
+  };
+
+  const handleInviteSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!inviteCode.trim()) {
+      setInputError('Please enter an invite code.');
+      return;
+    }
+    // TODO: handle invite code validation or navigation
+    setInputError('');
+    // For now, just log
+    alert(`Invite code submitted: ${inviteCode}`);
+  };
+
   return (
     <div className="min-h-screen flex flex-col bg-black">
       <div className="flex-1 flex flex-col px-16 md:px-24 py-6 md:py-8">
@@ -179,31 +200,77 @@ export default function LandingPage() {
               transition={{ duration: 0.7, delay: 0.3 }}
               className="mt-12 flex gap-6"
             >
-              <Link href="/signup">
-                <div
-                  className="relative rounded-xl p-[3px]"
-                  style={{
-                    background: 'linear-gradient(90deg, #ff8178, #ffb6b6, #ff8178)',
-                    backgroundSize: '200% 200%',
-                    animation: 'button-gradient-move 3s linear infinite alternate',
-                    display: 'inline-block',
-                  }}
-                >
-                  <Button className="bg-white hover:bg-gray-100 text-black font-semibold text-xl px-8 py-6 rounded-xl relative z-10">
-                    JOIN THE BETA
-                  </Button>
-                  <span className="absolute inset-0 rounded-xl pointer-events-none" style={{ boxShadow: '0 0 16px 2px #ff817880' }} />
-                </div>
-              </Link>
+              <motion.div
+                animate={{ width: showInviteInput ? 340 : 220 }}
+                initial={false}
+                transition={{ duration: 0.6, ease: 'easeInOut' }}
+                className="relative rounded-xl p-[3px]"
+                style={{
+                  background: 'linear-gradient(90deg, #ff8178, #ffb6b6, #ff8178)',
+                  backgroundSize: '200% 200%',
+                  animation: 'button-gradient-move 3s linear infinite alternate',
+                  display: 'inline-block',
+                }}
+              >
+                <Button className="bg-white hover:bg-gray-100 text-black font-semibold text-xl px-8 py-6 rounded-xl relative z-10 w-full min-w-0 flex justify-center items-center transition-all duration-300">
+                  <AnimatePresence mode="wait" initial={false}>
+                    {!showInviteInput && (
+                      <motion.span
+                        key="join-text"
+                        initial={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: 60 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        transition={{ duration: 0.6, ease: 'easeInOut' }}
+                        onClick={handleBetaClick}
+                        className="cursor-pointer w-full block text-center"
+                      >
+                        JOIN THE BETA
+                      </motion.span>
+                    )}
+                    {showInviteInput && (
+                      <motion.div
+                        key="invite-form"
+                        initial={{ opacity: 0, x: -60 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -60 }}
+                        transition={{ duration: 0.3, ease: 'easeInOut' }}
+                        className="flex items-center gap-2 w-full justify-center"
+                        style={{ minWidth: 180 }}
+                      >
+                        <form onSubmit={handleInviteSubmit} className="flex items-center gap-2 w-full">
+                          <input
+                            type="text"
+                            className="flex-1 bg-transparent outline-none text-xl text-black placeholder-gray-400 border-b border-gray-300 focus:border-[#ff8178] transition-colors px-1 py-0.5 min-w-0"
+                            placeholder="Invite code"
+                            value={inviteCode}
+                            onChange={e => setInviteCode(e.target.value)}
+                            autoFocus
+                          />
+                          <button
+                            type="submit"
+                            className="bg-[#ff8178] hover:bg-[#ff9d47] text-white font-semibold text-base px-4 py-1.5 rounded-lg transition-colors"
+                          >
+                            Verify
+                          </button>
+                        </form>
+                      </motion.div>
+                    )}
+                  </AnimatePresence>
+                </Button>
+                <span className="absolute inset-0 rounded-xl pointer-events-none" style={{ boxShadow: '0 0 16px 2px #ff817880' }} />
+                {inputError && showInviteInput && (
+                  <div className="text-red-500 text-sm mt-1 px-2 absolute left-0 right-0 top-full text-center">{inputError}</div>
+                )}
+              </motion.div>
               <Link href="/login">
                 <div
                   className="relative rounded-xl p-[3px]"
                   style={{
-                    background: 'transparent',
+                    background: '#2a0f0f',
                     display: 'inline-block',
                   }}
                 >
-                  <Button className="bg-[#2a0f0f] hover:bg-[#3a1f1f] text-white font-semibold text-xl px-8 py-6 rounded-xl relative z-10">
+                  <Button className="bg-[#2a0f0f] hover:bg-[#3a1f1f] text-white font-semibold text-xl px-8 py-6 rounded-xl relative z-10 w-full min-w-0 flex justify-center items-center">
                     LOGIN
                   </Button>
                 </div>
