@@ -6,6 +6,7 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { Lobster } from 'next/font/google';
 import React, { useEffect, useState } from 'react';
 import { useMotionValue, useTransform } from 'framer-motion';
+import { useRouter } from 'next/navigation';
 
 const lobster = Lobster({ 
   weight: '400',
@@ -97,25 +98,51 @@ function AccentBar({ accentColor, bgColor, children, intensity = 1, gradient, an
 }
 
 export default function LandingPage() {
+  const router = useRouter();
   const [showInviteInput, setShowInviteInput] = useState(false);
   const [inviteCode, setInviteCode] = useState('');
   const [inputError, setInputError] = useState('');
+  const [loading, setLoading] = useState(false);
+  const [success, setSuccess] = useState(false);
+  const [redirecting, setRedirecting] = useState(false);
 
   const handleBetaClick = (e: React.MouseEvent) => {
     e.preventDefault();
     setShowInviteInput(true);
   };
 
-  const handleInviteSubmit = (e: React.FormEvent) => {
+  const handleInviteSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!inviteCode.trim()) {
       setInputError('Please enter an invite code.');
       return;
     }
-    // TODO: handle invite code validation or navigation
     setInputError('');
-    // For now, just log
-    alert(`Invite code submitted: ${inviteCode}`);
+    setLoading(true);
+    setSuccess(false);
+    setRedirecting(false);
+    try {
+      const res = await fetch('/api/verify-invite-code', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ inviteCode }),
+      });
+      const data = await res.json();
+      if (data.valid) {
+        setSuccess(true);
+        setInputError('');
+        setRedirecting(true);
+        setTimeout(() => {
+          router.push('/signup');
+        }, 1000);
+      } else {
+        setInputError(data.reason || 'Invalid invite code.');
+      }
+    } catch (err) {
+      setInputError('Error verifying invite code.');
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -245,12 +272,24 @@ export default function LandingPage() {
                             value={inviteCode}
                             onChange={e => setInviteCode(e.target.value)}
                             autoFocus
+                            disabled={loading || success}
                           />
                           <button
                             type="submit"
                             className="bg-[#ff8178] hover:bg-[#ff9d47] text-white font-semibold text-base px-4 py-1.5 rounded-lg transition-colors shadow-md"
+                            disabled={loading || success}
                           >
-                            Verify
+                            {loading
+                              ? 'Verifying...'
+                              : redirecting
+                                ? (
+                                    <span className="inline-block w-5 h-5 align-middle">
+                                      <span className="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full"></span>
+                                    </span>
+                                  )
+                                : success
+                                  ? '✔️'
+                                  : 'Verify'}
                           </button>
                         </form>
                       </motion.div>
@@ -276,6 +315,30 @@ export default function LandingPage() {
                 </div>
               </Link>
             </motion.div>
+            {/* Waitlist message appears only when invite input is shown */}
+            {showInviteInput && (
+              <>
+                <motion.div
+                  className="mt-4 text-left"
+                  initial={{ opacity: 0, y: 10 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.5, delay: 1.2 }}
+                >
+                  <span className="text-white/80 text-base">Don't have an invite code? </span>
+                  <a
+                    href="#waitlist" // TODO: Replace with actual waitlist link or mailto
+                    className="text-[#ff8178] underline hover:text-[#ffb61a] transition-colors font-semibold"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    Get on the waitlist!
+                  </a>
+                </motion.div>
+                {success && (
+                  <div className="text-green-500 text-sm mt-2 px-2 text-left">Invite code accepted!</div>
+                )}
+              </>
+            )}
           </div>
         </div>
       </div>

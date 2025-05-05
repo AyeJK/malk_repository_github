@@ -128,9 +128,14 @@ export default function SignUpPage() {
         <Link href="/login" className="underline hover:text-primary">Sign in</Link>
       </motion.span>
       {/* Terms and sign-in fixed at the very bottom */}
-      <div className="fixed bottom-0 left-0 w-full text-xs text-gray-400 text-center pb-4 bg-transparent z-50">
+      <motion.div
+        className="fixed bottom-0 left-0 w-full text-xs text-gray-400 text-center pb-4 bg-transparent z-50"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 1.0 }}
+      >
         By signing up, you agree to the <a href="#" className="underline hover:text-primary">Terms of Service</a> and <a href="#" className="underline hover:text-primary">Privacy Policy</a>.
-      </div>
+      </motion.div>
     </div>
   );
 } 

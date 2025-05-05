@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import { signIn } from '@/lib/firebase';
 import { signIn as signInOAuth } from 'next-auth/react';
 import { upsertUser } from '@/lib/airtable';
+import { motion } from 'framer-motion';
 
 export default function LoginPage() {
   const router = useRouter();
@@ -17,7 +18,7 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false);
 
   // Social sign-in handler (reuse from signup)
-  const handleOAuthSignIn = async (provider: 'google' | 'facebook') => {
+  const handleOAuthSignIn = async (provider: 'google' | 'facebook' | 'apple') => {
     setError('');
     setLoading(true);
     try {
@@ -63,47 +64,70 @@ export default function LoginPage() {
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4 py-8">
       {/* Header Row - Centered, Huge */}
-      <div className="flex flex-col items-center mb-2">
+      <motion.div className="flex flex-col items-center mb-2"
+        initial={{ opacity: 0, y: -40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7 }}
+      >
         <div className="flex flex-row items-baseline justify-center gap-4">
-          <span className="text-[5rem] sm:text-[7rem] md:text-[9rem] lg:text-[11rem] font-lobster text-white leading-none">Malk</span>
-          <span className="text-blue-400 italic font-semibold align-baseline mb-4 text-3xl sm:text-4xl md:text-5xl lg:text-6xl">beta</span>
+          <span className="text-[9rem] sm:text-[12rem] md:text-[16rem] lg:text-[18rem] font-lobster text-white leading-none font-bold drop-shadow-[0_4px_32px_rgba(255,255,255,0.25)]">Malk</span>
         </div>
-      </div>
+      </motion.div>
       {/* Subheader */}
-      <div className="w-full max-w-3xl text-center mb-16">
-        <h2 className="italic text-2xl sm:text-3xl md:text-4xl lg:text-5xl font-light text-gray-200 lowercase tracking-wide" style={{ fontStyle: 'italic' }}>
-          watch what the world is watching
-        </h2>
-      </div>
+      <motion.div className="w-full flex justify-center mb-16"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.2 }}
+      >
+        <h2 className="text-4xl sm:text-5xl md:text-6xl font-light text-white lowercase tracking-wide whitespace-nowrap text-center drop-shadow-[0_2px_16px_rgba(255,255,255,0.15)]">Welcome Back</h2>
+      </motion.div>
       {/* Social sign-in */}
-      <div className="w-full max-w-md flex flex-row gap-4 mb-6">
-        <button
-          type="button"
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-zinc-900 text-white hover:bg-zinc-800 transition font-semibold text-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-          onClick={() => handleOAuthSignIn('google')}
-          disabled={loading}
-        >
-          <svg className="w-6 h-6" viewBox="0 0 48 48"><g><path fill="#4285F4" d="M24 9.5c3.54 0 6.73 1.22 9.24 3.23l6.9-6.9C36.68 2.36 30.7 0 24 0 14.82 0 6.71 5.06 2.69 12.44l8.06 6.26C12.33 13.13 17.74 9.5 24 9.5z"/><path fill="#34A853" d="M46.1 24.55c0-1.64-.15-3.22-.42-4.74H24v9.01h12.42c-.54 2.9-2.18 5.36-4.65 7.01l7.19 5.6C43.99 37.13 46.1 31.3 46.1 24.55z"/><path fill="#FBBC05" d="M10.75 28.7c-1.13-3.36-1.13-6.98 0-10.34l-8.06-6.26C.7 16.13 0 19.97 0 24c0 4.03.7 7.87 2.69 12.44l8.06-6.26z"/><path fill="#EA4335" d="M24 48c6.7 0 12.68-2.36 17.14-6.43l-7.19-5.6c-2.01 1.35-4.6 2.13-7.95 2.13-6.26 0-11.67-3.63-13.25-8.7l-8.06 6.26C6.71 42.94 14.82 48 24 48z"/><path fill="none" d="M0 0h48v48H0z"/></g></svg>
-          Google
-        </button>
-        <button
-          type="button"
-          className="flex-1 flex items-center justify-center gap-2 py-3 rounded-2xl bg-zinc-900 text-white hover:bg-zinc-800 transition font-semibold text-lg border border-gray-700 focus:outline-none focus:ring-2 focus:ring-primary"
-          onClick={() => handleOAuthSignIn('facebook')}
-          disabled={loading}
-        >
-          <svg className="w-6 h-6" viewBox="0 0 32 32"><path fill="#1877F3" d="M32 16c0-8.837-7.163-16-16-16S0 7.163 0 16c0 7.837 5.657 14.307 13 15.742V20.844h-3.922v-4.844H13V12.5c0-3.066 1.792-4.75 4.533-4.75 1.312 0 2.686.235 2.686.235v2.953h-1.513c-1.491 0-1.954.926-1.954 1.875v2.25h3.328l-.532 4.844h-2.796v10.898C26.343 30.307 32 23.837 32 16z"/><path fill="#FFF" d="M22.468 20.844l.532-4.844h-3.328v-2.25c0-.949.463-1.875 1.954-1.875h1.513V8.985s-1.374-.235-2.686-.235C14.792 8.75 13 10.434 13 13.5v2.5H9.078v4.844H13v10.898a16.06 16.06 0 002.001.129c.682 0 1.354-.045 2.001-.129V20.844h2.796z"/></svg>
-          Facebook
-        </button>
-      </div>
-      {/* Divider */}
-      <div className="w-full max-w-md flex items-center gap-2 mb-6">
-        <div className="flex-grow border-t border-gray-600" />
-        <span className="mx-2 text-gray-400 font-medium">or</span>
-        <div className="flex-grow border-t border-gray-600" />
-      </div>
+      <motion.div className="w-full max-w-lg flex flex-col items-center"
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.4 }}
+      >
+        <span className="text-gray-400 font-medium text-lg mb-6 block">Sign in via:</span>
+        <div className="grid grid-cols-3 gap-4 w-full mb-8">
+          <button
+            type="button"
+            className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#2a0f0f] border-t-4 border-[#ff8178] text-[#ff8178] font-extrabold text-lg uppercase transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 hover:bg-[#1a0707]"
+            onClick={() => handleOAuthSignIn('google')}
+            disabled={loading}
+            style={{ boxShadow: 'none' }}
+          >
+            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M21.35 11.1H12v2.8h5.35c-.23 1.25-1.4 3.67-5.35 3.67-3.22 0-5.85-2.67-5.85-5.97s2.63-5.97 5.85-5.97c1.83 0 3.06.78 3.76 1.45l2.57-2.49C17.09 3.59 14.76 2.5 12 2.5 6.75 2.5 2.5 6.75 2.5 12s4.25 9.5 9.5 9.5c5.47 0 9.09-3.85 9.09-9.27 0-.62-.07-1.09-.16-1.63z" /></svg>
+            GOOGLE
+          </button>
+          <button
+            type="button"
+            className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#2a1505] border-t-4 border-[#ff9d47] text-[#ff9d47] font-extrabold text-lg uppercase transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 hover:bg-[#180a03]"
+            onClick={() => handleOAuthSignIn('facebook')}
+            disabled={loading}
+            style={{ boxShadow: 'none' }}
+          >
+            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a4 4 0 0 0-4 4v3H7v4h4v8h4v-8h3l1-4h-4V6a1 1 0 0 1 1-1h3z" /></svg>
+            FACEBOOK
+          </button>
+          <button
+            type="button"
+            className="flex-1 flex items-center justify-center gap-2 py-3 px-6 rounded-xl bg-[#2a1f05] border-t-4 border-[#ffb61a] text-[#ffb61a] font-extrabold text-lg uppercase transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2 hover:bg-[#181204]"
+            onClick={() => handleOAuthSignIn('apple')}
+            disabled={loading}
+            style={{ boxShadow: 'none' }}
+          >
+            <svg className="w-6 h-6" viewBox="0 0 24 24" fill="currentColor" xmlns="http://www.w3.org/2000/svg"><path d="M16.365 1.43c0 1.14-.93 2.06-2.07 2.06-.04 0-.08 0-.12-.01.01-.13.02-.27.02-.41 0-1.12.97-2.04 2.07-2.04.06 0 .11 0 .16.01-.01.13-.02.26-.02.39zm2.13 4.37c-1.14-.07-2.1.65-2.65.65-.56 0-1.42-.63-2.34-.61-.96.02-1.85.56-2.34 1.43-1 .17-3.7 1.44-3.7 4.28 0 1.69.65 3.45 1.45 4.59.68.98 1.27 1.85 2.18 1.82.87-.03 1.2-.56 2.25-.56 1.05 0 1.34.56 2.25.54.91-.02 1.48-.89 2.16-1.87.61-.89.86-1.76.86-1.8-.02-.01-2.36-.91-2.38-3.6-.02-2.26 1.84-3.34 1.92-3.39-.99-1.45-2.53-1.48-2.74-1.5zm-2.13 13.13c-.41 0-.82-.12-1.16-.34-.34-.22-.62-.53-.81-.91-.19-.38-.29-.8-.29-1.23 0-.43.1-.85.29-1.23.19-.38.47-.69.81-.91.34-.22.75-.34 1.16-.34.41 0 .82.12 1.16.34.34.22.62.53.81.91.19.38.29.8.29 1.23 0 .43-.1.85-.29 1.23-.19.38-.47.69-.81.91-.34.22-.75.34-1.16.34z"/></svg>
+            APPLE
+          </button>
+        </div>
+      </motion.div>
       {/* Email/password login form */}
-      <form className="w-full max-w-md space-y-4" onSubmit={handleSubmit}>
+      <motion.form className="w-full max-w-lg space-y-4"
+        onSubmit={handleSubmit}
+        initial={{ opacity: 0, y: 40 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.6 }}
+      >
         {error && (
           <div className="rounded-md bg-red-900/30 p-4 mb-2">
             <div className="flex">
@@ -127,7 +151,7 @@ export default function LoginPage() {
           type="email"
           autoComplete="email"
           required
-          className="w-full py-3 px-4 rounded-t-2xl bg-zinc-900 text-white border border-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-lg"
+          className="w-full py-3 px-4 rounded-xl bg-zinc-900 text-white border border-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-lg"
           placeholder="Email address"
           value={formData.email}
           onChange={handleChange}
@@ -138,7 +162,7 @@ export default function LoginPage() {
           type="password"
           autoComplete="current-password"
           required
-          className="w-full py-3 px-4 rounded-b-2xl bg-zinc-900 text-white border border-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-lg"
+          className="w-full py-3 px-4 rounded-xl bg-zinc-900 text-white border border-gray-700 placeholder-gray-400 focus:outline-none focus:ring-2 focus:ring-primary focus:border-primary text-lg mb-8"
           placeholder="Password"
           value={formData.password}
           onChange={handleChange}
@@ -146,23 +170,29 @@ export default function LoginPage() {
         <button
           type="submit"
           disabled={loading}
-          className="w-full py-3 rounded-2xl bg-primary hover:bg-primary-dark text-white font-bold text-lg transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+          className="w-full py-3 rounded-md bg-primary hover:bg-[#280312] text-white font-bold text-lg transition focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
         >
           {loading ? 'Signing in...' : 'Log In'}
         </button>
-      </form>
-      {/* Terms and sign-up */}
-      <div className="w-full max-w-md text-xs text-gray-400 text-center mb-8 mt-6">
+      </motion.form>
+      {/* Sign up prompt */}
+      <motion.span className="text-gray-400 text-lg font-medium mt-8"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 0.8 }}
+      >
+        Don't have an account?{' '}
+        <Link href="/signup" className="underline hover:text-primary">Sign up</Link>
+      </motion.span>
+      {/* Terms fixed at the very bottom */}
+      <motion.div
+        className="fixed bottom-0 left-0 w-full text-xs text-gray-400 text-center pb-4 bg-transparent z-50"
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.7, delay: 1.0 }}
+      >
         By logging in, you agree to the <a href="#" className="underline hover:text-primary">Terms of Service</a> and <a href="#" className="underline hover:text-primary">Privacy Policy</a>.
-      </div>
-      <div className="w-full max-w-md flex flex-col items-center gap-2">
-        <span className="text-gray-200 text-base mb-1">Don't have an account?</span>
-        <Link href="/signup" className="w-full">
-          <button className="w-full py-3 rounded-2xl bg-zinc-700 hover:bg-zinc-600 text-white font-bold text-lg focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2">
-            Sign Up
-          </button>
-        </Link>
-      </div>
+      </motion.div>
     </div>
   );
 } 
