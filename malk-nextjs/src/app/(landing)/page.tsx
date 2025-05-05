@@ -212,7 +212,7 @@ export default function LandingPage() {
                   display: 'inline-block',
                 }}
               >
-                <Button className="bg-white hover:bg-gray-100 text-black font-semibold text-xl px-8 py-6 rounded-xl relative z-10 w-full min-w-0 flex justify-center items-center transition-all duration-300">
+                <Button className="bg-[#1a1a1a] hover:bg-[#2a0f0f] text-[#ff8178] font-semibold text-xl px-8 py-6 rounded-xl relative z-10 w-full min-w-0 flex justify-center items-center transition-all duration-300 shadow-lg">
                   <AnimatePresence mode="wait" initial={false}>
                     {!showInviteInput && (
                       <motion.span
@@ -240,7 +240,7 @@ export default function LandingPage() {
                         <form onSubmit={handleInviteSubmit} className="flex items-center gap-2 w-full">
                           <input
                             type="text"
-                            className="flex-1 bg-transparent outline-none text-xl text-black placeholder-gray-400 border-b border-gray-300 focus:border-[#ff8178] transition-colors px-1 py-0.5 min-w-0"
+                            className="flex-1 bg-[#18181b] outline-none text-xl text-[#ffb6b6] placeholder-[#ff8178] border-b-2 border-[#ff8178] focus:border-[#ffb61a] transition-colors px-1 py-0.5 min-w-0 rounded-none"
                             placeholder="Invite code"
                             value={inviteCode}
                             onChange={e => setInviteCode(e.target.value)}
@@ -248,7 +248,7 @@ export default function LandingPage() {
                           />
                           <button
                             type="submit"
-                            className="bg-[#ff8178] hover:bg-[#ff9d47] text-white font-semibold text-base px-4 py-1.5 rounded-lg transition-colors"
+                            className="bg-[#ff8178] hover:bg-[#ff9d47] text-white font-semibold text-base px-4 py-1.5 rounded-lg transition-colors shadow-md"
                           >
                             Verify
                           </button>
@@ -266,11 +266,11 @@ export default function LandingPage() {
                 <div
                   className="relative rounded-xl p-[3px]"
                   style={{
-                    background: '#2a0f0f',
+                    background: 'transparent',
                     display: 'inline-block',
                   }}
                 >
-                  <Button className="bg-[#2a0f0f] hover:bg-[#3a1f1f] text-white font-semibold text-xl px-8 py-6 rounded-xl relative z-10 w-full min-w-0 flex justify-center items-center">
+                  <Button className="bg-[#18181b] hover:bg-[#232323] text-[#e5e5e5] font-semibold text-xl px-8 py-6 rounded-xl relative z-10 w-full min-w-0 flex justify-center items-center transition-all duration-300 border border-[#232323]">
                     LOGIN
                   </Button>
                 </div>
