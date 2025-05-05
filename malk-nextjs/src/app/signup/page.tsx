@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import { signIn } from 'next-auth/react';
@@ -10,18 +10,6 @@ export default function SignUpPage() {
   const router = useRouter();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-
-  // Inject keyframes for button-gradient-move if not present
-  useEffect(() => {
-    if (typeof window !== 'undefined') {
-      if (!document.getElementById('button-gradient-keyframes-signup')) {
-        const style = document.createElement('style');
-        style.id = 'button-gradient-keyframes-signup';
-        style.innerHTML = `@keyframes button-gradient-move { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }`;
-        document.head.appendChild(style);
-      }
-    }
-  }, []);
 
   const handleOAuthSignUp = async (provider: 'google' | 'facebook' | 'apple') => {
     setError('');
@@ -38,6 +26,16 @@ export default function SignUpPage() {
   const handleCreateAccount = () => {
     // This will trigger the next step/modal for email/password (to be implemented)
   };
+
+  // Animated gradient keyframes for button border (if not already present)
+  if (typeof window !== 'undefined') {
+    if (!document.getElementById('button-gradient-keyframes-signup')) {
+      const style = document.createElement('style');
+      style.id = 'button-gradient-keyframes-signup';
+      style.innerHTML = `@keyframes button-gradient-move { 0% { background-position: 0% 50%; } 100% { background-position: 100% 50%; } }`;
+      document.head.appendChild(style);
+    }
+  }
 
   return (
     <div className="min-h-screen flex flex-col items-center justify-center bg-black px-4 py-8">
@@ -60,16 +58,9 @@ export default function SignUpPage() {
         <h2 className="text-4xl sm:text-5xl md:text-6xl font-light text-white lowercase tracking-wide whitespace-nowrap text-center drop-shadow-[0_2px_16px_rgba(255,255,255,0.15)]">Social Video Discovery</h2>
       </motion.div>
       {/* Two-column layout for sign up options */}
-      <div className="w-full max-w-md flex flex-col items-center gap-4 mb-8 mx-auto">
-        {/* Animated border for Create Account button */}
+      <div className="w-full max-w-md grid grid-rows-[auto_auto] grid-cols-3 gap-y-8 gap-x-4 mb-8 mx-auto">
         <motion.div
-          className="relative rounded-xl p-[3px] w-full mt-8 mb-8"
-          style={{
-            background: 'linear-gradient(90deg, #ffe29a, #b6ffd7, #b6caff, #ffe29a)',
-            backgroundSize: '400% 400%',
-            animation: 'button-gradient-move 3s linear infinite alternate',
-            display: 'inline-block',
-          }}
+          className="col-span-3"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.4 }}
@@ -77,21 +68,20 @@ export default function SignUpPage() {
           <button
             type="button"
             onClick={handleCreateAccount}
-            className="bg-[#181818] hover:bg-[#232323] text-[#ffe29a] font-extrabold text-xl px-8 py-6 rounded-xl uppercase relative z-10 w-full min-w-0 flex justify-center items-center transition-all duration-300 focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
+            className="bg-[#232323] border-4 border-[#ffe29a] text-[#ffe29a] font-extrabold text-xl px-8 py-6 rounded-xl uppercase relative z-10 w-full min-w-0 flex justify-center items-center transition-all duration-300 hover:bg-[#181818] focus:outline-none focus:ring-2 focus:ring-primary focus:ring-offset-2"
             disabled={loading}
-            style={{ boxShadow: '0 0 16px 2px #ffe29a80' }}
+            style={{ boxShadow: 'none' }}
           >
             CREATE ACCOUNT
           </button>
-          <span className="absolute inset-0 rounded-xl pointer-events-none" style={{ boxShadow: '0 0 16px 2px #ffe29a80' }} />
         </motion.div>
-        <motion.div className="w-full flex flex-col items-center mt-16"
+        <motion.div className="col-span-3 flex flex-col items-center"
           initial={{ opacity: 0, y: 40 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.7, delay: 0.6 }}
         >
           <span className="text-gray-400 font-medium text-lg mb-6 block">or create an account via:</span>
-          <div className="flex flex-row gap-4 w-full justify-center">
+          <div className="grid grid-cols-3 gap-4 w-full">
             {/* Google Button styled as accent bar */}
             <button
               type="button"
