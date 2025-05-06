@@ -3,13 +3,18 @@
 import Link from 'next/link';
 import { Button } from '@/components/ui/button';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Lobster } from 'next/font/google';
+import { Lobster, Raleway } from 'next/font/google';
 import React, { useEffect, useState } from 'react';
 import { useMotionValue, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
 
 const lobster = Lobster({ 
   weight: '400',
+  subsets: ['latin'],
+});
+
+const raleway = Raleway({
+  weight: ['400', '500', '700'],
   subsets: ['latin'],
 });
 
@@ -224,7 +229,7 @@ export default function LandingPage() {
                 transition={{ duration: 0.7, delay: 0.2 }}
                 className="mt-12"
               >
-                <p className="text-2xl md:text-3xl text-white leading-relaxed">
+                <p className={`text-2xl md:text-3xl text-white leading-relaxed ${raleway.className}`}>
                   The best <span className="font-semibold">video recommendations</span> come<br />
                   from real people – not algorithms
                 </p>
@@ -241,11 +246,10 @@ export default function LandingPage() {
                   animate={{ width: showInviteInput ? 340 : 220 }}
                   initial={false}
                   transition={{ duration: 0.6, ease: 'easeInOut' }}
-                  className="relative rounded-xl p-[3px]"
+                  className="relative rounded-xl p-[3px] animate-border-gradient"
                   style={{
                     background: 'linear-gradient(90deg, #ff8178, #ffb6b6, #ff8178)',
                     backgroundSize: '200% 200%',
-                    animation: 'button-gradient-move 3s linear infinite alternate',
                     display: 'inline-block',
                   }}
                 >
@@ -353,6 +357,15 @@ export default function LandingPage() {
           </div>
         </div>
       </div>
+      <style>{`
+        @keyframes border-gradient-move {
+          0% { background-position: 0% 50%; }
+          100% { background-position: 100% 50%; }
+        }
+        .animate-border-gradient {
+          animation: border-gradient-move 4s linear infinite;
+        }
+      `}</style>
     </>
   );
 } 
