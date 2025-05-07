@@ -173,7 +173,7 @@ export default function LandingPage() {
             transition={{ duration: 0.5 }}
           >
             <h1 className={`${lobster.className} text-4xl md:text-5xl text-white mb-12`}>
-              Malk.tv
+              Malk
             </h1>
           </motion.div>
 

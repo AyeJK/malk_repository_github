@@ -42,7 +42,26 @@ export async function GET(request: NextRequest) {
       }
     }
     
-    // If not found by record ID, try Firebase UID
+    // If not found by record ID, try DisplayName (username)
+    if (!user) {
+      console.log('Trying to fetch user by DisplayName:', id);
+      try {
+        const records = await base('Users').select({
+          filterByFormula: `{DisplayName} = '${id}'`,
+          maxRecords: 1
+        }).firstPage();
+        if (records.length > 0) {
+          user = {
+            id: records[0].id,
+            fields: records[0].fields
+          };
+        }
+      } catch (error) {
+        console.error('Error fetching by DisplayName:', error);
+      }
+    }
+    
+    // If not found by DisplayName, try Firebase UID
     if (!user) {
       console.log('Trying to fetch user by Firebase UID:', id);
       user = await getUserByFirebaseUID(id);
