@@ -19,7 +19,7 @@ export default function SignUpPage() {
   const router = useRouter();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
-  const [step, setStep] = useState(1);
+  const [step, setStep] = useState<1 | 2 | 3>(1);
   const [form, setForm] = useState({
     username: '',
     email: '',
@@ -134,6 +134,9 @@ export default function SignUpPage() {
     }
   }
 
+  // Step indicator dots as a reusable component
+  const steps: [1, 2, 3] = [1, 2, 3];
+
   return (
     <div className="min-h-screen flex flex-col bg-black relative overflow-hidden">
       {/* Animated Gradient Background */}
@@ -169,9 +172,9 @@ export default function SignUpPage() {
                   <span className="font-normal italic">Account Setup:</span> <span className="font-bold italic">Step 1</span>
                 </h2>
                 <div className="flex gap-2 mb-16 ml-1">
-                  <span className={`w-4 h-4 rounded-full ${step === 1 ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
-                  <span className={`w-4 h-4 rounded-full ${step === 2 ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
-                  <span className={`w-4 h-4 rounded-full ${step === 3 ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
+                  {steps.map((s) => (
+                    <span key={s} className={`w-4 h-4 rounded-full ${step === s ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
+                  ))}
                 </div>
                 <h1 className={`${raleway.className} text-4xl md:text-5xl font-bold text-white text-left mb-6`}>Let's get started</h1>
                 <form
@@ -250,9 +253,9 @@ export default function SignUpPage() {
                   <span className="font-normal italic">Account Setup:</span> <span className="font-bold italic">Step 2</span>
                 </h2>
                 <div className="flex gap-2 mb-16 ml-1">
-                  <span className={`w-4 h-4 rounded-full ${step === 1 ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
-                  <span className={`w-4 h-4 rounded-full ${step === 2 ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
-                  <span className={`w-4 h-4 rounded-full ${step === 3 ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
+                  {steps.map((s) => (
+                    <span key={s} className={`w-4 h-4 rounded-full ${step === s ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
+                  ))}
                 </div>
                 <h1 className={`${raleway.className} text-4xl md:text-5xl font-bold text-white text-left mb-6`}>Choose a username</h1>
                 <form
@@ -295,9 +298,9 @@ export default function SignUpPage() {
                   <span className="font-normal italic">Account Setup:</span> <span className="font-bold italic">Step 3</span> <span className="text-base font-normal italic text-[#cccccc]">(optional)</span>
                 </h2>
                 <div className="flex gap-2 mb-16 ml-1">
-                  <span className={`w-4 h-4 rounded-full ${step === 1 ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
-                  <span className={`w-4 h-4 rounded-full ${step === 2 ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
-                  <span className={`w-4 h-4 rounded-full ${step === 3 ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
+                  {steps.map((s) => (
+                    <span key={s} className={`w-4 h-4 rounded-full ${step === s ? 'bg-[#ffe29a]' : 'bg-[#232323]'} border-2 border-[#ffe29a] transition-all`}></span>
+                  ))}
                 </div>
                 <h1 className={`${raleway.className} text-4xl md:text-5xl font-bold text-white text-left mb-16`}>Choose a profile image</h1>
                 <form
@@ -333,8 +336,8 @@ export default function SignUpPage() {
                       Browse
                     </button>
                   </div>
-                  {selectedImage && false && (
-                    <div className="text-left text-gray-400 mt-2">Image selected: {selectedImage.name}</div>
+                  {selectedImage && (
+                    <div className="text-left text-gray-400 mt-2">Image selected: {selectedImage?.name}</div>
                   )}
                   <div className="flex items-center gap-4 mt-12">
                     <button
