@@ -1,3 +1,4 @@
+export const dynamic = "force-dynamic";
 import { NextRequest, NextResponse } from 'next/server';
 import Airtable, { FieldSet } from 'airtable';
 import { getYouTubeThumbnailUrl } from '@/lib/video-utils';

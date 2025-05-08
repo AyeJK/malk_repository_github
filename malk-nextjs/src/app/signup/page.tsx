@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useRouter, useSearchParams } from 'next/navigation';
 import { signIn, useSession } from 'next-auth/react';
@@ -15,7 +15,15 @@ import { auth } from '@/lib/firebase';
 const lobster = Lobster({ weight: '400', subsets: ['latin'] });
 const raleway = Raleway({ weight: ['400', '500', '700'], subsets: ['latin'] });
 
-export default function SignUpPage() {
+export default function SignUpPageWrapper() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <SignUpPage />
+    </Suspense>
+  );
+}
+
+function SignUpPage() {
   const router = useRouter();
   const { data: session } = useSession();
   const searchParams = useSearchParams();
