@@ -198,7 +198,7 @@ export default function Sidebar() {
           isExpanded ? 'w-64' : 'w-[72px]'
         }`}
       >
-        <div className="h-full overflow-y-auto">
+        <div className="h-full overflow-y-auto sidebar-scrollbar">
           {/* Main Navigation */}
           <nav className={`pt-8 pb-4 space-y-2 ${isCollapsed ? 'pl-[14px] pr-3' : 'px-4'}`}>
             {mainLinks.map(({ href, label, icon }) => (
