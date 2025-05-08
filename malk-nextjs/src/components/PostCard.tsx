@@ -371,7 +371,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
             </Link>
             
             {/* User name and video title */}
-            <div>
+            <div className="min-w-0 pr-4">
               <div className="text-gray-400 text-sm">
                 {loadingAuthor ? (
                   <span>Loading author...</span>

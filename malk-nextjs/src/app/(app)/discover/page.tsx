@@ -311,26 +311,26 @@ function PostSlider({
                   )}
                 </div>
                 <div className="pt-3">
-                  <div className="flex items-center gap-2 mb-1.5">
-                    <div className="w-6 h-6 rounded-full overflow-hidden flex-shrink-0">
+                  <div className="mt-2 flex items-center gap-2 mb-1">
+                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
                       {post.fields.UserAvatar ? (
                         <Image
                           src={post.fields.UserAvatar}
                           alt={post.fields.UserName || 'User'}
-                          width={24}
-                          height={24}
+                          width={32}
+                          height={32}
                           className="object-cover"
                         />
                       ) : (
                         <DefaultAvatar />
                       )}
                     </div>
-                    <div className="text-sm text-gray-300 truncate">
-                      <span className="font-semibold">{post.fields.UserName || 'Anonymous'}</span>
-                      <span className="ml-1">shared:</span>
+                    <div className="text-base text-gray-300 truncate">
+                      <span className="font-semibold text-base">{post.fields.UserName || 'Anonymous'}</span>
+                      <span className="ml-1 text-base">shared:</span>
                     </div>
                   </div>
-                  <h3 className="font-medium text-white text-sm line-clamp-2">
+                  <h3 className="font-bold text-white text-lg leading-snug font-sans line-clamp-2">
                     {post.fields.VideoTitle || 'Untitled Video'}
                   </h3>
                 </div>
@@ -381,6 +381,14 @@ export default function DiscoverPage() {
   const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
   const lastRequestTime = React.useRef<Map<string, number>>(new Map());
   const REQUEST_DEBOUNCE = 1000; // 1 second
+
+  // Fetch top tags for tag row
+  const [topTags, setTopTags] = useState<{ id: string; name: string }[]>([]);
+  useEffect(() => {
+    fetch('/api/get-top-tags?limit=15')
+      .then(res => res.json())
+      .then(data => setTopTags(data.tags || []));
+  }, []);
 
   const loadFollowingPosts = React.useCallback(async () => {
     if (!user?.uid || loadedSections.has('following')) return;
@@ -662,28 +670,100 @@ export default function DiscoverPage() {
     }
   }, [user?.uid, addToLoadingQueue]);
 
+  const tagRowRef = React.useRef<HTMLDivElement>(null);
+  const [showTagScrollButton, setShowTagScrollButton] = React.useState(false);
+  const [canScrollLeft, setCanScrollLeft] = React.useState(false);
+  const [canScrollRight, setCanScrollRight] = React.useState(false);
+
+  const updateTagScrollButton = React.useCallback(() => {
+    const el = tagRowRef.current;
+    if (!el) return;
+    setCanScrollLeft(el.scrollLeft > 0);
+    setCanScrollRight(el.scrollLeft < el.scrollWidth - el.clientWidth - 1);
+  }, []);
+
+  React.useEffect(() => {
+    updateTagScrollButton();
+    window.addEventListener('resize', updateTagScrollButton);
+    return () => window.removeEventListener('resize', updateTagScrollButton);
+  }, [topTags, updateTagScrollButton]);
+
+  const scrollTagRowRight = () => {
+    const el = tagRowRef.current;
+    if (!el) return;
+    el.scrollBy({ left: 300, behavior: 'smooth' });
+    setTimeout(updateTagScrollButton, 350);
+  };
+
+  const scrollTagRowLeft = () => {
+    const el = tagRowRef.current;
+    if (!el) return;
+    el.scrollBy({ left: -300, behavior: 'smooth' });
+    setTimeout(updateTagScrollButton, 350);
+  };
+
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
-        <h1 className="text-3xl font-bold mb-8">Discover</h1>
-        
-        {/* Categories Grid */}
-        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 mb-12">
-          {categories.map((category) => {
-            const Icon = category.icon;
-            return (
-              <Link
-                key={category.name}
-                href={category.href}
-                className="group bg-dark-lighter flex items-center gap-3 py-2.5 px-4 rounded-lg hover:bg-white/5 transition-all duration-200"
-              >
-                <Icon className="w-7 h-7 text-white/70 group-hover:text-white transition-colors" />
-                <span className="text-base font-medium text-white/90 group-hover:text-white">
-                  {category.name}
-                </span>
-              </Link>
-            );
-          })}
+        {/* Popular Tags Row */}
+        <div className="flex items-center relative mb-12" style={{ minHeight: '48px' }}>
+          {/* Left Scroll Button */}
+          {canScrollLeft && (
+            <button
+              type="button"
+              className="bg-black/80 hover:bg-black/90 text-white p-2 rounded-full shadow transition-colors z-10 mr-2 self-center"
+              onClick={scrollTagRowLeft}
+              aria-label="Scroll tags left"
+              style={{ pointerEvents: 'auto' }}
+            >
+              <ChevronLeftIcon className="w-5 h-5" />
+            </button>
+          )}
+          <div
+            className="flex gap-3 overflow-x-auto hide-scrollbar items-center flex-1"
+            ref={tagRowRef}
+            onScroll={updateTagScrollButton}
+          >
+            {topTags.map((tag, idx) => {
+              // Color palettes matching the screenshot (deep brown, maroon, etc. for bg; red, orange, yellow, magenta for text)
+              const bgColors = [
+                'bg-[#1a0d10]', // deep maroon
+                'bg-[#1a1208]', // deep brown
+                'bg-[#181200]', // dark yellow-brown
+                'bg-[#1a0810]', // deep purple-maroon
+              ];
+              const textColors = [
+                'text-[#ff6b81]', // vibrant red
+                'text-[#ffb347]', // orange
+                'text-[#ffe156]', // yellow
+                'text-[#e26ee5]', // magenta
+              ];
+              const bg = bgColors[idx % bgColors.length];
+              const text = textColors[idx % textColors.length];
+              return (
+                <Link
+                  key={tag.id}
+                  href={`/tags/${tag.name.toLowerCase()}`}
+                  className={`px-4 py-2 rounded-md font-medium text-base whitespace-nowrap transition-colors ${bg} ${text} hover:brightness-125`}
+                  style={{ fontFamily: 'inherit' }}
+                >
+                  #{tag.name}
+                </Link>
+              );
+            })}
+          </div>
+          {/* Right Scroll Button */}
+          {canScrollRight && (
+            <button
+              type="button"
+              className="bg-black/80 hover:bg-black/90 text-white p-2 rounded-full shadow transition-colors z-10 ml-2 self-center"
+              onClick={scrollTagRowRight}
+              aria-label="Scroll tags right"
+              style={{ pointerEvents: 'auto' }}
+            >
+              <ChevronRightIcon className="w-5 h-5" />
+            </button>
+          )}
         </div>
 
         {/* Post Sliders */}

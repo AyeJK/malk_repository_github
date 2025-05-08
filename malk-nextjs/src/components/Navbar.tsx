@@ -66,9 +66,9 @@ export default function Navbar() {
               <>
                 <button 
                   onClick={openShareModal}
-                  className="px-6 py-1.5 rounded-lg bg-white text-black hover:bg-gray-100 transition-all duration-300 h-9 flex items-center gap-2 font-bold text-lg shadow-lg"
+                  className="px-6 py-1.5 rounded-lg bg-[#111] text-white h-9 flex items-center gap-2 font-bold text-lg shadow-lg animated-gradient-border relative overflow-hidden"
                 >
-                  <PlusIcon className="w-6 h-6 text-black" />
+                  <PlusIcon className="w-6 h-6 text-white" />
                   <span>Share Video</span>
                 </button>
                 <button
