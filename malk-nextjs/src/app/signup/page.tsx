@@ -1,9 +1,9 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import Link from 'next/link';
-import { useRouter } from 'next/navigation';
-import { signIn } from 'next-auth/react';
+import { useRouter, useSearchParams } from 'next/navigation';
+import { signIn, useSession } from 'next-auth/react';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { motion } from 'framer-motion';
 import { Lobster, Raleway } from 'next/font/google';
@@ -17,6 +17,8 @@ const raleway = Raleway({ weight: ['400', '500', '700'], subsets: ['latin'] });
 
 export default function SignUpPage() {
   const router = useRouter();
+  const { data: session } = useSession();
+  const searchParams = useSearchParams();
   const [error, setError] = useState('');
   const [loading, setLoading] = useState(false);
   const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -35,7 +37,7 @@ export default function SignUpPage() {
     setError('');
     setLoading(true);
     try {
-      await signIn(provider, { callbackUrl: '/dashboard' });
+      await signIn(provider, { callbackUrl: '/signup?step=2' });
     } catch (err: any) {
       setError('Failed to sign up with ' + provider.charAt(0).toUpperCase() + provider.slice(1));
     } finally {
@@ -123,6 +125,17 @@ export default function SignUpPage() {
       setForm({ ...form, profileImage: URL.createObjectURL(e.target.files[0]) });
     }
   };
+
+  // Automatically proceed to step 2 if authenticated and step=2 in query
+  useEffect(() => {
+    const stepParam = searchParams.get('step');
+    if (session && stepParam === '2') {
+      setStep(2);
+      if (session.user?.email) {
+        setForm((prev) => ({ ...prev, email: session.user.email ?? '' }));
+      }
+    }
+  }, [session, searchParams]);
 
   // Animated gradient keyframes for button border (if not already present)
   if (typeof window !== 'undefined') {
