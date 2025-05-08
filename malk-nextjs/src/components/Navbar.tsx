@@ -56,7 +56,7 @@ export default function Navbar() {
             >
               <Bars3Icon className="w-6 h-6 text-white/70 hover:text-white" />
             </button>
-            <Link href="/">
+            <Link href={user ? "/discover" : "/"}>
               <span className={`${lobster.className} text-4xl md:text-5xl text-white`}>Malk</span>
             </Link>
           </div>
