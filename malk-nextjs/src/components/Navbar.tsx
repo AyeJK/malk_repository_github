@@ -4,9 +4,12 @@ import React, { useState, useRef, useEffect } from 'react';
 import Link from 'next/link';
 import { useAuth } from '@/lib/auth-context';
 import ShareVideoModal from './ShareVideoModal';
-import { Bars3Icon } from '@heroicons/react/24/outline';
+import { Bars3Icon, BellIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useSidebar } from '@/lib/sidebar-context';
 import DefaultAvatar from './DefaultAvatar';
+import { Lobster } from 'next/font/google';
+
+const lobster = Lobster({ weight: '400', subsets: ['latin'] });
 
 export default function Navbar() {
   const { user, airtableUser, signOut } = useAuth();
@@ -43,7 +46,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 bg-black text-white p-2 z-50 border-b border-white/10">
+      <nav className="fixed top-0 left-0 right-0 bg-black text-white p-2 z-50 shadow-md">
         <div className="flex justify-between items-center px-3">
           <div className="flex items-center space-x-4">
             <button
@@ -53,21 +56,28 @@ export default function Navbar() {
             >
               <Bars3Icon className="w-6 h-6 text-white/70 hover:text-white" />
             </button>
-            <Link href="/" className="text-3xl font-lobster text-white">
-              Malk.tv <span className="text-blue-300 text-sm bg-blue-900/30 px-2 py-0.5 rounded-full">Beta</span>
+            <Link href="/">
+              <span className={`${lobster.className} text-4xl md:text-5xl text-white`}>Malk</span>
             </Link>
           </div>
           
-          <div className="flex items-center space-x-6">
+          <div className="flex items-center space-x-3">
             {user ? (
               <>
                 <button 
                   onClick={openShareModal}
-                  className="px-6 py-1.5 rounded-lg text-sm font-medium bg-red-800 text-red-100 hover:bg-red-700 transition-all duration-300 h-9 flex items-center"
+                  className="px-6 py-1.5 rounded-lg bg-[#ff8178] text-white hover:bg-[#e76a5e] transition-all duration-300 h-9 flex items-center gap-2 font-bold text-lg shadow-lg"
                 >
-                  Share Video
+                  <PlusIcon className="w-6 h-6" />
+                  <span>Share Video</span>
                 </button>
-                <div className="relative" ref={dropdownRef}>
+                <button
+                  className="ml-1 p-2 rounded-full hover:bg-white/10 transition-colors"
+                  aria-label="Notifications"
+                >
+                  <BellIcon className="w-6 h-6 text-white/80" />
+                </button>
+                <div className="relative ml-1" ref={dropdownRef}>
                   <button 
                     className="w-9 h-9 rounded-full overflow-hidden hover:opacity-80 transition-opacity flex items-center justify-center"
                     onClick={toggleDropdown}
@@ -106,21 +116,15 @@ export default function Navbar() {
               <>
                 <Link 
                   href="/signup" 
-                  className="text-white hover:text-blue-300 transition-colors"
+                  className="px-4 py-2 rounded-lg font-semibold bg-[#ff8178] text-white hover:bg-[#e76a5e] transition-colors"
                 >
                   Sign Up
                 </Link>
                 <Link 
                   href="/login" 
-                  className="text-white hover:text-blue-300 transition-colors"
+                  className="px-4 py-2 rounded-lg font-semibold bg-gray-800 text-white hover:bg-gray-700 transition-colors"
                 >
                   Log In
-                </Link>
-                <Link 
-                  href="/login" 
-                  className="btn-primary px-4 py-2 rounded-lg text-sm font-medium"
-                >
-                  Share Video
                 </Link>
               </>
             )}

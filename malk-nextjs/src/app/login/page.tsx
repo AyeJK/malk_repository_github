@@ -8,7 +8,6 @@ import { signIn as signInOAuth } from 'next-auth/react';
 import { upsertUser } from '@/lib/airtable';
 import { motion } from 'framer-motion';
 import { Lobster, Raleway } from 'next/font/google';
-import { FaFacebook } from 'react-icons/fa';
 
 const lobster = Lobster({ weight: '400', subsets: ['latin'] });
 const raleway = Raleway({ weight: ['400', '500', '700'], subsets: ['latin'] });
@@ -52,18 +51,12 @@ export default function LoginPage() {
       if (error) {
         setError(error);
       } else if (user) {
-        const upserted = await upsertUser({
+        await upsertUser({
           email: user.email!,
           firebaseUID: user.uid,
           displayName: user.displayName || user.email!.split('@')[0],
         });
-        // Redirect to profile page using DisplayName if available, else fallback to Airtable record ID
-        if (upserted && (upserted.fields.DisplayName || upserted.id)) {
-          const profileSlug = upserted.fields.DisplayName || upserted.id;
-          router.push(`/profile/${profileSlug}`);
-        } else {
-          router.push('/profile'); // fallback if no info
-        }
+        router.push('/dashboard');
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during login');
@@ -189,7 +182,7 @@ export default function LoginPage() {
                 disabled={loading}
                 style={{ boxShadow: 'none' }}
               >
-                <FaFacebook className="w-6 h-6" />
+                <svg className="w-6 h-6" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M18 2h-3a4 4 0 0 0-4 4v3H7v4h4v8h4v-8h3l1-4h-4V6a1 1 0 0 1 1-1h3z" /></svg>
                 FACEBOOK
               </button>
               <button

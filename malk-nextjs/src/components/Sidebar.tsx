@@ -28,6 +28,9 @@ import {
 import { useSidebar } from '@/lib/sidebar-context';
 import { useAuth } from '@/lib/auth-context';
 import DefaultAvatar from './DefaultAvatar';
+import { Raleway } from 'next/font/google';
+
+const raleway = Raleway({ weight: ['400', '500', '700'], subsets: ['latin'] });
 
 interface SidebarSection {
   title: string;
@@ -188,24 +191,24 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <div
-        className={`fixed left-0 top-12 h-[calc(100vh-3rem)] bg-black border-r border-white/10 transition-all duration-300 ${
+        className={`fixed left-0 top-12 h-[calc(100vh-3rem)] ${raleway.className} shadow-lg transition-all duration-300 bg-black ${
           !isVisible ? '-translate-x-full' : 'translate-x-0'
         } ${
           sidebarState === 'hidden' ? 'z-50 w-64 shadow-lg' :
-          isExpanded ? 'w-64' : 'w-16'
+          isExpanded ? 'w-64' : 'w-[72px]'
         }`}
       >
         <div className="h-full overflow-y-auto">
           {/* Main Navigation */}
-          <nav className="p-4 space-y-2">
+          <nav className={`pt-8 pb-4 space-y-2 ${isCollapsed ? 'pl-3 pr-3' : 'px-4'}`}>
             {mainLinks.map(({ href, label, icon }) => (
               <Link
                 key={href}
                 href={href}
-                className={`flex items-center ${shouldShowLabels ? 'space-x-3' : 'justify-center'} px-3 py-2 rounded-lg transition-colors ${
+                className={`flex items-center ${shouldShowLabels ? 'space-x-3' : ''} ${isCollapsed ? 'justify-start' : ''} px-3 py-2 rounded-lg transition-colors font-semibold text-lg ${
                   pathname === href
-                    ? 'bg-red-600/20 text-red-500'
-                    : 'text-white/70 hover:bg-white/5 hover:text-white'
+                    ? 'bg-[#ff8178]/20 text-[#ff8178] shadow-md'
+                    : 'text-white/80 hover:bg-[#ff8178]/10 hover:text-[#ff8178]'
                 }`}
                 title={!shouldShowLabels ? label : undefined}
               >
@@ -220,9 +223,9 @@ export default function Sidebar() {
             <div className="px-4 py-2">
               <button
                 onClick={() => toggleSection('Following')}
-                className="flex items-center justify-between w-full text-white/70 hover:text-white"
+                className="flex items-center justify-between w-full text-white/80 hover:text-[#ff8178] font-bold text-base tracking-wide"
               >
-                <span className="font-medium">Following</span>
+                <span className="font-bold">Following</span>
                 {sections.Following ? (
                   <ChevronUpIcon className="w-4 h-4" />
                 ) : (
@@ -238,7 +241,7 @@ export default function Sidebar() {
                       <Link
                         key={followedUser.id}
                         href={`/profile/${followedUser.id}`}
-                        className="flex items-center space-x-2 px-2 py-1 rounded hover:bg-white/5 group"
+                        className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/5 group"
                       >
                         <div className="relative w-6 h-6 rounded-full overflow-hidden">
                           {followedUser.fields?.ProfileImage ? (
@@ -271,9 +274,9 @@ export default function Sidebar() {
             <div className="px-4 py-2">
               <button
                 onClick={() => toggleSection('Categories')}
-                className="flex items-center justify-between w-full text-white/70 hover:text-white"
+                className="flex items-center justify-between w-full text-white/80 hover:text-[#ff8178] font-bold text-base tracking-wide"
               >
-                <span className="font-medium">Categories</span>
+                <span className="font-bold">Categories</span>
                 {sections.Categories ? (
                   <ChevronUpIcon className="w-4 h-4" />
                 ) : (
@@ -294,19 +297,17 @@ export default function Sidebar() {
                         <Link
                           key={id}
                           href={`/category/${slug}`}
-                          className={`flex items-center px-2 py-1 rounded hover:bg-white/5 ${
+                          className={`flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/5 ${
                             pathname === `/category/${slug}`
                               ? 'text-red-500 bg-red-500/10'
                               : 'text-white/70 hover:text-white'
                           } group`}
                           title={!shouldShowLabels ? name : undefined}
                         >
-                          <div className={`flex items-center ${shouldShowLabels ? 'space-x-2' : 'justify-center'}`}>
-                            <span className="text-white/70 group-hover:text-white">
-                              {getCategoryIcon(name)}
-                            </span>
-                            {shouldShowLabels && <span>{name}</span>}
-                          </div>
+                          <span className="text-white/70 group-hover:text-white">
+                            {getCategoryIcon(name)}
+                          </span>
+                          {shouldShowLabels && <span>{name}</span>}
                         </Link>
                       ))
                   ) : (
@@ -322,9 +323,9 @@ export default function Sidebar() {
             <div className="px-4 py-2">
               <button
                 onClick={() => toggleSection('Popular Tags')}
-                className="flex items-center justify-between w-full text-white/70 hover:text-white"
+                className="flex items-center justify-between w-full text-white/80 hover:text-[#ff8178] font-bold text-base tracking-wide"
               >
-                <span className="font-medium">Popular Tags</span>
+                <span className="font-bold">Popular Tags</span>
                 {sections['Popular Tags'] ? (
                   <ChevronUpIcon className="w-4 h-4" />
                 ) : (
@@ -340,13 +341,11 @@ export default function Sidebar() {
                       <Link
                         key={id}
                         href={`/tags/${name.toLowerCase()}`}
-                        className="flex items-center px-2 py-1 rounded hover:bg-white/5 text-white/70 hover:text-white group"
+                        className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/5 text-white/70 hover:text-white group"
                         title={!shouldShowLabels ? name : undefined}
                       >
-                        <div className={`flex items-center ${shouldShowLabels ? 'space-x-2' : 'justify-center'}`}>
-                          <HashtagIcon className="w-5 h-5 text-white/70 group-hover:text-white" />
-                          {shouldShowLabels && <span>{name}</span>}
-                        </div>
+                        <HashtagIcon className="w-5 h-5 text-white/70 group-hover:text-white" />
+                        {shouldShowLabels && <span>{name}</span>}
                       </Link>
                     ))
                   ) : (

@@ -20,7 +20,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
       <Sidebar />
       <main className={`transition-all duration-300 ${
         isHidden ? 'ml-0' : 
-        isCollapsed ? 'ml-16' : 'ml-64'
+        isCollapsed ? 'ml-[72px]' : 'ml-64'
       } mt-12 max-w-[100vw] overflow-x-hidden`}>
         {children}
       </main>

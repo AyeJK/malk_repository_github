@@ -181,8 +181,8 @@ function SignUpPage() {
         >
           <Link href="/">
             <h1 className={`${lobster.className} text-4xl md:text-5xl text-white mb-12 cursor-pointer`}>
-              Malk
-            </h1>
+            Malk
+          </h1>
           </Link>
         </motion.div>
         {/* Main content centered as before */}
