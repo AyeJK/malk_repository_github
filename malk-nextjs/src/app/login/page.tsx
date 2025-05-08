@@ -26,7 +26,7 @@ export default function LoginPage() {
     setError('');
     setLoading(true);
     try {
-      await signInOAuth(provider, { callbackUrl: '/dashboard' });
+      await signInOAuth(provider, { callbackUrl: '/login/oauth-redirect' });
     } catch (err: any) {
       setError('Failed to sign in with ' + provider.charAt(0).toUpperCase() + provider.slice(1));
     } finally {
@@ -51,12 +51,18 @@ export default function LoginPage() {
       if (error) {
         setError(error);
       } else if (user) {
-        await upsertUser({
+        const userRecord = await upsertUser({
           email: user.email!,
           firebaseUID: user.uid,
           displayName: user.displayName || user.email!.split('@')[0],
         });
-        router.push('/dashboard');
+        if (userRecord) {
+          const displayName = userRecord.fields.DisplayName;
+          const profileId = displayName ? displayName : userRecord.id;
+          router.push(`/profile/${profileId}`);
+        } else {
+          router.push('/'); // fallback
+        }
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during login');

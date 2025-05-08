@@ -66,9 +66,9 @@ export default function Navbar() {
               <>
                 <button 
                   onClick={openShareModal}
-                  className="px-6 py-1.5 rounded-lg bg-[#ff8178] text-white hover:bg-[#e76a5e] transition-all duration-300 h-9 flex items-center gap-2 font-bold text-lg shadow-lg"
+                  className="px-6 py-1.5 rounded-lg bg-white text-black hover:bg-gray-100 transition-all duration-300 h-9 flex items-center gap-2 font-bold text-lg shadow-lg"
                 >
-                  <PlusIcon className="w-6 h-6" />
+                  <PlusIcon className="w-6 h-6 text-black" />
                   <span>Share Video</span>
                 </button>
                 <button
@@ -115,7 +115,7 @@ export default function Navbar() {
             ) : (
               <>
                 <Link 
-                  href="/signup" 
+                  href="/" 
                   className="px-4 py-2 rounded-lg font-semibold bg-[#ff8178] text-white hover:bg-[#e76a5e] transition-colors"
                 >
                   Sign Up

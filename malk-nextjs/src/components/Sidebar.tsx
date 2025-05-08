@@ -200,7 +200,7 @@ export default function Sidebar() {
       >
         <div className="h-full overflow-y-auto">
           {/* Main Navigation */}
-          <nav className={`pt-8 pb-4 space-y-2 ${isCollapsed ? 'pl-3 pr-3' : 'px-4'}`}>
+          <nav className={`pt-8 pb-4 space-y-2 ${isCollapsed ? 'pl-[14px] pr-3' : 'px-4'}`}>
             {mainLinks.map(({ href, label, icon }) => (
               <Link
                 key={href}
