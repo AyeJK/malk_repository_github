@@ -179,9 +179,11 @@ function SignUpPage() {
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.5 }}
         >
-          <h1 className={`${lobster.className} text-4xl md:text-5xl text-white mb-12`}>
-            Malk
-          </h1>
+          <Link href="/">
+            <h1 className={`${lobster.className} text-4xl md:text-5xl text-white mb-12 cursor-pointer`}>
+              Malk
+            </h1>
+          </Link>
         </motion.div>
         {/* Main content centered as before */}
         <div className="flex-1 flex flex-col items-center justify-center px-4 py-8 relative z-10">
