@@ -552,7 +552,14 @@ export default function ProfilePage() {
                 priority
               />
             ) : (
-              <div className="w-full h-full bg-gradient-to-br from-primary-dark to-accent"></div>
+              <div
+                className="w-full h-full"
+                style={{
+                  background: 'linear-gradient(120deg, #181818 0%, #2a0f0f 40%, #ff8178 70%, #000000 100%)',
+                  backgroundSize: '200% 200%',
+                  backgroundPosition: '100% 50%'
+                }}
+              />
             )}
           </div>
 
@@ -593,7 +600,8 @@ export default function ProfilePage() {
                         title="Social Link"
                       >
                         <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" strokeWidth={1.5} stroke="currentColor" className="w-6 h-6 text-white">
-                          <path strokeLinecap="round" strokeLinejoin="round" d="M12 3c2.755 0 5 4.03 5 9s-2.245 9-5 9-5-4.03-5-9 2.245-9 5-9zm0 0c4.418 0 8 4.03 8 9s-3.582 9-8 9-8-4.03-8-9 3.582-9 8-9zm0 0v18" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M13.828 10.172a4 4 0 0 1 0 5.656l-3 3a4 4 0 0 1-5.656-5.656l1.5-1.5" />
+                          <path strokeLinecap="round" strokeLinejoin="round" d="M10.172 13.828a4 4 0 0 1 0-5.656l3-3a4 4 0 0 1 5.656 5.656l-1.5 1.5" />
                         </svg>
                       </a>
                     )}
@@ -696,10 +704,10 @@ export default function ProfilePage() {
               {currentUser && firebaseUID && currentUser.uid === firebaseUID && (
                 <button
                   onClick={() => setShowAddSectionModal(true)}
-                  className="flex items-center gap-2 px-5 py-2 bg-white/10 hover:bg-red-700 text-white rounded-lg shadow-lg transition-all duration-200 font-bold text-lg ml-auto"
+                  className="flex items-center gap-1 px-3 py-1.5 bg-white/10 hover:bg-red-700 text-white rounded-lg shadow transition-all duration-200 font-semibold text-base ml-auto"
                 >
-                  <PlusIcon className="w-6 h-6" />
-                  <span>Add Section</span>
+                  <PlusIcon className="w-4 h-4" />
+                  <span className="text-base">Add Section</span>
                 </button>
               )}
             </div>
