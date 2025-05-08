@@ -655,6 +655,13 @@ export default function DiscoverPage() {
     return () => clearTimeout(timeoutId);
   }, [currentlyLoading]);
 
+  // Load following section on mount if user is logged in
+  useEffect(() => {
+    if (user?.uid) {
+      addToLoadingQueue('following');
+    }
+  }, [user?.uid, addToLoadingQueue]);
+
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
@@ -681,7 +688,7 @@ export default function DiscoverPage() {
 
         {/* Post Sliders */}
         <div className="space-y-8">
-          {user && (
+          {user && (followingPosts.length > 0 || followingLoading || currentlyLoading === 'following') && (
             <PostSlider 
               title="Following"
               posts={followingPosts}

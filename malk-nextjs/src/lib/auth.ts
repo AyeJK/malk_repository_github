@@ -3,6 +3,8 @@ import { auth } from '@/lib/firebase';
 import { signInWithEmailAndPassword } from 'firebase/auth';
 import { getUserByFirebaseUID } from '@/lib/airtable';
 import { AuthOptions } from 'next-auth';
+import GoogleProvider from 'next-auth/providers/google';
+import FacebookProvider from 'next-auth/providers/facebook';
 
 export const authOptions: AuthOptions = {
   secret: process.env.NEXTAUTH_SECRET,
@@ -48,13 +50,45 @@ export const authOptions: AuthOptions = {
           return null;
         }
       }
+    }),
+    GoogleProvider({
+      clientId: process.env.GOOGLE_CLIENT_ID!,
+      clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
+    }),
+    FacebookProvider({
+      clientId: process.env.FACEBOOK_CLIENT_ID!,
+      clientSecret: process.env.FACEBOOK_CLIENT_SECRET!,
     })
   ],
   callbacks: {
-    async jwt({ token, user }) {
+    async jwt({ token, user, account, profile }) {
+      // Unify user creation for OAuth
+      if (account && (account.provider === 'google' || account.provider === 'facebook')) {
+        const { upsertUser, fetchRecords } = await import('@/lib/airtable');
+        let airtableUser = null;
+        if (user?.email) {
+          // Find user by email in Airtable
+          const users = await fetchRecords('Users');
+          airtableUser = users.find(u => u.fields.Email === user.email);
+        }
+        if (!airtableUser && user?.email) {
+          // Create user in Airtable with a dummy firebaseUID
+          const firebaseUID = `oauth-${account.provider.toUpperCase()}-${user.email}`;
+          airtableUser = await upsertUser({
+            email: user.email,
+            firebaseUID,
+            displayName: user.name || user.email.split('@')[0],
+            profileURL: user.name ? user.name.toLowerCase().replace(/\s+/g, '-') : user.email.split('@')[0],
+            postCount: 0
+          });
+        }
+        if (airtableUser) {
+          token.airtableId = airtableUser.id;
+        }
+      }
       if (user) {
         token.id = user.id;
-        token.airtableId = user.airtableId;
+        if (user.airtableId) token.airtableId = user.airtableId;
       }
       return token;
     },

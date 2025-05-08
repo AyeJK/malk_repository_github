@@ -792,4 +792,24 @@ export async function getPost(postId: string): Promise<PostRecord | null> {
     console.error('Error fetching post:', error);
     return null;
   }
+}
+
+// Function to get invite code record by code value
+export async function getInviteCodeRecord(inviteCode: string) {
+  try {
+    const records = await base('Invite Codes').select({
+      filterByFormula: `{Invite Code} = '${inviteCode}'`,
+      maxRecords: 1
+    }).firstPage();
+    if (records.length > 0) {
+      return {
+        id: records[0].id,
+        fields: records[0].fields as any
+      };
+    }
+    return null;
+  } catch (error) {
+    console.error('Error getting invite code record:', error);
+    return null;
+  }
 } 
