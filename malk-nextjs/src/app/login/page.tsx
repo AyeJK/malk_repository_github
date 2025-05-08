@@ -116,7 +116,7 @@ export default function LoginPage() {
                   <div className="ml-3">
                     <h3 className="text-sm font-medium text-red-400">Error</h3>
                     <div className="mt-2 text-sm text-red-300">
-                      <p>{error}</p>
+                      <p>{error === 'Firebase: Error (auth/invalid-credential).' ? 'Invalid email or password. Please try again.' : error}</p>
                     </div>
                   </div>
                 </div>
