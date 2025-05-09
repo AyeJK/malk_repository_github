@@ -15,7 +15,7 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   const isHidden = sidebarState === 'hidden';
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-[#101010]">
       <Navbar />
       <Sidebar />
       <main className={`transition-all duration-300 ${

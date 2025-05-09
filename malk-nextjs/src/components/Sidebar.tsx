@@ -191,7 +191,7 @@ export default function Sidebar() {
 
       {/* Sidebar */}
       <div
-        className={`fixed left-0 top-12 h-[calc(100vh-3rem)] ${raleway.className} shadow-lg transition-all duration-300 bg-black ${
+        className={`fixed left-0 top-12 h-[calc(100vh-3rem)] ${raleway.className} shadow-lg transition-all duration-300 bg-[#101010] ${
           !isVisible ? '-translate-x-full' : 'translate-x-0'
         } ${
           sidebarState === 'hidden' ? 'z-50 w-64 shadow-lg' :

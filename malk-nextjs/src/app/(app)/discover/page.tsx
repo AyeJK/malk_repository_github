@@ -312,14 +312,13 @@ function PostSlider({
                 </div>
                 <div className="pt-3">
                   <div className="mt-2 flex items-center gap-2 mb-1">
-                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                    <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-gray-700">
                       {post.fields.UserAvatar ? (
                         <Image
                           src={post.fields.UserAvatar}
                           alt={post.fields.UserName || 'User'}
-                          width={32}
-                          height={32}
-                          className="object-cover"
+                          fill
+                          className="object-cover w-full h-full"
                         />
                       ) : (
                         <DefaultAvatar />
@@ -330,7 +329,7 @@ function PostSlider({
                       <span className="ml-1 text-base">shared:</span>
                     </div>
                   </div>
-                  <h3 className="font-bold text-white text-lg leading-snug font-sans line-clamp-2">
+                  <h3 className="mt-2 font-medium text-white text-base leading-snug font-sans line-clamp-2">
                     {post.fields.VideoTitle || 'Untitled Video'}
                   </h3>
                 </div>
