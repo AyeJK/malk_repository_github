@@ -297,7 +297,7 @@ export default function ShareVideoModal({ isOpen, onClose }: ShareVideoModalProp
                 <svg width="40" height="28" viewBox="0 0 40 28" fill="none" xmlns="http://www.w3.org/2000/svg">
                   <rect x="0.5" y="0.5" width="39" height="27" rx="8.5" fill="#FF0000" stroke="#FF0000"/>
                   <path d="M27 14.0001C27 13.3478 26.6488 12.7339 26.0858 12.3887L17.9142 7.23607C17.3507 6.89091 16.6493 6.89091 16.0858 7.23607C15.5223 7.58123 15.1711 8.19513 15.1711 8.84737V19.1528C15.1711 19.805 15.5223 20.4189 16.0858 20.7641C16.6493 21.1092 17.3507 21.1092 17.9142 20.7641L26.0858 15.6114C26.6488 15.2662 27 14.6523 27 14.0001Z" fill="white"/>
-                </svg>
+            </svg>
               </a>
             </div>
           </div>
@@ -363,15 +363,15 @@ export default function ShareVideoModal({ isOpen, onClose }: ShareVideoModalProp
                 </Listbox.Button>
                 <Transition as={Fragment} leave="transition ease-in duration-100" leaveFrom="opacity-100" leaveTo="opacity-0">
                   <Listbox.Options className="absolute mt-1 max-h-60 w-full overflow-auto rounded-[0.75rem] bg-[#ff8178] py-1 text-base shadow-lg ring-1 ring-black/5 focus:outline-none z-50">
-                    {CATEGORIES.map(category => (
+              {CATEGORIES.map(category => (
                       <Listbox.Option
                         key={category}
                         value={category}
                         className={({ active }) => `cursor-pointer select-none relative py-2 pl-4 pr-4 ${active ? 'bg-[#e76a5e] text-white' : 'text-white'}`}
                       >
-                        {category}
+                  {category}
                       </Listbox.Option>
-                    ))}
+              ))}
                   </Listbox.Options>
                 </Transition>
               </div>
@@ -398,7 +398,7 @@ export default function ShareVideoModal({ isOpen, onClose }: ShareVideoModalProp
                   ) : (
                     <ul>
                       {suggestedTags.map(tag => (
-                        <li
+                        <li 
                           key={tag}
                           className="px-4 py-2 cursor-pointer text-white select-none rounded-[0.5rem] transition-colors duration-100 hover:bg-[#e76a5e] hover:text-white"
                           onClick={() => handleTagSelect(tag)}
