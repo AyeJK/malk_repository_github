@@ -46,7 +46,7 @@ export default function Navbar() {
 
   return (
     <>
-      <nav className="fixed top-0 left-0 right-0 bg-[#101010] text-white p-2 z-50 shadow-md">
+      <nav className="fixed top-0 left-0 right-0 bg-[#101010] text-white p-2 z-50">
         <div className="flex justify-between items-center px-3">
           <div className="flex items-center space-x-4">
             <button
