@@ -3,6 +3,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import { ChevronLeftIcon, ChevronRightIcon, HashtagIcon, FilmIcon } from '@heroicons/react/24/outline';
 import DefaultAvatar from './DefaultAvatar';
+import { motion } from 'framer-motion';
 
 // Optionally import category icons if needed for category sliders
 import {
@@ -49,6 +50,20 @@ function getSliderLink(title: string): string {
   }
   return '#';
 }
+
+const containerVariants = {
+  hidden: {},
+  show: {
+    transition: {
+      staggerChildren: 0.08,
+    },
+  },
+};
+
+const itemVariants = {
+  hidden: { opacity: 0, y: 40 },
+  show: { opacity: 1, y: 0, transition: { duration: 0.6, ease: [0.4, 0, 0.2, 1] } },
+};
 
 export interface PostSliderProps {
   title: string;
@@ -258,15 +273,19 @@ export default function PostSlider({
             {emptyMessage}
           </div>
         )}
-        <div
+        <motion.div
           ref={sliderRef}
           className="flex gap-4 overflow-x-auto pb-4 hide-scrollbar scroll-smooth relative"
+          variants={containerVariants}
+          initial="hidden"
+          animate="show"
         >
           {displayPosts.map((post) => (
-            <div
+            <motion.div
               key={post.id}
               data-post-id={post.id}
               className="flex-none w-[300px]"
+              variants={itemVariants}
             >
               {!isLoading && !showEmptyState ? (
                 <Link
@@ -305,14 +324,14 @@ export default function PostSlider({
                   </div>
                 </div>
               )}
-            </div>
+            </motion.div>
           ))}
           {isLoadingMore && (
             <div className="flex-none w-[300px] flex items-center justify-center">
               <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-white"></div>
             </div>
           )}
-        </div>
+        </motion.div>
       </div>
     </div>
   );

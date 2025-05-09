@@ -15,13 +15,13 @@ export default function ClientLayout({ children }: ClientLayoutProps) {
   const isHidden = sidebarState === 'hidden';
 
   return (
-    <div className="min-h-screen bg-black">
+    <div className="min-h-screen bg-[#101010]">
       <Navbar />
       <Sidebar />
       <main className={`transition-all duration-300 ${
         isHidden ? 'ml-0' : 
         isCollapsed ? 'ml-[72px]' : 'ml-64'
-      } mt-12 max-w-[100vw] overflow-x-hidden`}>
+      } mt-16 max-w-[100vw] overflow-x-hidden`}>
         {children}
       </main>
     </div>
