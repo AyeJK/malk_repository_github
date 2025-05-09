@@ -246,6 +246,37 @@ h1, h2, h3, h4, h5, h6 {
   display: none;  /* Chrome, Safari and Opera */
 }
 
+/* Custom Sidebar Scrollbar */
+.sidebar-scrollbar {
+  scrollbar-width: thin;
+  scrollbar-color: transparent transparent;
+  transition: scrollbar-color 0.3s;
+}
+.sidebar-scrollbar:hover {
+  scrollbar-color: #222 #111;
+}
+.sidebar-scrollbar::-webkit-scrollbar {
+  width: 8px;
+  background: transparent;
+  transition: background 0.3s;
+}
+.sidebar-scrollbar:hover::-webkit-scrollbar {
+  background: #111;
+}
+.sidebar-scrollbar::-webkit-scrollbar-thumb {
+  background: transparent;
+  border-radius: 6px;
+  border: 2px solid transparent;
+  transition: background 0.3s, border 0.3s;
+}
+.sidebar-scrollbar:hover::-webkit-scrollbar-thumb {
+  background: #222;
+  border: 2px solid #111;
+}
+.sidebar-scrollbar::-webkit-scrollbar-thumb:hover {
+  background: #444;
+}
+
 /* Custom minimal scrollbar for Headless UI Listbox dropdown */
 .bg-\[\#ff8178\]::-webkit-scrollbar {
   width: 8px;
