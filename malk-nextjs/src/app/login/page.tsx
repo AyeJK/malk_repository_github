@@ -51,18 +51,22 @@ export default function LoginPage() {
       if (error) {
         setError(error);
       } else if (user) {
-        const userRecord = await upsertUser({
+        // Check if user exists in Airtable
+        const existingUser = await upsertUser({
           email: user.email!,
-          firebaseUID: user.uid,
-          displayName: user.displayName || user.email!.split('@')[0],
+          firebaseUID: user.uid
         });
-        if (userRecord) {
-          const displayName = userRecord.fields.DisplayName;
-          const profileId = displayName ? displayName : userRecord.id;
-          router.push(`/profile/${profileId}`);
-        } else {
-          router.push('/'); // fallback
+        // Only set displayName if user is new (no DisplayName in Airtable)
+        if (existingUser && !existingUser.fields.DisplayName) {
+          await upsertUser({
+            email: user.email!,
+            firebaseUID: user.uid,
+            displayName: user.displayName || user.email!.split('@')[0],
+          });
         }
+        const displayName = (existingUser && existingUser.fields.DisplayName) || user.displayName || user.email!.split('@')[0];
+        const profileId = displayName ? displayName : (existingUser ? existingUser.id : user.uid);
+        router.push(`/profile/${profileId}`);
       }
     } catch (err: any) {
       setError(err.message || 'An error occurred during login');

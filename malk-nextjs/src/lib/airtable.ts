@@ -254,9 +254,13 @@ export async function upsertUser(userData: {
         Email: userData.email,
         LastLogin: now
       };
-      
-      // Only update optional fields if they are provided
-      if (userData.displayName !== undefined) updatedFields.DisplayName = userData.displayName;
+      // Only update DisplayName if explicitly provided and different from current value
+      if (
+        userData.displayName !== undefined &&
+        userData.displayName !== record.fields.DisplayName
+      ) {
+        updatedFields.DisplayName = userData.displayName;
+      }
       if (userData.firstName !== undefined) updatedFields.FirstName = userData.firstName;
       if (userData.lastName !== undefined) updatedFields.LastName = userData.lastName;
       if (userData.bio !== undefined) updatedFields.Bio = userData.bio;
