@@ -288,62 +288,54 @@ function PostSlider({
                 data-post-id={post.id}
                 className={`flex-none w-[300px] flex flex-col ${isPlaceholder ? 'animate-pulse' : ''}`}
               >
-                <div className="block group">
-                  <div className="relative aspect-video rounded-lg overflow-hidden">
-                    {isPlaceholder ? (
+                {isPlaceholder ? (
+                  <div className="block group">
+                    <div className="relative aspect-video rounded-lg overflow-hidden">
                       <div className="w-full h-full bg-gray-800" />
-                    ) : post.fields.ThumbnailURL ? (
-                      <Image
-                        src={post.fields.ThumbnailURL}
-                        alt={post.fields.VideoTitle || 'Video thumbnail'}
-                        fill
-                        className="object-cover absolute top-0 left-0 group-hover:scale-105 transition-transform duration-300"
-                        sizes="300px"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                        <span className="text-gray-400">No thumbnail</span>
-                      </div>
-                    )}
+                    </div>
                   </div>
-                </div>
-                <div className="block group">
-                  <div className="mt-2 flex flex-row items-start gap-2">
-                    <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-gray-700">
-                      {isPlaceholder ? (
-                        <div className="w-full h-full bg-gray-700" />
-                      ) : post.fields.UserAvatar ? (
+                ) : (
+                  <Link href={`/posts/${post.id}`} className="block group">
+                    <div className="relative aspect-video rounded-lg overflow-hidden">
+                      {post.fields.ThumbnailURL ? (
                         <Image
-                          src={post.fields.UserAvatar}
-                          alt={post.fields.UserName || 'User'}
+                          src={post.fields.ThumbnailURL}
+                          alt={post.fields.VideoTitle || 'Video thumbnail'}
                           fill
-                          className="object-cover w-full h-full"
+                          className="object-cover absolute top-0 left-0 group-hover:scale-105 transition-transform duration-300"
+                          sizes="300px"
                         />
                       ) : (
-                        <DefaultAvatar />
+                        <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                          <span className="text-gray-400">No thumbnail</span>
+                        </div>
                       )}
                     </div>
-                    <div className="flex flex-col min-w-0">
-                      <div className="text-base text-gray-300 truncate">
-                        {isPlaceholder ? (
-                          <div className="h-4 w-20 bg-gray-700 rounded mb-1" />
+                    <div className="mt-2 flex flex-row items-start gap-2">
+                      <div className="relative w-8 h-8 rounded-full overflow-hidden flex-shrink-0 bg-gray-700">
+                        {post.fields.UserAvatar ? (
+                          <Image
+                            src={post.fields.UserAvatar}
+                            alt={post.fields.UserName || 'User'}
+                            fill
+                            className="object-cover w-full h-full"
+                          />
                         ) : (
-                          <>
-                            <span className="font-semibold text-base">{post.fields.UserName || 'Anonymous'}</span>
-                            <span className="ml-1 text-base">shared:</span>
-                          </>
+                          <DefaultAvatar />
                         )}
                       </div>
-                      <h3 className="mt-0.5 font-medium text-white text-base leading-snug font-sans line-clamp-2">
-                        {isPlaceholder ? (
-                          <div className="h-4 w-32 bg-gray-700 rounded" />
-                        ) : (
-                          post.fields.VideoTitle || 'Untitled Video'
-                        )}
-                      </h3>
+                      <div className="flex flex-col min-w-0">
+                        <div className="text-base text-gray-300 truncate">
+                          <span className="font-semibold text-base">{post.fields.UserName || 'Anonymous'}</span>
+                          <span className="ml-1 text-base">shared:</span>
+                        </div>
+                        <h3 className="mt-0.5 font-medium text-white text-base leading-snug font-sans line-clamp-2">
+                          {post.fields.VideoTitle || 'Untitled Video'}
+                        </h3>
+                      </div>
                     </div>
-                  </div>
-                </div>
+                  </Link>
+                )}
               </div>
             );
           })}
