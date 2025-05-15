@@ -18,9 +18,7 @@ export async function GET(request: NextRequest) {
           Task: "Create User Profile Component",
           Details: "Develop component to display and edit user profiles",
           Status: "Not Started",
-          Timeline: "1 day",
-          CreatedAt: new Date().toISOString(),
-          LastModified: new Date().toISOString()
+          Timeline: "1 day"
         }
       });
       
@@ -36,8 +34,7 @@ export async function GET(request: NextRequest) {
     
     // Update the task status to "In Progress"
     const updatedTask = await updateTask(targetTask.id!, {
-      Status: "In Progress",
-      LastModified: new Date().toISOString()
+      Status: "In Progress"
     });
     
     return NextResponse.json({

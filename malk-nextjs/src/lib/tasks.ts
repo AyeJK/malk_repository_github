@@ -8,8 +8,6 @@ export interface Task {
     Timeline?: string;
     Status?: 'Not Started' | 'In Progress' | 'Completed' | 'Blocked';
     Dependencies?: string[];
-    CreatedAt?: string;
-    LastModified?: string;
   };
 }
 
@@ -63,9 +61,7 @@ export async function createTask(taskData: Omit<Task, 'id'>): Promise<Task | nul
     const record = await base('Tasks').create([
       {
         fields: {
-          ...taskData.fields,
-          CreatedAt: new Date().toISOString(),
-          LastModified: new Date().toISOString()
+          ...taskData.fields
         }
       }
     ]);
@@ -85,8 +81,7 @@ export async function updateTask(taskId: string, taskData: Partial<Task['fields'
   try {
     // Update the task directly with the fields
     const record = await base('Tasks').update(taskId, {
-      ...taskData,
-      LastModified: new Date().toISOString()
+      ...taskData
     });
     
     // Return the updated task in our standard format
