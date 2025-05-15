@@ -94,6 +94,23 @@ interface CreatePostParams {
   importId?: string;
 }
 
+// Notification record interface
+export interface NotificationRecord {
+  id: string;
+  fields: {
+    'Notification ID'?: number;
+    'User (Recipient)': string[]; // Linked to Users table
+    'Type': 'New Like' | 'New Comment' | 'New Follow' | 'New Feature';
+    'Related User'?: string[]; // Linked to Users table
+    'Related Post'?: string[]; // Linked to Posts table
+    'Related Comment'?: string[]; // Linked to Comments table
+    'Is Read'?: boolean;
+    'Email Sent'?: boolean;
+    'Created At'?: string;
+    [key: string]: any;
+  };
+}
+
 // Function to list all tables in the base
 export async function listTables(): Promise<string[]> {
   try {
@@ -811,5 +828,51 @@ export async function getInviteCodeRecord(inviteCode: string) {
   } catch (error) {
     console.error('Error getting invite code record:', error);
     return null;
+  }
+}
+
+// Create a notification
+export async function createNotification(fields: Omit<NotificationRecord['fields'], 'Notification ID' | 'Created At'>): Promise<NotificationRecord | null> {
+  try {
+    const record = await base('Notifications').create([{ fields }]);
+    return {
+      id: record[0].id,
+      fields: record[0].fields as NotificationRecord['fields'],
+    };
+  } catch (error) {
+    console.error('Error creating notification:', error);
+    return null;
+  }
+}
+
+// Fetch notifications for a user (by User (Recipient) record ID)
+export async function getNotificationsForUser(userId: string, options: { onlyUnread?: boolean } = {}): Promise<NotificationRecord[]> {
+  try {
+    const filterByFormula = `AND({User (Recipient)} = '${userId}'${options.onlyUnread ? ", {Is Read} = FALSE()" : ''})`;
+    const records = await base('Notifications')
+      .select({
+        filterByFormula,
+        sort: [{ field: 'Created At', direction: 'desc' }],
+        maxRecords: 100,
+      })
+      .all();
+    return records.map(record => ({
+      id: record.id,
+      fields: record.fields as NotificationRecord['fields'],
+    }));
+  } catch (error) {
+    console.error('Error fetching notifications:', error);
+    return [];
+  }
+}
+
+// Mark a notification as read
+export async function markNotificationAsRead(notificationId: string): Promise<boolean> {
+  try {
+    await base('Notifications').update([{ id: notificationId, fields: { 'Is Read': true } }]);
+    return true;
+  } catch (error) {
+    console.error('Error marking notification as read:', error);
+    return false;
   }
 } 

@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Airtable from 'airtable';
+import { createNotification, getPost } from '@/lib/airtable';
 
 // Initialize Airtable
 const base = new Airtable({
@@ -129,6 +130,22 @@ export async function POST(request: NextRequest) {
       await postsTable.update(postId, {
         Comments: [...currentComments, createdComment.id]
       });
+    }
+    
+    // Notification logic: notify post owner if commenter is not the owner
+    const postDetails = await getPost(postId);
+    if (postDetails && postDetails.fields.FirebaseUID && postDetails.fields.FirebaseUID.length > 0) {
+      const postOwnerId = postDetails.fields.FirebaseUID[0];
+      if (postOwnerId !== userAirtableId) {
+        await createNotification({
+          'User (Recipient)': [postOwnerId],
+          'Type': 'New Comment',
+          'Related User': [userAirtableId],
+          'Related Post': [postId],
+          'Related Comment': [createdComment.id],
+          'Is Read': false
+        });
+      }
     }
     
     // Return the created comment
