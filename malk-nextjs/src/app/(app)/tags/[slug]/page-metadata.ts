@@ -1,9 +1,12 @@
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const url = `/api/get-tag?slug=${params.slug}`;
+  const host = headers().get('host');
+  const protocol = host?.includes('localhost') ? 'http' : 'https';
+  const url = `${protocol}://${host}/api/get-tag?slug=${params.slug}`;
   try {
     console.log('[Tag Metadata] Fetching:', url);
     const res = await fetch(url, { cache: 'no-store' });

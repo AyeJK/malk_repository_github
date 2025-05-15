@@ -1,9 +1,13 @@
-export const dynamic = 'force-dynamic';
+import { headers } from 'next/headers';
 import { getPostMetadata } from '@/lib/metadata';
 import type { Metadata } from 'next';
 
+export const dynamic = 'force-dynamic';
+
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const url = `/api/get-post?id=${params.id}`;
+  const host = headers().get('host');
+  const protocol = host?.includes('localhost') ? 'http' : 'https';
+  const url = `${protocol}://${host}/api/get-post?id=${params.id}`;
   console.log('[generateMetadata] Fetching post for metadata:', url);
   const res = await fetch(url, { cache: 'no-store' });
   console.log('[generateMetadata] Fetch status:', res.status);

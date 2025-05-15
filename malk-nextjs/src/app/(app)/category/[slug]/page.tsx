@@ -2,6 +2,7 @@ export const dynamic = 'force-dynamic';
 import nextDynamic from 'next/dynamic';
 import { getCategoryMetadata } from '@/lib/metadata';
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 
 const CategoryClient = nextDynamic(() => import('./CategoryClient'), { ssr: false });
 
@@ -29,7 +30,9 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const url = `/api/get-category?slug=${params.slug}`;
+  const host = headers().get('host');
+  const protocol = host?.includes('localhost') ? 'http' : 'https';
+  const url = `${protocol}://${host}/api/get-category?slug=${params.slug}`;
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) return { title: 'Category – Malk' };
   const data = await res.json();

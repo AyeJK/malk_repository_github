@@ -1,9 +1,12 @@
 export const dynamic = 'force-dynamic';
 import { getProfileMetadata } from '@/lib/metadata';
 import type { Metadata } from 'next';
+import { headers } from 'next/headers';
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const url = `/api/get-user?ids=${params.id}`;
+  const host = headers().get('host');
+  const protocol = host?.includes('localhost') ? 'http' : 'https';
+  const url = `${protocol}://${host}/api/get-user?ids=${params.id}`;
   console.log('[generateMetadata] Fetching user for metadata:', url);
   const res = await fetch(url, { cache: 'no-store' });
   console.log('[generateMetadata] Fetch status:', res.status);
