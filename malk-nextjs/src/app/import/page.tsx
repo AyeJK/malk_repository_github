@@ -13,7 +13,7 @@ export default function ImportPage() {
   const [progress, setProgress] = useState<{ processed: number; total: number; percentage: number } | null>(null);
   const [skippedPosts, setSkippedPosts] = useState<string[]>([]);
   const [importErrors, setImportErrors] = useState<string[]>([]);
-  const { user } = useAuth();
+  const { user, loading } = useAuth();
   const router = useRouter();
 
   const onDrop = useCallback((acceptedFiles: File[]) => {
@@ -74,6 +74,15 @@ export default function ImportPage() {
       setIsImporting(false);
     }
   };
+
+  if (loading) {
+    return (
+      <div className="container mx-auto px-4 py-8">
+        <h1 className="text-2xl font-bold mb-4">Import Posts</h1>
+        <p>Loading authentication status...</p>
+      </div>
+    );
+  }
 
   if (!user) {
     return (

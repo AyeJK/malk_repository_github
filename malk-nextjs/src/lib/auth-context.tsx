@@ -66,14 +66,17 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   useEffect(() => {
     const unsubscribe = onAuthStateChanged(auth, async (user) => {
+      console.log('[auth-context] onAuthStateChanged fired. User:', user);
       setUser(user);
       if (user) {
         const userRecord = await getUserByFirebaseUID(user.uid);
+        console.log('[auth-context] Airtable user record:', userRecord);
         setAirtableUser(transformUserRecord(userRecord));
       } else {
         setAirtableUser(null);
       }
       setLoading(false);
+      console.log('[auth-context] Loading set to false');
     });
 
     return () => unsubscribe();
