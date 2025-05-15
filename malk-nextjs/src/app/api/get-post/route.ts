@@ -18,7 +18,7 @@ export async function GET(request: Request) {
     // First try to fetch by record ID
     try {
       const record = await table.find(id);
-      return NextResponse.json(record);
+      return NextResponse.json({ post: { id: record.id, ...record.fields } });
     } catch (error) {
       console.error('Error fetching post:', error);
       return NextResponse.json({ error: 'Post not found' }, { status: 404 });

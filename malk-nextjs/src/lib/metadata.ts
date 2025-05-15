@@ -25,22 +25,21 @@ export function getProfileMetadata(user: any): Metadata {
 
 // Post Metadata (using correct Airtable field names)
 export function getPostMetadata(post: any): Metadata {
-  const title = post?.fields?.VideoTitle || 'Post on Malk';
-  const author = post?.fields?.DisplayName || 'Unknown';
-  const excerpt = post?.fields?.UserCaption || 'Check out this post on Malk!';
-  const image = post?.fields?.ThumbnailURL || '/images/default-profile.svg';
+  const title = post?.VideoTitle || 'Post on Malk';
+  const excerpt = post?.UserCaption || 'Check out this post on Malk!';
+  const image = post?.ThumbnailURL || '/images/default-profile.svg';
   return {
-    title: `${title} by ${author} – Malk - Social Video Discovery`,
+    title: `${title} - Malk - Social Video Discovery`,
     description: excerpt,
     openGraph: {
-      title: `${title} by ${author} – Malk - Social Video Discovery`,
+      title: `${title} - Malk - Social Video Discovery`,
       description: excerpt,
       images: [image],
       url: `https://malk.tv/posts/${post.id}`,
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${title} by ${author} – Malk - Social Video Discovery`,
+      title: `${title} - Malk - Social Video Discovery`,
       description: excerpt,
       images: [image],
     },

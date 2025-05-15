@@ -1,9 +1,10 @@
-// Metadata for this page is handled in 'page-metadata.ts' (server file)
-'use client';
+import { generateMetadata as _generateMetadata } from './page-metadata';
 
-import PostDetail from '@/components/PostDetail';
-import { getPost } from '@/lib/airtable';
-import { useEffect, useState } from 'react';
+export const generateMetadata = _generateMetadata;
+
+import dynamic from 'next/dynamic';
+
+const PostPageClient = dynamic(() => import('./PostPageClient'), { ssr: false });
 
 interface PostPageProps {
   params: {
@@ -12,56 +13,5 @@ interface PostPageProps {
 }
 
 export default function PostPage({ params }: PostPageProps) {
-  const [post, setPost] = useState<any>(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
-
-  useEffect(() => {
-    const fetchPost = async () => {
-      try {
-        const fetchedPost = await getPost(params.id);
-        if (!fetchedPost) {
-          setError('Post not found');
-        } else {
-          setPost(fetchedPost);
-        }
-      } catch (err) {
-        setError('Failed to load post');
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPost();
-  }, [params.id]);
-
-  if (loading) {
-    return (
-      <div className="w-full py-8 px-4">
-        <div className="flex items-center justify-center h-64">
-          <div className="text-white text-center">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-blue-500 mx-auto"></div>
-            <p className="mt-4">Loading post...</p>
-          </div>
-        </div>
-      </div>
-    );
-  }
-
-  if (error || !post) {
-    return (
-      <div className="w-full py-8 px-4">
-        <div className="text-center">
-          <h1 className="text-2xl font-bold text-red-500">Post not found</h1>
-          <p className="mt-4 text-gray-300">The post you're looking for doesn't exist or has been removed.</p>
-        </div>
-      </div>
-    );
-  }
-
-  return (
-    <div className="w-full">
-      <PostDetail post={post} hideFollowButton={false} />
-    </div>
-  );
+  return <PostPageClient params={params} />;
 } 
