@@ -5,7 +5,10 @@ import type { Metadata } from 'next';
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
   const base = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
-    : (process.env.NEXT_PUBLIC_BASE_URL || 'http://localhost:3000');
+    : process.env.NEXT_PUBLIC_BASE_URL;
+  if (!base) {
+    throw new Error('Base URL is not set. Please set VERCEL_URL or NEXT_PUBLIC_BASE_URL.');
+  }
   const url = `${base}/api/get-post?id=${params.id}`;
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) return { title: 'Post – Malk' };
