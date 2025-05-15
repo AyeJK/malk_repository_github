@@ -3,11 +3,7 @@ import { getProfileMetadata } from '@/lib/metadata';
 import type { Metadata } from 'next';
 
 export async function generateMetadata({ params }: { params: { id: string } }): Promise<Metadata> {
-  const base = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : process.env.NEXT_PUBLIC_BASE_URL;
-  console.log('[generateMetadata] Base URL used for metadata:', base);
-  const url = `${base}/api/get-user?ids=${params.id}`;
+  const url = `/api/get-user?ids=${params.id}`;
   console.log('[generateMetadata] Fetching user for metadata:', url);
   const res = await fetch(url, { cache: 'no-store' });
   console.log('[generateMetadata] Fetch status:', res.status);

@@ -29,13 +29,7 @@ export function generateStaticParams() {
 }
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const base = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : process.env.NEXT_PUBLIC_BASE_URL;
-  if (!base) {
-    throw new Error('Base URL is not set. Please set VERCEL_URL or NEXT_PUBLIC_BASE_URL.');
-  }
-  const url = `${base}/api/get-category?slug=${params.slug}`;
+  const url = `/api/get-category?slug=${params.slug}`;
   const res = await fetch(url, { cache: 'no-store' });
   if (!res.ok) return { title: 'Category – Malk' };
   const data = await res.json();

@@ -3,13 +3,7 @@ import type { Metadata } from 'next';
 export const dynamic = 'force-dynamic';
 
 export async function generateMetadata({ params }: { params: { slug: string } }): Promise<Metadata> {
-  const base = process.env.VERCEL_URL
-    ? `https://${process.env.VERCEL_URL}`
-    : process.env.NEXT_PUBLIC_BASE_URL;
-  if (!base) {
-    throw new Error('Base URL is not set. Please set VERCEL_URL or NEXT_PUBLIC_BASE_URL.');
-  }
-  const url = `${base}/api/get-tag?slug=${params.slug}`;
+  const url = `/api/get-tag?slug=${params.slug}`;
   try {
     console.log('[Tag Metadata] Fetching:', url);
     const res = await fetch(url, { cache: 'no-store' });
