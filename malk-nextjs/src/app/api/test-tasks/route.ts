@@ -18,7 +18,6 @@ export async function GET(request: NextRequest) {
           Task: "Create User Profile Component",
           Details: "Develop component to display and edit user profiles",
           Status: "Not Started",
-          Phase: "Phase 4: Frontend Development",
           Timeline: "1 day",
           Dependencies: ["Create Webflow custom code"],
           CreatedAt: new Date().toISOString(),

@@ -5,17 +5,11 @@ import { listTasks, getTask, createTask, updateTask, deleteTask } from '@/lib/ta
 export async function GET(request: NextRequest) {
   try {
     const searchParams = request.nextUrl.searchParams;
-    const phase = searchParams.get('phase');
     const status = searchParams.get('status');
     const assignee = searchParams.get('assignee');
     
     let tasks;
-    if (phase) {
-      tasks = await listTasks({
-        filterByFormula: `{Phase} = '${phase}'`,
-        sort: [{ field: 'Name', direction: 'asc' }]
-      });
-    } else if (status) {
+    if (status) {
       tasks = await listTasks({
         filterByFormula: `{Status} = '${status}'`,
         sort: [{ field: 'Priority', direction: 'desc' }, { field: 'Name', direction: 'asc' }]

@@ -4,7 +4,6 @@ export interface Task {
   id?: string;
   fields: {
     Task: string;
-    Phase?: string;
     Details?: string;
     Timeline?: string;
     Status?: 'Not Started' | 'In Progress' | 'Completed' | 'Blocked';
@@ -110,14 +109,6 @@ export async function deleteTask(taskId: string): Promise<boolean> {
     console.error('Error deleting task:', error);
     return false;
   }
-}
-
-// Function to get tasks by phase
-export async function getTasksByPhase(phase: string): Promise<Task[]> {
-  return listTasks({
-    filterByFormula: `{Phase} = '${phase}'`,
-    sort: [{ field: 'Task', direction: 'asc' }]
-  });
 }
 
 // Function to get tasks by status
