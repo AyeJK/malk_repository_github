@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Airtable from 'airtable';
+import { createNotification } from '@/lib/airtable';
 
 // Initialize Airtable
 const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(process.env.AIRTABLE_BASE_ID!);
@@ -95,6 +96,16 @@ export async function POST(request: NextRequest) {
     });
 
     console.log('Follow status updated successfully');
+
+    // Notification logic: only if this is a new follow
+    if (!isFollowing) {
+      await createNotification({
+        'User (Recipient)': [followingUser[0].id],
+        'Type': 'New Follow',
+        'Related User': [followerRecord[0].id],
+        'Is Read': false
+      });
+    }
 
     // Return the new follow status (opposite of what it was before)
     return NextResponse.json({ success: true, isFollowing: !isFollowing });

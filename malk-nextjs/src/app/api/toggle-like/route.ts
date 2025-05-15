@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Airtable from 'airtable';
-import { getUserByFirebaseUID } from '@/lib/airtable';
+import { getUserByFirebaseUID, getPost, createNotification } from '@/lib/airtable';
 
 // Initialize Airtable
 const base = new Airtable({
@@ -74,6 +74,25 @@ export async function POST(request: NextRequest) {
     });
     
     console.log('Post updated successfully');
+    
+    // Notification logic: only if this is a new like (not an unlike)
+    if (!hasLiked) {
+      // Fetch post details to get the owner
+      const postRecord = await getPost(postId);
+      if (postRecord && postRecord.fields.FirebaseUID && postRecord.fields.FirebaseUID.length > 0) {
+        const postOwnerId = postRecord.fields.FirebaseUID[0];
+        // Only notify if the liker is not the owner
+        if (postOwnerId !== userRecordId) {
+          await createNotification({
+            'User (Recipient)': [postOwnerId],
+            'Type': 'New Like',
+            'Related User': [userRecordId],
+            'Related Post': [postId],
+            'Is Read': false
+          });
+        }
+      }
+    }
     
     return NextResponse.json({
       success: true,
