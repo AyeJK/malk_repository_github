@@ -17,7 +17,7 @@ export async function GET(request: NextRequest) {
     const tagsTable = base('Tags');
     const records = await tagsTable.select({
       maxRecords: 100, // Fetch more records to ensure we get enough valid ones
-      fields: ['Name', 'Count']
+      fields: ['Name', 'Count', 'Slug']
     }).all();
 
     console.log(`Found ${records.length} total tag records`);
@@ -27,6 +27,7 @@ export async function GET(request: NextRequest) {
       .map(record => ({
         id: record.id,
         name: record.get('Name') as string,
+        slug: record.get('Slug') as string,
         count: record.get('Count') as number || 0 // Default to 0 if Count is not set
       }))
       .filter(tag => tag.name) // Only include tags that have a name

@@ -28,7 +28,8 @@ export async function GET(request: NextRequest) {
     // Map records to tag objects
     const tags = records.map(record => ({
       id: record.id,
-      name: record.fields.Name || 'Unnamed Tag'
+      name: record.fields.Name || 'Unnamed Tag',
+      slug: record.fields.Slug || ''
     }));
     
     return NextResponse.json({ tags });

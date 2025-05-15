@@ -35,6 +35,7 @@ interface PostCardProps {
 interface Tag {
   id: string;
   name: string;
+  slug: string;
 }
 
 interface Author {
@@ -441,7 +442,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
                 return tag ? (
                   <Link
                     key={tagId}
-                    href={`/tags/${tag.name.toLowerCase()}`}
+                    href={`/tags/${tag.slug}`}
                     className={`px-3 py-1.5 ${gradientClasses[index % 5]} text-sm rounded-lg transition-colors`}
                   >
                     #{tag.name || tagId.substring(0, 8)}

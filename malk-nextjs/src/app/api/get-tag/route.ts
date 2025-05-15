@@ -15,13 +15,13 @@ export async function GET(request: NextRequest) {
     }
     const tagsTable = base('Tags');
     const records = await tagsTable.select({
-      filterByFormula: `LOWER({Name}) = '${slug.toLowerCase()}'`
+      filterByFormula: `LOWER({Slug}) = '${slug.toLowerCase()}'`
     }).all();
     if (records.length === 0) {
       return NextResponse.json({ tag: null }, { status: 404 });
     }
     const tag = records[0].fields;
-    return NextResponse.json({ tag: { name: tag.Name, slug: tag.Name } });
+    return NextResponse.json({ tag: { name: tag.Name, slug: tag.Slug } });
   } catch (error) {
     console.error('Error fetching tag:', error);
     return NextResponse.json(

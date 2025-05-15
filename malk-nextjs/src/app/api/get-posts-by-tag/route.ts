@@ -22,11 +22,12 @@ export async function GET(request: NextRequest) {
     // First, find the tag record
     const tagsTable = base('Tags');
     const tagRecords = await tagsTable.select({
-      filterByFormula: `LOWER({Name}) = LOWER('${tagName}')`,
+      filterByFormula: `{Slug} = '${tagName}'`,
       maxRecords: 1
     }).firstPage();
 
     if (tagRecords.length === 0) {
+      console.log('No tag record found for slug:', tagName);
       return NextResponse.json(
         { error: 'Tag not found' },
         { status: 404 }
@@ -35,16 +36,30 @@ export async function GET(request: NextRequest) {
 
     const tagRecord = tagRecords[0];
     const tagId = tagRecord.id;
+    console.log('Found tag record:', { id: tagId, name: tagRecord.get('Name'), slug: tagRecord.get('Slug') });
 
-    // Then, find all posts that have this tag
+    // Get the array of post IDs from the tag's Posts field
+    const postIds = tagRecord.get('Posts') as string[] | undefined;
+    if (!postIds || postIds.length === 0) {
+      return NextResponse.json({
+        tag: {
+          name: tagRecord.get('Name'),
+          postCount: 0
+        },
+        posts: []
+      });
+    }
+
+    // Fetch posts by their record IDs
     const postsTable = base('Posts');
     let postRecords = await postsTable.select({
-      filterByFormula: `OR(
-        SEARCH('${tagId}', ARRAYJOIN({UserTags}, ',')),
-        SEARCH('${tagName.toLowerCase()}', LOWER(ARRAYJOIN({UserTags}, ',')))
-      )`,
+      filterByFormula: `OR(${postIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
       sort: [{ field: 'DateCreated', direction: 'desc' }]
     }).all();
+    console.log('Number of posts found:', postRecords.length);
+    if (postRecords.length > 0) {
+      console.log('UserTags of first post:', postRecords[0].fields.UserTags);
+    }
 
     // If userId is provided, filter posts to only those by that user
     if (userId) {

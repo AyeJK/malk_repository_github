@@ -373,7 +373,7 @@ export default function DiscoverPage() {
   const REQUEST_DEBOUNCE = 1000; // 1 second
 
   // Fetch top tags for tag row
-  const [topTags, setTopTags] = useState<{ id: string; name: string }[]>([]);
+  const [topTags, setTopTags] = useState<{ id: string; name: string; slug: string }[]>([]);
   useEffect(() => {
     fetch('/api/get-top-tags?limit=15')
       .then(res => res.json())
@@ -733,7 +733,7 @@ export default function DiscoverPage() {
               return (
                 <Link
                   key={tag.id}
-                  href={`/tags/${tag.name.toLowerCase()}`}
+                  href={`/tags/${tag.slug}`}
                   className={`px-4 py-2 rounded-md font-medium text-base whitespace-nowrap transition-colors ${bg} ${text} hover:brightness-125`}
                   style={{ fontFamily: 'inherit' }}
                 >

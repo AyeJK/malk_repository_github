@@ -49,6 +49,7 @@ interface FollowingUser {
 interface Tag {
   id: string;
   name: string;
+  slug: string;
   count: number;
 }
 
@@ -337,10 +338,10 @@ export default function Sidebar() {
                   {isLoadingTags ? (
                     <div className="text-white/50 text-sm px-2">Loading tags...</div>
                   ) : popularTags.length > 0 ? (
-                    popularTags.map(({ id, name }) => (
+                    popularTags.map(({ id, name, slug }) => (
                       <Link
                         key={id}
-                        href={`/tags/${name.toLowerCase()}`}
+                        href={`/tags/${slug}`}
                         className="flex items-center space-x-3 px-3 py-2 rounded-lg hover:bg-white/5 text-white/70 hover:text-white group"
                         title={!shouldShowLabels ? name : undefined}
                       >
