@@ -1,8 +1,9 @@
-import dynamic from 'next/dynamic';
+export const dynamic = 'force-dynamic';
+import nextDynamic from 'next/dynamic';
 import { getCategoryMetadata } from '@/lib/metadata';
 import type { Metadata } from 'next';
 
-const CategoryClient = dynamic(() => import('./CategoryClient'), { ssr: false });
+const CategoryClient = nextDynamic(() => import('./CategoryClient'), { ssr: false });
 
 export default function CategoryPage() {
   return <CategoryClient />;

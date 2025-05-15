@@ -1,3 +1,4 @@
+export const dynamic = 'force-dynamic';
 import { getProfileMetadata } from '@/lib/metadata';
 import type { Metadata } from 'next';
 
