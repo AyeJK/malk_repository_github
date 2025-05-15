@@ -6,14 +6,21 @@ export async function generateMetadata({ params }: { params: { id: string } }): 
   const base = process.env.VERCEL_URL
     ? `https://${process.env.VERCEL_URL}`
     : process.env.NEXT_PUBLIC_BASE_URL;
-  if (!base) {
-    throw new Error('Base URL is not set. Please set VERCEL_URL or NEXT_PUBLIC_BASE_URL.');
-  }
+  console.log('[generateMetadata] Base URL used for metadata:', base);
   const url = `${base}/api/get-user?ids=${params.id}`;
+  console.log('[generateMetadata] Fetching user for metadata:', url);
   const res = await fetch(url, { cache: 'no-store' });
-  if (!res.ok) return { title: 'Profile – Malk' };
+  console.log('[generateMetadata] Fetch status:', res.status);
+  if (!res.ok) {
+    console.log('[generateMetadata] Fetch failed, returning fallback title.');
+    return { title: 'Profile – Malk' };
+  }
   const data = await res.json();
+  console.log('[generateMetadata] User data:', data);
   const user = data.users?.[0];
-  if (!user) return { title: 'Profile – Malk' };
+  if (!user) {
+    console.log('[generateMetadata] No user found, returning fallback title.');
+    return { title: 'Profile – Malk' };
+  }
   return getProfileMetadata(user);
 } 
