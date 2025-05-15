@@ -7,6 +7,7 @@ import { Lobster, Raleway } from 'next/font/google';
 import React, { useEffect, useState } from 'react';
 import { useMotionValue, useTransform } from 'framer-motion';
 import { useRouter } from 'next/navigation';
+import { homeMetadata } from '@/lib/metadata';
 
 const lobster = Lobster({ 
   weight: '400',
@@ -368,4 +369,6 @@ export default function LandingPage() {
       `}</style>
     </>
   );
-} 
+}
+
+// Metadata for this page is handled in 'page-metadata.ts' (server file) 

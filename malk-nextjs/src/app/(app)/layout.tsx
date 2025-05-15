@@ -17,11 +17,6 @@ const lobster = Lobster({
   variable: '--font-lobster',
 });
 
-export const metadata: Metadata = {
-  title: 'Malk.tv - Share Your Videos',
-  description: 'A platform for sharing and discovering videos',
-};
-
 export default function AppLayout({ children }: { children: React.ReactNode }) {
   return (
         <Providers>

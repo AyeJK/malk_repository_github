@@ -1,3 +1,4 @@
+// Metadata for this page is handled in 'page-metadata.ts' (server file)
 'use client';
 
 import PostDetail from '@/components/PostDetail';
