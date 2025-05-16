@@ -33,6 +33,30 @@ export async function GET() {
       });
     }
 
+    // Create a follower user
+    const followerEmail = `follower-user-${Date.now()}@example.com`;
+    const followerUID = `follower-uid-${Date.now()}`;
+    const followerUser = await upsertUser({
+      email: followerEmail,
+      firebaseUID: followerUID,
+      displayName: `Follower User ${Date.now()}`,
+      role: 'User'
+    });
+    if (!followerUser) {
+      return NextResponse.json({
+        success: false,
+        message: 'Failed to create follower user',
+        error: 'The upsertUser function returned null for follower'
+      });
+    }
+
+    // Link the follower to the test user (so testUser has a follower)
+    // Add followerUser.id to testUser's FollowingThisUser field
+    const AirtableBase = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(process.env.AIRTABLE_BASE_ID!);
+    await AirtableBase('Users').update(testUser.id, {
+      FollowingThisUser: [followerUser.id]
+    });
+
     // Create a test post using the test user's ID
     const testPost = await createPost({
       firebaseUID: testUID,

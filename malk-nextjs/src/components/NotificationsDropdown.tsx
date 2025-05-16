@@ -168,6 +168,14 @@ export default function NotificationsDropdown({ open }: { open: boolean }) {
             } else {
               showWarning = true;
             }
+          } else if (n.fields.Type === 'New Post by Followed User') {
+            title = `New Post by ${related.user?.fields?.DisplayName || 'Someone'}`;
+            desc = related.post?.VideoTitle || '';
+            if (related.post) {
+              href = `/posts/${related.post.id}`;
+            } else {
+              showWarning = true;
+            }
           }
           const isRead = n.fields['Is Read'];
           return (
@@ -200,6 +208,8 @@ export default function NotificationsDropdown({ open }: { open: boolean }) {
                       return <><span className="font-semibold">{related.user?.fields?.DisplayName || 'Someone'}</span> commented on your post</>;
                     } else if (n.fields.Type === 'New Follow') {
                       return <><span className="font-semibold">{related.user?.fields?.DisplayName || 'Someone'}</span> followed you</>;
+                    } else if (n.fields.Type === 'New Post by Followed User') {
+                      return <><span className="font-normal">New post by </span><span className="font-semibold">{related.user?.fields?.DisplayName || 'Someone'}</span></>;
                     } else {
                       return <span className="font-semibold">{title}</span>;
                     }

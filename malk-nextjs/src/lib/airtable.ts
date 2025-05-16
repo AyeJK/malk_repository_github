@@ -505,6 +505,27 @@ export async function createPost(params: CreatePostParams) {
 
     try {
       const records = await base('Posts').create([{ fields }]);
+      // Notify all followers of the creator about the new post
+      const newPostId = records[0].id;
+      // Fetch the creator's user record (already have userAirtableId)
+      const userRecord = userRecords[0];
+      let followers: string[] = [];
+      if (Array.isArray(userRecord.fields.FollowingThisUser)) {
+        followers = userRecord.fields.FollowingThisUser.filter((id: any) => typeof id === 'string');
+      }
+      for (const followerId of followers) {
+        try {
+          await createNotification({
+            'User': [followerId],
+            'Type': 'New Post by Followed User',
+            'Related User': [userAirtableId],
+            'Related Post': [newPostId],
+            'Is Read': false
+          });
+        } catch (notifErr) {
+          console.error('Error creating notification for follower', followerId, notifErr);
+        }
+      }
       return records[0];
     } catch (createError: any) {
       console.error('Error creating post record:', {
