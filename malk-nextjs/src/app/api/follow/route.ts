@@ -100,7 +100,7 @@ export async function POST(request: NextRequest) {
     // Notification logic: only if this is a new follow
     if (!isFollowing) {
       await createNotification({
-        'User (Recipient)': [followingUser[0].id],
+        'User': [followingUser[0].id],
         'Type': 'New Follow',
         'Related User': [followerRecord[0].id],
         'Is Read': false

@@ -80,16 +80,31 @@ export async function POST(request: NextRequest) {
       // Fetch post details to get the owner
       const postRecord = await getPost(postId);
       if (postRecord && postRecord.fields.FirebaseUID && postRecord.fields.FirebaseUID.length > 0) {
-        const postOwnerId = postRecord.fields.FirebaseUID[0];
-        // Only notify if the liker is not the owner
-        if (postOwnerId !== userRecordId) {
+        const postOwnerAirtableId = postRecord.fields.FirebaseUID[0];
+        // Fetch the Airtable user record for the post owner by record ID
+        const postOwnerRecord = postOwnerAirtableId
+          ? await base('Users').find(postOwnerAirtableId)
+          : null;
+        console.log('Checking notification logic:', {
+          postOwnerRecordId: postOwnerRecord?.id,
+          userRecordId,
+          shouldNotify: postOwnerRecord && postOwnerRecord.id !== userRecordId
+        });
+        if (postOwnerRecord && postOwnerRecord.id !== userRecordId) {
+          console.log('About to create notification for like', {
+            user: postOwnerRecord.id,
+            type: 'New Like',
+            relatedUser: userRecordId,
+            relatedPost: postId
+          });
           await createNotification({
-            'User (Recipient)': [postOwnerId],
+            'User': [postOwnerRecord.id],
             'Type': 'New Like',
             'Related User': [userRecordId],
             'Related Post': [postId],
             'Is Read': false
           });
+          console.log('createNotification finished for like');
         }
       }
     }

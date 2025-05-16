@@ -8,6 +8,7 @@ import { Bars3Icon, BellIcon, PlusIcon } from '@heroicons/react/24/outline';
 import { useSidebar } from '@/lib/sidebar-context';
 import DefaultAvatar from './DefaultAvatar';
 import { Lobster } from 'next/font/google';
+import NotificationsDropdown from './NotificationsDropdown';
 
 const lobster = Lobster({ weight: '400', subsets: ['latin'] });
 
@@ -16,7 +17,10 @@ export default function Navbar() {
   const { toggleVisibility } = useSidebar();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
   const [isDropdownOpen, setIsDropdownOpen] = useState(false);
+  const [isNotificationsOpen, setIsNotificationsOpen] = useState(false);
   const dropdownRef = useRef<HTMLDivElement>(null);
+  const notificationsRef = useRef<HTMLDivElement>(null);
+  const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
 
   const handleSignOut = async () => {
     await signOut();
@@ -29,6 +33,17 @@ export default function Navbar() {
   const toggleDropdown = () => {
     setIsDropdownOpen(!isDropdownOpen);
   };
+
+  // Fetch unread notifications count
+  useEffect(() => {
+    if (!user) return;
+    fetch(`/api/notifications?firebaseUID=${user.uid}`)
+      .then(res => res.json())
+      .then(data => {
+        const unread = (data.notifications || []).some((n: any) => !n.fields['Is Read']);
+        setHasUnreadNotifications(unread);
+      });
+  }, [user, isNotificationsOpen]);
 
   // Close dropdown when clicking outside
   useEffect(() => {
@@ -43,6 +58,23 @@ export default function Navbar() {
       document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
+
+  // Close notifications dropdown when clicking outside
+  useEffect(() => {
+    function handleClickOutside(event: MouseEvent) {
+      if (notificationsRef.current && !notificationsRef.current.contains(event.target as Node)) {
+        setIsNotificationsOpen(false);
+      }
+    }
+    if (isNotificationsOpen) {
+      document.addEventListener('mousedown', handleClickOutside);
+    } else {
+      document.removeEventListener('mousedown', handleClickOutside);
+    }
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [isNotificationsOpen]);
 
   return (
     <>
@@ -71,12 +103,18 @@ export default function Navbar() {
                   <PlusIcon className="w-6 h-6 text-white" />
                   <span>Share Video</span>
                 </button>
-                <button
-                  className="ml-1 p-2 rounded-full hover:bg-white/10 transition-colors"
-                  aria-label="Notifications"
-                >
-                  <BellIcon className="w-6 h-6 text-white/80" />
-                </button>
+                <div className="relative">
+                  <button
+                    className={`ml-1 rounded-full transition-colors relative flex items-center justify-center ${hasUnreadNotifications ? 'w-9 h-9 bg-[#ff8178]' : 'p-2 hover:bg-white/10'}`}
+                    aria-label="Notifications"
+                    onClick={() => setIsNotificationsOpen((v) => !v)}
+                  >
+                    <BellIcon className={`w-6 h-6 ${hasUnreadNotifications ? 'text-white' : 'text-white/80'}`} />
+                  </button>
+                  <div ref={notificationsRef}>
+                    <NotificationsDropdown open={isNotificationsOpen} />
+                  </div>
+                </div>
                 <div className="relative ml-1" ref={dropdownRef}>
                   <button 
                     className="w-9 h-9 rounded-full overflow-hidden hover:opacity-80 transition-opacity flex items-center justify-center"

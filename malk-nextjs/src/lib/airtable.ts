@@ -99,7 +99,7 @@ export interface NotificationRecord {
   id: string;
   fields: {
     'Notification ID'?: number;
-    'User (Recipient)': string[]; // Linked to Users table
+    'User': string[]; // Linked to Users table
     'Type': 'New Like' | 'New Comment' | 'New Follow' | 'New Feature';
     'Related User'?: string[]; // Linked to Users table
     'Related Post'?: string[]; // Linked to Posts table
@@ -837,10 +837,32 @@ export async function getInviteCodeRecord(inviteCode: string) {
 
 // Create a notification
 export async function createNotification(fields: Omit<NotificationRecord['fields'], 'Notification ID' | 'Created At'>): Promise<NotificationRecord | null> {
+  console.log('createNotification called with fields:', fields);
   try {
     const record = await base('Notifications').create([{ fields }]);
+    const notificationId = record[0].id;
+    const recipientUserId = fields['User']?.[0];
+    if (recipientUserId) {
+      // Fetch the recipient user record
+      const userRecord = await base('Users').find(recipientUserId);
+      let currentNotifications: string[] = [];
+      if (Array.isArray(userRecord.fields.Notifications)) {
+        currentNotifications = userRecord.fields.Notifications.map(String);
+      }
+      // Avoid duplicates
+      if (!currentNotifications.includes(notificationId)) {
+        await base('Users').update([
+          {
+            id: recipientUserId,
+            fields: {
+              Notifications: [...currentNotifications, notificationId],
+            },
+          },
+        ]);
+      }
+    }
     return {
-      id: record[0].id,
+      id: notificationId,
       fields: record[0].fields as NotificationRecord['fields'],
     };
   } catch (error) {
@@ -849,10 +871,12 @@ export async function createNotification(fields: Omit<NotificationRecord['fields
   }
 }
 
-// Fetch notifications for a user (by User (Recipient) record ID)
+// Fetch notifications for a user (by User record ID)
 export async function getNotificationsForUser(userId: string, options: { onlyUnread?: boolean } = {}): Promise<NotificationRecord[]> {
   try {
-    const filterByFormula = `AND({User (Recipient)} = '${userId}'${options.onlyUnread ? ", {Is Read} = FALSE()" : ''})`;
+    // Use a simple equality filter for single linked record
+    const filterByFormula = `{User} = '${userId}'${options.onlyUnread ? " AND {Is Read} = FALSE()" : ''}`;
+    console.log('getNotificationsForUser filterByFormula:', filterByFormula);
     const records = await base('Notifications')
       .select({
         filterByFormula,
@@ -860,6 +884,7 @@ export async function getNotificationsForUser(userId: string, options: { onlyUnr
         maxRecords: 100,
       })
       .all();
+    console.log('getNotificationsForUser found records:', records.length);
     return records.map(record => ({
       id: record.id,
       fields: record.fields as NotificationRecord['fields'],

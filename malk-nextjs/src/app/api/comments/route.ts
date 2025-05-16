@@ -135,10 +135,14 @@ export async function POST(request: NextRequest) {
     // Notification logic: notify post owner if commenter is not the owner
     const postDetails = await getPost(postId);
     if (postDetails && postDetails.fields.FirebaseUID && postDetails.fields.FirebaseUID.length > 0) {
-      const postOwnerId = postDetails.fields.FirebaseUID[0];
-      if (postOwnerId !== userAirtableId) {
+      const postOwnerAirtableId = postDetails.fields.FirebaseUID[0];
+      // Fetch the Airtable user record for the post owner by record ID
+      const postOwnerRecord = postOwnerAirtableId
+        ? await usersTable.find(postOwnerAirtableId)
+        : null;
+      if (postOwnerRecord && postOwnerRecord.id !== userAirtableId) {
         await createNotification({
-          'User (Recipient)': [postOwnerId],
+          'User': [postOwnerRecord.id],
           'Type': 'New Comment',
           'Related User': [userAirtableId],
           'Related Post': [postId],
