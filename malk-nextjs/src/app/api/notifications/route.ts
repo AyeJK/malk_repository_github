@@ -23,14 +23,14 @@ export async function GET(req: NextRequest) {
       console.log('User not found for firebaseUID:', firebaseUID);
       return NextResponse.json({ error: 'User not found' }, { status: 404 });
     }
-    const notificationIds = user.fields.Notifications || [];
+    const notificationIds: string[] = user.fields.Notifications || [];
     console.log('User notification IDs:', notificationIds);
     if (notificationIds.length === 0) {
       return NextResponse.json({ notifications: [] });
     }
 
     // Fetch notifications by IDs
-    const filterByFormula = `OR(${notificationIds.map(id => `RECORD_ID() = '${id}'`).join(',')})` + (onlyUnread ? ` AND {Is Read} = FALSE()` : '');
+    const filterByFormula = `OR(${notificationIds.map((id: string) => `RECORD_ID() = '${id}'`).join(',')})` + (onlyUnread ? ` AND {Is Read} = FALSE()` : '');
     console.log('Notifications filterByFormula:', filterByFormula);
     const notifications = await base('Notifications').select({
       filterByFormula,
