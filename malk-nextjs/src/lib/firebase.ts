@@ -1,5 +1,5 @@
 import { initializeApp, getApps, getApp } from 'firebase/app';
-import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User, sendEmailVerification } from 'firebase/auth';
+import { getAuth, signInWithEmailAndPassword, createUserWithEmailAndPassword, signOut, onAuthStateChanged, User, sendEmailVerification, sendPasswordResetEmail } from 'firebase/auth';
 import { getAnalytics } from 'firebase/analytics';
 import { getStorage } from 'firebase/storage';
 
@@ -100,6 +100,16 @@ export function getCurrentUser(): Promise<User | null> {
       resolve(user);
     });
   });
+}
+
+// Send password reset email
+export async function sendResetPassword(email: string) {
+  try {
+    await sendPasswordResetEmail(auth, email);
+    return { success: true, error: null };
+  } catch (error: any) {
+    return { success: false, error: error.message };
+  }
 }
 
 export { auth, analytics, storage }; 
