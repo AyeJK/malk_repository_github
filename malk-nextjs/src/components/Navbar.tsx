@@ -21,6 +21,7 @@ export default function Navbar() {
   const dropdownRef = useRef<HTMLDivElement>(null);
   const notificationsRef = useRef<HTMLDivElement>(null);
   const [hasUnreadNotifications, setHasUnreadNotifications] = useState(false);
+  const [unreadCount, setUnreadCount] = useState(0);
 
   const handleSignOut = async () => {
     await signOut();
@@ -40,8 +41,9 @@ export default function Navbar() {
     fetch(`/api/notifications?firebaseUID=${user.uid}`)
       .then(res => res.json())
       .then(data => {
-        const unread = (data.notifications || []).some((n: any) => !n.fields['Is Read']);
-        setHasUnreadNotifications(unread);
+        const unread = (data.notifications || []).filter((n: any) => !n.fields['Is Read']);
+        setHasUnreadNotifications(unread.length > 0);
+        setUnreadCount(unread.length);
       });
   }, [user, isNotificationsOpen]);
 
@@ -105,11 +107,19 @@ export default function Navbar() {
                 </button>
                 <div className="relative">
                   <button
-                    className={`ml-1 rounded-full transition-colors relative flex items-center justify-center ${hasUnreadNotifications ? 'w-9 h-9 bg-[#ff8178]' : 'p-2 hover:bg-white/10'}`}
+                    className={`ml-1 w-9 h-9 p-0 rounded-full transition-colors relative flex items-center justify-center`}
                     aria-label="Notifications"
                     onClick={() => setIsNotificationsOpen((v) => !v)}
                   >
-                    <BellIcon className={`w-6 h-6 ${hasUnreadNotifications ? 'text-white' : 'text-white/80'}`} />
+                    <BellIcon className={`w-7 h-7 transition-colors ${hasUnreadNotifications ? 'text-[#ff8178]' : 'text-white/80'}`} />
+                    {unreadCount > 0 && (
+                      <span
+                        className="absolute -top-1 -right-1 w-5 h-5 bg-red-600 text-white text-xs font-bold rounded-full flex items-center justify-center border-2 border-[#101010] shadow"
+                        style={{ fontSize: '0.75rem', lineHeight: '1' }}
+                      >
+                        {unreadCount}
+                      </span>
+                    )}
                   </button>
                   <div ref={notificationsRef}>
                     <NotificationsDropdown open={isNotificationsOpen} />
