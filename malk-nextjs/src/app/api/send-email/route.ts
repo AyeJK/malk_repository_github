@@ -3,6 +3,8 @@ import { Resend } from 'resend';
 
 const resend = new Resend(process.env.RESEND_API_KEY);
 
+console.log('RESEND_API_KEY (masked):', process.env.RESEND_API_KEY ? `${process.env.RESEND_API_KEY.slice(0,3)}...${process.env.RESEND_API_KEY.slice(-3)}` : 'undefined');
+
 export async function POST(req: NextRequest) {
   try {
     const { to, subject, html } = await req.json();

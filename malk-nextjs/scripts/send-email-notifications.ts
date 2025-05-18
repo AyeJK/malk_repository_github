@@ -1,6 +1,6 @@
 import "dotenv/config";
 import { getNotificationsForUser, fetchRecords, getUserByFirebaseUID, getPost, base } from "../src/lib/airtable";
-import { sendNotificationEmail, sendBatchDigestEmail } from "../src/lib/utils";
+import { sendNotificationEmail, sendBatchDigestEmail } from "../src/lib/sendNotificationEmail";
 
 type AirtableRecord = { id: string; fields: Record<string, any> };
 
