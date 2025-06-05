@@ -1,6 +1,8 @@
 import { useState, useEffect } from 'react';
 import { useAuth } from '@/lib/auth-context';
 import { formatRelativeTime } from '@/lib/date-utils';
+import Link from 'next/link';
+import Image from 'next/image';
 
 interface Comment {
   id: string;
@@ -11,6 +13,7 @@ interface Comment {
   content: string;
   created_at: string;
   updated_at: string;
+  profile_image?: string;
 }
 
 interface CommentsProps {
@@ -103,20 +106,50 @@ export default function Comments({ postId, postAuthorId }: CommentsProps) {
       {/* Comment form */}
       {user && (
         <form onSubmit={handleSubmitComment} className="space-y-2">
-          <textarea
-            value={newComment}
-            onChange={(e) => setNewComment(e.target.value)}
-            placeholder="Write a comment..."
-            className="w-full p-2 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500"
-            rows={3}
-          />
-          <button
-            type="submit"
-            disabled={isLoading || !newComment.trim()}
-            className="px-4 py-2 text-sm font-medium text-white bg-blue-500 rounded-lg hover:bg-blue-600 focus:outline-none focus:ring-2 focus:ring-blue-500 disabled:opacity-50"
-          >
-            {isLoading ? 'Posting...' : 'Post Comment'}
-          </button>
+          <div className="flex items-start">
+            <div className="w-8 h-8 rounded-full bg-neutral-800 mr-2 flex-shrink-0 flex items-center justify-center overflow-hidden">
+              {airtableUser?.fields?.ProfileImage ? (
+                <Image
+                  src={Array.isArray(airtableUser.fields.ProfileImage) ? airtableUser.fields.ProfileImage[0] : airtableUser.fields.ProfileImage}
+                  alt={airtableUser.fields.DisplayName || 'Your avatar'}
+                  width={32}
+                  height={32}
+                  className="object-cover w-8 h-8 rounded-full"
+                />
+              ) : (
+                <span className="text-xs font-medium text-gray-200">
+                  {airtableUser?.fields?.DisplayName
+                    ? String(airtableUser.fields.DisplayName).charAt(0).toUpperCase()
+                    : 'Y'}
+                </span>
+              )}
+            </div>
+            <div className="flex-1">
+              <div className="relative">
+                <textarea
+                  value={newComment}
+                  onChange={(e) => setNewComment(e.target.value)}
+                  placeholder="Write a comment..."
+                  className="w-full p-2 pr-20 border rounded-lg focus:outline-none focus:ring-2 focus:ring-blue-500 bg-neutral-900 text-white border-neutral-700 placeholder-gray-400"
+                  rows={3}
+                  maxLength={445}
+                />
+                {newComment.trim().length > 0 && (
+                  <button
+                    type="submit"
+                    disabled={isLoading}
+                    className="absolute bottom-2 right-2 mb-2 px-4 py-1.5 text-sm font-medium text-white rounded-lg focus:outline-none focus:ring-2 focus:ring-[#ff8178] disabled:opacity-50 transition"
+                    style={{ backgroundColor: '#ff8178' }}
+                    onMouseOver={e => (e.currentTarget.style.backgroundColor = '#e76a5e')}
+                    onMouseOut={e => (e.currentTarget.style.backgroundColor = '#ff8178')}
+                  >
+                    {isLoading ? 'Posting...' : 'Post'}
+                  </button>
+                )}
+              </div>
+              <div className="text-xs text-gray-500 mt-1 text-right">{newComment.length} / 445</div>
+            </div>
+          </div>
         </form>
       )}
 
@@ -135,34 +168,44 @@ export default function Comments({ postId, postAuthorId }: CommentsProps) {
           comments.map((comment) => (
             <div
               key={comment.id}
-              className="p-4 bg-gray-50 rounded-lg"
+              className="pt-4 pb-2 rounded-lg"
             >
-              <div className="flex items-center justify-between">
+              <div className="flex items-start justify-between">
                 <div className="flex-1">
-                  <div className="flex items-center">
-                    <div className="w-8 h-8 rounded-full bg-gray-300 mr-2 flex-shrink-0 flex items-center justify-center">
-                      <span className="text-xs font-medium text-gray-600">
-                        {comment.commentor_display_name 
-                          ? (Array.isArray(comment.commentor_display_name) 
-                              ? comment.commentor_display_name[0] 
-                              : comment.commentor_display_name).charAt(0).toUpperCase() 
-                          : 'A'}
-                      </span>
+                  <div className="flex items-start">
+                    <div className="w-8 h-8 rounded-full bg-neutral-800 mr-2 flex-shrink-0 flex items-center justify-center overflow-hidden">
+                      {comment.profile_image ? (
+                        <Image
+                          src={comment.profile_image}
+                          alt={Array.isArray(comment.commentor_display_name) ? comment.commentor_display_name[0] : comment.commentor_display_name || 'User'}
+                          width={32}
+                          height={32}
+                          className="object-cover w-8 h-8 rounded-full"
+                        />
+                      ) : (
+                        <span className="text-xs font-medium text-gray-200">
+                          {comment.commentor_display_name 
+                            ? (Array.isArray(comment.commentor_display_name) 
+                                ? comment.commentor_display_name[0] 
+                                : comment.commentor_display_name).charAt(0).toUpperCase() 
+                            : 'A'}
+                        </span>
+                      )}
                     </div>
-                    <div className="flex-1">
-                      <p className="text-sm text-gray-900 flex items-center">
-                        <span className="font-medium">
+                    <div className="flex-1 flex flex-col">
+                      <span className="text-sm text-gray-100 flex items-center">
+                        <Link href={`/profile/${comment.commenter_id}`} className="font-medium text-[#ff8178] hover:underline">
                           {Array.isArray(comment.commentor_display_name) 
                             ? comment.commentor_display_name[0] 
                             : comment.commentor_display_name || 'Anonymous'}
-                        </span> <span className="text-gray-600 ml-1 mr-1">commented:</span> {comment.content}
-                      </p>
+                        </Link>
+                        <span className="text-gray-400 ml-1">commented:</span>
+                      </span>
+                      <span className="text-gray-200 text-base mt-0.5">{comment.content}</span>
+                      <span className="text-xs text-gray-500 mt-1">{formatRelativeTime(comment.created_at)}</span>
                     </div>
                   </div>
                 </div>
-                <span className="text-xs text-gray-500 ml-2 flex items-center">
-                  {formatRelativeTime(comment.created_at)}
-                </span>
               </div>
             </div>
           ))

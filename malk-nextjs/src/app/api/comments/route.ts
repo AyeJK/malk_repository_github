@@ -46,7 +46,26 @@ export async function GET(request: NextRequest) {
       sort: [{ field: 'created_at', direction: 'desc' }]
     }).all();
     
-    // Map records to comment objects
+    // Fetch all unique commenter_ids
+    const commenterIds = Array.from(
+      new Set(
+        commentRecords.map(record => {
+          const id = record.fields.commenter_id;
+          return Array.isArray(id) ? id[0] : id;
+        })
+      )
+    ).filter(Boolean);
+    
+    // Fetch user records for all commenters
+    const usersTable = base('Users');
+    const userRecords = await usersTable.select({
+      filterByFormula: `OR(${commenterIds.map(id => `RECORD_ID() = '${id}'`).join(',')})`,
+      fields: ['ProfileImage'],
+      maxRecords: commenterIds.length
+    }).all();
+    const userMap = Object.fromEntries(userRecords.map(user => [user.id, user.fields.ProfileImage ? (Array.isArray(user.fields.ProfileImage) ? user.fields.ProfileImage[0] : user.fields.ProfileImage) : null]));
+    
+    // Map records to comment objects, including profile_image
     const comments = commentRecords.map(record => ({
       id: record.id,
       post_id: Array.isArray(record.fields.post_id) ? record.fields.post_id[0] as string : '',
@@ -55,7 +74,8 @@ export async function GET(request: NextRequest) {
       commentor_display_name: record.fields.commentor_display_name as string,
       content: record.fields.content,
       created_at: record.fields.created_at,
-      updated_at: record.fields.updated_at
+      updated_at: record.fields.updated_at,
+      profile_image: userMap[(Array.isArray(record.fields.commenter_id) ? record.fields.commenter_id[0] : record.fields.commenter_id) as string] || null
     }));
     
     return NextResponse.json({ comments });
