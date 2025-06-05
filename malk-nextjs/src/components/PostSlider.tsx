@@ -238,35 +238,29 @@ export default function PostSlider({
           ) : null}
           <h2 className="text-xl font-semibold text-white">{title}</h2>
         </div>
-        <div className="flex items-center gap-2">
+        {onRenderActions}
+      </div>
+      <div className="relative mb-2">
+        {canScrollLeft && (
           <button
             onClick={() => scroll('left')}
-            className={`p-2 rounded-full transition-colors ${
-              canScrollLeft 
-                ? 'bg-white/5 hover:bg-white/10 text-white cursor-pointer' 
-                : 'bg-white/5 text-white/30 cursor-not-allowed'
-            }`}
+            className="absolute -left-6 top-[84px] -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center rounded-full bg-neutral-900/90 shadow-xl hover:bg-neutral-800 transition-colors text-white border border-black/30"
             aria-label="Scroll left"
-            disabled={!canScrollLeft}
+            style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.35)' }}
           >
-            <ChevronLeftIcon className="w-5 h-5" />
+            <ChevronLeftIcon className="w-6 h-6" />
           </button>
+        )}
+        {canScrollRight && (
           <button
             onClick={() => scroll('right')}
-            className={`p-2 rounded-full transition-colors ${
-              canScrollRight 
-                ? 'bg-white/5 hover:bg-white/10 text-white cursor-pointer' 
-                : 'bg-white/5 text-white/30 cursor-not-allowed'
-            }`}
+            className="absolute -right-6 top-[84px] -translate-y-1/2 z-20 w-12 h-12 flex items-center justify-center rounded-full bg-neutral-900/90 shadow-xl hover:bg-neutral-800 transition-colors text-white border border-black/30"
             aria-label="Scroll right"
-            disabled={!canScrollRight}
+            style={{ boxShadow: '0 4px 16px rgba(0,0,0,0.35)' }}
           >
-            <ChevronRightIcon className="w-5 h-5" />
+            <ChevronRightIcon className="w-6 h-6" />
           </button>
-          {onRenderActions}
-        </div>
-      </div>
-      <div className="relative">
+        )}
         {/* Overlay message on top of empty thumbnails */}
         {showEmptyState && emptyMessage && (
           <div className="absolute inset-0 z-10 flex flex-col items-center justify-center bg-black/80 rounded-lg">

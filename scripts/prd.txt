@@ -1,4 +1,3 @@
-
 # Malk.tv Beta Phase – Product Requirements Document
 
 ## 1. Introduction

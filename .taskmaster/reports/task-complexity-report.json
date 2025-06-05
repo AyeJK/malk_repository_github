@@ -1,0 +1,134 @@
+{
+  "taskComplexityData": [
+    {
+      "id": 1,
+      "title": "Project Setup and Infrastructure",
+      "complexity": 6,
+      "explanation": "Moderate complexity due to the need to set up multiple technologies (Next.js, TypeScript, TailwindCSS, Vercel, GitHub Actions). Requires careful configuration of build processes and deployment pipelines.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 5
+    },
+    {
+      "id": 2,
+      "title": "Authentication System",
+      "complexity": 8,
+      "explanation": "High complexity due to multiple auth providers (email, Google, Apple), secure token rotation requirements, and integration with Firebase Auth and Firebase Rules for row-level security.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 7
+    },
+    {
+      "id": 3,
+      "title": "User Profiles",
+      "complexity": 7,
+      "explanation": "Significant complexity due to profile customization options (avatar, banner, bio, unique handles), image upload requirements, and public vs. private profile views.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 6
+    },
+    {
+      "id": 4,
+      "title": "Video Posting System",
+      "complexity": 9,
+      "explanation": "Very high complexity due to integration with multiple external platforms (YouTube, Vimeo, Twitch), metadata fetching, and edit/delete functionality. Core to the application's purpose.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 8
+    },
+    {
+      "id": 5,
+      "title": "Feed Implementation",
+      "complexity": 8,
+      "explanation": "High complexity due to multiple feed types, potential performance challenges with large content volumes, and pagination requirements.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 7
+    },
+    {
+      "id": 6,
+      "title": "Social Interactions",
+      "complexity": 7,
+      "explanation": "Moderately high complexity due to real-time interaction requirements, @mention functionality in comments, and follow/unfollow relationship management.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 6
+    },
+    {
+      "id": 7,
+      "title": "Stations Feature",
+      "complexity": 8,
+      "explanation": "High complexity due to autoplay functionality, cross-platform video player integration, and mobile/desktop controls. May involve complex state management.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 7
+    },
+    {
+      "id": 8,
+      "title": "User Discovery System",
+      "complexity": 8,
+      "explanation": "High complexity due to algorithmic user suggestion requirements, onboarding integration, and discover carousel implementation.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 7
+    },
+    {
+      "id": 9,
+      "title": "Squads (Private Groups)",
+      "complexity": 9,
+      "explanation": "Very high complexity due to private content management, invitation system with expiring links, permissions system, and group-specific feeds.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 8
+    },
+    {
+      "id": 10,
+      "title": "Cross-Platform Sharing",
+      "complexity": 5,
+      "explanation": "Moderate complexity due to integration with multiple external platforms and OG metadata requirements for previews.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 4
+    },
+    {
+      "id": 11,
+      "title": "In-Platform Search",
+      "complexity": 6,
+      "explanation": "Moderate complexity due to integration with external platform search APIs and autocomplete implementation.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 5
+    },
+    {
+      "id": 12,
+      "title": "Notifications System V2",
+      "complexity": 8,
+      "explanation": "High complexity due to in-app notifications, email digest batching, and granular user preferences.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 7
+    },
+    {
+      "id": 13,
+      "title": "Badge System",
+      "complexity": 5,
+      "explanation": "Moderate complexity due to milestone verification logic and badge display requirements.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 4
+    },
+    {
+      "id": 14,
+      "title": "Moderation Tools",
+      "complexity": 6,
+      "explanation": "Moderate complexity due to admin interface requirements, content reporting, and soft-delete functionality.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 5
+    },
+    {
+      "id": 15,
+      "title": "Performance Optimization and Testing",
+      "complexity": 9,
+      "explanation": "Very high complexity due to stringent performance requirements, comprehensive testing needs, and the broad scope across the entire application.",
+      "recommendExpansion": true,
+      "suggestedSubtasks": 8
+    }
+  ],
+  "dateGenerated": "2024-05-30",
+  "reportSummary": {
+    "totalTasks": 15,
+    "averageComplexity": 7.27,
+    "highComplexityTasks": 9,
+    "mediumComplexityTasks": 6,
+    "lowComplexityTasks": 0,
+    "threshold": 5,
+    "tasksNeedingExpansion": 15
+  }
+} 
