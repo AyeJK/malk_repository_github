@@ -119,8 +119,8 @@ export async function POST(request: NextRequest) {
                   }
                 },
                 {
-                  email: postOwnerRecord.fields.Email,
-                  DisplayName: postOwnerRecord.fields.DisplayName
+                  email: Array.isArray(postOwnerRecord.fields.Email) ? postOwnerRecord.fields.Email[0] : String(postOwnerRecord.fields.Email),
+                  DisplayName: Array.isArray(postOwnerRecord.fields.DisplayName) ? postOwnerRecord.fields.DisplayName[0] : String(postOwnerRecord.fields.DisplayName)
                 }
               );
               // Mark notification as emailed
