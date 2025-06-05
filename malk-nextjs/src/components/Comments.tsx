@@ -102,7 +102,7 @@ export default function Comments({ postId, postAuthorId }: CommentsProps) {
   };
 
   return (
-    <div className="mt-4 space-y-4">
+    <div className="mt-1 space-y-1">
       {/* Comment form */}
       {user && (
         <form onSubmit={handleSubmitComment} className="space-y-2">
@@ -168,7 +168,7 @@ export default function Comments({ postId, postAuthorId }: CommentsProps) {
           comments.map((comment) => (
             <div
               key={comment.id}
-              className="pt-4 pb-2 rounded-lg"
+              className="py-2 rounded-lg"
             >
               <div className="flex items-start justify-between">
                 <div className="flex-1">
