@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Airtable from 'airtable';
 import { createNotification, getPost } from '@/lib/airtable';
+import { sendNotificationEmail } from '@/lib/sendNotificationEmail';
 
 // Initialize Airtable
 const base = new Airtable({
@@ -141,7 +142,7 @@ export async function POST(request: NextRequest) {
         ? await usersTable.find(postOwnerAirtableId)
         : null;
       if (postOwnerRecord && postOwnerRecord.id !== userAirtableId) {
-        await createNotification({
+        const notification = await createNotification({
           'User': [postOwnerRecord.id],
           'Type': 'New Comment',
           'Related User': [userAirtableId],
@@ -149,6 +150,35 @@ export async function POST(request: NextRequest) {
           'Related Comment': [createdComment.id],
           'Is Read': false
         });
+        // Send email notification and mark as sent
+        if (notification && postOwnerRecord.fields.Email && postOwnerRecord.fields.DisplayName) {
+          try {
+            await sendNotificationEmail(
+              {
+                type: 'New Comment',
+                data: {
+                  commenterName: userRecord.fields.DisplayName,
+                  commentText: content,
+                  postTitle: postDetails.fields.VideoTitle,
+                  postUrl: `/posts/${postId}`
+                }
+              },
+              {
+                email: Array.isArray(postOwnerRecord.fields.Email) ? postOwnerRecord.fields.Email[0] : String(postOwnerRecord.fields.Email),
+                DisplayName: Array.isArray(postOwnerRecord.fields.DisplayName) ? postOwnerRecord.fields.DisplayName[0] : String(postOwnerRecord.fields.DisplayName)
+              }
+            );
+            // Mark notification as emailed
+            await base('Notifications').update([
+              {
+                id: notification.id,
+                fields: { 'Email Sent': true }
+              }
+            ]);
+          } catch (err) {
+            console.error('Failed to send notification email:', err);
+          }
+        }
       }
     }
     

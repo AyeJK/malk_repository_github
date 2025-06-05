@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Airtable from 'airtable';
 import { getUserByFirebaseUID, getPost, createNotification } from '@/lib/airtable';
+import { sendNotificationEmail } from '@/lib/sendNotificationEmail';
 
 // Initialize Airtable
 const base = new Airtable({
@@ -97,7 +98,7 @@ export async function POST(request: NextRequest) {
             relatedUser: userRecordId,
             relatedPost: postId
           });
-          await createNotification({
+          const notification = await createNotification({
             'User': [postOwnerRecord.id],
             'Type': 'New Like',
             'Related User': [userRecordId],
@@ -105,6 +106,34 @@ export async function POST(request: NextRequest) {
             'Is Read': false
           });
           console.log('createNotification finished for like');
+          // Send email notification and mark as sent
+          if (notification && postOwnerRecord.fields.Email && postOwnerRecord.fields.DisplayName) {
+            try {
+              await sendNotificationEmail(
+                {
+                  type: 'New Like',
+                  data: {
+                    likerName: userRecord.fields.DisplayName,
+                    postTitle: postRecord.fields.VideoTitle,
+                    postUrl: `/posts/${postId}`
+                  }
+                },
+                {
+                  email: postOwnerRecord.fields.Email,
+                  DisplayName: postOwnerRecord.fields.DisplayName
+                }
+              );
+              // Mark notification as emailed
+              await base('Notifications').update([
+                {
+                  id: notification.id,
+                  fields: { 'Email Sent': true }
+                }
+              ]);
+            } catch (err) {
+              console.error('Failed to send notification email:', err);
+            }
+          }
         }
       }
     }

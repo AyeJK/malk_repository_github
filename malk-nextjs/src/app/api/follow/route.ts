@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import Airtable from 'airtable';
 import { createNotification } from '@/lib/airtable';
+import { sendNotificationEmail } from '@/lib/sendNotificationEmail';
 
 // Initialize Airtable
 const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT }).base(process.env.AIRTABLE_BASE_ID!);
@@ -99,12 +100,42 @@ export async function POST(request: NextRequest) {
 
     // Notification logic: only if this is a new follow
     if (!isFollowing) {
-      await createNotification({
+      const notification = await createNotification({
         'User': [followingUser[0].id],
         'Type': 'New Follow',
         'Related User': [followerRecord[0].id],
         'Is Read': false
       });
+      // Send email notification and mark as sent
+      if (notification && followingUser[0].fields.Email && followingUser[0].fields.DisplayName) {
+        // Ensure Email and DisplayName are strings
+        const email = Array.isArray(followingUser[0].fields.Email) ? followingUser[0].fields.Email[0] : String(followingUser[0].fields.Email);
+        const displayName = Array.isArray(followingUser[0].fields.DisplayName) ? followingUser[0].fields.DisplayName[0] : String(followingUser[0].fields.DisplayName);
+        try {
+          await sendNotificationEmail(
+            {
+              type: 'New Follow',
+              data: {
+                followerName: followerRecord[0].fields.DisplayName,
+                followerProfileUrl: `/profile/${followerId}`
+              }
+            },
+            {
+              email,
+              DisplayName: displayName
+            }
+          );
+          // Mark notification as emailed
+          await base('Notifications').update([
+            {
+              id: notification.id,
+              fields: { 'Email Sent': true }
+            }
+          ]);
+        } catch (err) {
+          console.error('Failed to send notification email:', err);
+        }
+      }
     }
 
     // Return the new follow status (opposite of what it was before)
