@@ -386,7 +386,7 @@ export default function ProfileClient() {
             {layout === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-3">
                 {sortedPosts.map((post: any) => (
-                  <div key={post.id} className="bg-black rounded-xl p-1 shadow w-full h-full flex flex-col">
+                  <div key={post.id} className="rounded-xl p-1 shadow w-full h-full flex flex-col">
                     <Link href={`/posts/${post.id}`} className="block overflow-hidden group h-full">
                       <div className="relative aspect-video rounded-lg overflow-hidden w-full">
                         {post.fields.ThumbnailURL ? (
@@ -437,7 +437,7 @@ export default function ProfileClient() {
             {layout === 'grid' ? (
           <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-3">
                 {sortedLikes.map((post: any) => (
-              <div key={post.id} className="bg-black rounded-xl p-1 shadow w-full h-full flex flex-col">
+              <div key={post.id} className="rounded-xl p-1 shadow w-full h-full flex flex-col">
                 <Link href={`/posts/${post.id}`} className="block overflow-hidden group h-full">
                   <div className="relative aspect-video rounded-lg overflow-hidden w-full">
                     {post.fields.ThumbnailURL ? (
