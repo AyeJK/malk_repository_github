@@ -538,6 +538,7 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
         videoTitle={videoTitle}
         authorName={authorName}
         authorAvatarUrl={authorProfileImage || undefined}
+        caption={post.fields.UserCaption}
       />
     </div>
   );
