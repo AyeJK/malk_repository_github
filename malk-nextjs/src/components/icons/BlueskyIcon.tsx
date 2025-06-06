@@ -12,7 +12,7 @@ interface BlueskyIconProps extends React.ImgHTMLAttributes<HTMLImageElement> {
 export default function BlueskyIcon({ className = '', alt = 'Bluesky', width = 32, height = 32, ...props }: BlueskyIconProps) {
   return (
     <Image
-      src={bluesky}
+      src={require('./bluesky.png')}
       alt={alt}
       width={width}
       height={height}
