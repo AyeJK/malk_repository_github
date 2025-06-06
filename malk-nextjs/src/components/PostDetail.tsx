@@ -9,6 +9,7 @@ import Image from 'next/image';
 import DefaultAvatar from './DefaultAvatar';
 import { HeartIcon, ChatBubbleLeftIcon, ShareIcon, CheckIcon } from '@heroicons/react/24/outline';
 import { getVideoTitle } from '@/lib/video-utils';
+import SharePostModal from './SharePostModal';
 
 interface Post {
   id: string;
@@ -26,6 +27,7 @@ interface Post {
     UserAvatar?: string;
     UserName?: string;
     DisplayDate?: string;
+    ThumbnailURL?: string;
   };
 }
 
@@ -69,8 +71,11 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(true);
   const [videoTitle, setVideoTitle] = useState<string>(post.fields.VideoTitle || 'Untitled Video');
+  const [isShareOpen, setIsShareOpen] = useState(false);
   
   const isOwnPost = user?.uid === authorFirebaseUID;
+  
+  const postUrl = typeof window !== 'undefined' ? `${window.location.origin}/posts/${post.id}` : '';
   
   // Fetch author's Firebase UID and check follow status
   useEffect(() => {
@@ -507,7 +512,13 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
               <span>{post.fields.CommentCount || 0}</span>
             </button>
           </div>
-          {/* Optionally add share or delete button here if needed, matching feed style */}
+          <button
+            className="share-button ml-auto"
+            onClick={() => setIsShareOpen(true)}
+            aria-label="Share"
+          >
+            <ShareIcon className="w-5 h-5" />
+          </button>
         </div>
 
         {/* Comments Section */}
@@ -518,6 +529,16 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
           />
         </div>
       </div>
+      <SharePostModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        postUrl={postUrl}
+        postTitle={videoTitle}
+        thumbnailUrl={post.fields.ThumbnailURL}
+        videoTitle={videoTitle}
+        authorName={authorName}
+        authorAvatarUrl={authorProfileImage || undefined}
+      />
     </div>
   );
 } 

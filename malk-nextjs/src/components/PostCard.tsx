@@ -9,7 +9,8 @@ import Image from 'next/image';
 import DefaultAvatar from './DefaultAvatar';
 import { formatRelativeTime } from '@/lib/date-utils';
 import { getVideoTitle } from '@/lib/video-utils';
-import { CheckIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, ShareIcon } from '@heroicons/react/24/outline';
+import SharePostModal from './SharePostModal';
 
 interface PostCardProps {
   post: {
@@ -26,6 +27,7 @@ interface PostCardProps {
       LikeCount?: number;
       CommentCount?: number;
       DisplayDate?: string;
+      ThumbnailURL?: string;
     };
   };
   onDelete?: (postId: string) => void;
@@ -67,8 +69,11 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
   const [isFollowing, setIsFollowing] = useState(false);
   const [isFollowLoading, setIsFollowLoading] = useState(true);
   const [videoTitle, setVideoTitle] = useState<string>(post.fields.VideoTitle || 'Untitled Video');
+  const [isShareOpen, setIsShareOpen] = useState(false);
   
   const isOwnPost = user?.uid === authorFirebaseUID;
+  
+  const postUrl = typeof window !== 'undefined' ? `${window.location.origin}/posts/${post.id}` : '';
   
   // Fetch author's Firebase UID and check follow status
   useEffect(() => {
@@ -514,10 +519,17 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
               <span>{post.fields.CommentCount || 0}</span>
             </button>
           </div>
+          <button
+            className="share-button ml-auto"
+            onClick={() => setIsShareOpen(true)}
+            aria-label="Share"
+          >
+            <ShareIcon className="w-5 h-5" />
+          </button>
           {isOwnPost && onDelete && (
             <button
               onClick={handleDelete}
-              className="text-red-500 hover:text-red-400"
+              className="text-red-500 hover:text-red-400 ml-2"
             >
               Delete
             </button>
@@ -534,6 +546,17 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
           </div>
         )}
       </div>
+      <SharePostModal
+        isOpen={isShareOpen}
+        onClose={() => setIsShareOpen(false)}
+        postUrl={postUrl}
+        postTitle={videoTitle}
+        thumbnailUrl={post.fields.ThumbnailURL}
+        videoTitle={videoTitle}
+        authorName={authorName}
+        authorAvatarUrl={authorProfileImage || undefined}
+        caption={post.fields.UserCaption}
+      />
     </div>
   );
 } 
