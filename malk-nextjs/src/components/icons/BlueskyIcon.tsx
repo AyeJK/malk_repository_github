@@ -1,5 +1,6 @@
 import Image from 'next/image';
 import React from 'react';
+import bluesky from './bluesky.png';
 
 interface BlueskyIconProps extends React.ImgHTMLAttributes<HTMLImageElement> {
   className?: string;
@@ -11,7 +12,7 @@ interface BlueskyIconProps extends React.ImgHTMLAttributes<HTMLImageElement> {
 export default function BlueskyIcon({ className = '', alt = 'Bluesky', width = 32, height = 32, ...props }: BlueskyIconProps) {
   return (
     <Image
-      src={require('./bluesky.png')}
+      src={bluesky}
       alt={alt}
       width={width}
       height={height}
