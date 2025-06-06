@@ -9,8 +9,10 @@ import Image from 'next/image';
 import DefaultAvatar from './DefaultAvatar';
 import { formatRelativeTime } from '@/lib/date-utils';
 import { getVideoTitle } from '@/lib/video-utils';
-import { CheckIcon, ShareIcon } from '@heroicons/react/24/outline';
+import { CheckIcon, ShareIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import SharePostModal from './SharePostModal';
+import EditPostModal from './EditPostModal';
+import DeletePostModal from './DeletePostModal';
 
 interface PostCardProps {
   post: {
@@ -70,6 +72,11 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
   const [isFollowLoading, setIsFollowLoading] = useState(true);
   const [videoTitle, setVideoTitle] = useState<string>(post.fields.VideoTitle || 'Untitled Video');
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   
   const isOwnPost = user?.uid === authorFirebaseUID;
   
@@ -331,9 +338,43 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
     return id.substring(0, 8) + '...';
   };
 
-  const handleDelete = async () => {
-    if (!onDelete) return;
-    onDelete(post.id);
+  // Edit handler
+  const handleEdit = async (updatedFields: { UserCaption: string; UserTags?: string[]; Categories?: string[] }) => {
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/posts/${post.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(updatedFields),
+      });
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed to update post');
+      setShowEditModal(false);
+      // Optionally, refresh or update local state
+      window.location.reload();
+    } catch (err: any) {
+      setActionError(err.message || 'Failed to update post');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Delete handler
+  const handleDeleteConfirm = async () => {
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/posts/${post.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed to delete post');
+      setShowDeleteModal(false);
+      if (onDelete) onDelete(post.id);
+      else window.location.reload();
+    } catch (err: any) {
+      setActionError(err.message || 'Failed to delete post');
+    } finally {
+      setActionLoading(false);
+    }
   };
 
   // Fetch video title if not available
@@ -398,8 +439,7 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
               </h3>
             </div>
           </div>
-           
-          {/* Follow button - simplified to just UI without functionality */}
+          {/* Show follow button for non-owned posts */}
           {!hideFollowButton && !isOwnPost && (
             <button
               onClick={handleToggleFollow}
@@ -421,6 +461,34 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
                 'Follow'
               )}
             </button>
+          )}
+          {/* Actions menu for post owner */}
+          {isOwnPost && (
+            <div className="relative ml-2">
+              <button
+                className="pl-2 rounded-full focus:outline-none"
+                onClick={() => setShowActions((v) => !v)}
+                aria-label="Post actions"
+              >
+                <EllipsisVerticalIcon className="w-6 h-6 text-gray-400 hover:text-[#fa7268] transition-colors" />
+              </button>
+              {showActions && (
+                <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-[#181c20] ring-1 ring-black ring-opacity-5 z-50">
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/5"
+                    onClick={() => { setShowEditModal(true); setShowActions(false); }}
+                  >
+                    Edit
+                  </button>
+                  <button
+                    className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5"
+                    onClick={() => { setShowDeleteModal(true); setShowActions(false); }}
+                  >
+                    Delete
+                  </button>
+                </div>
+              )}
+            </div>
           )}
         </div>
 
@@ -526,14 +594,6 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
           >
             <ShareIcon className="w-5 h-5" />
           </button>
-          {isOwnPost && onDelete && (
-            <button
-              onClick={handleDelete}
-              className="text-red-500 hover:text-red-400 ml-2"
-            >
-              Delete
-            </button>
-          )}
         </div>
 
         {/* Comments section */}
@@ -557,6 +617,22 @@ export default function PostCard({ post, onDelete, hideFollowButton = false }: P
         authorAvatarUrl={authorProfileImage || undefined}
         caption={post.fields.UserCaption}
       />
+      {/* Modals */}
+      <EditPostModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        post={post}
+        onSave={handleEdit}
+        authorName={authorName}
+        authorAvatarUrl={authorProfileImage || undefined}
+      />
+      <DeletePostModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+        post={post}
+      />
+      {actionError && <div className="text-red-400 mt-2">{actionError}</div>}
     </div>
   );
 } 

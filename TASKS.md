@@ -87,7 +87,7 @@ This document provides a human-readable overview of all current tasks and subtas
        7. Post Sharing to Squads [ ] — Implement functionality to share posts specifically to Squads.
        8. Squad Testing and Optimization [ ] — Test and optimize the Squad feature for performance, security, and usability.
 
-10. **Cross-Platform Sharing** [ ]
+10. **Cross-Platform Sharing** [x]
    - Implement sharing functionality to external platforms with proper metadata.
    - _Priority: Low_
    - _Dependencies: 4_
