@@ -40,4 +40,47 @@ export async function GET(request: NextRequest) {
       { status: 500 }
     );
   }
+}
+
+export async function POST(request: NextRequest) {
+  try {
+    const { name } = await request.json();
+    if (!name || typeof name !== 'string') {
+      return NextResponse.json({ error: 'Tag name is required' }, { status: 400 });
+    }
+
+    // Check if tag already exists (case-insensitive)
+    const tagsTable = base('Tags');
+    const existing = await tagsTable.select({
+      filterByFormula: `LOWER({Name}) = '${name.toLowerCase()}'`,
+      maxRecords: 1
+    }).all();
+
+    if (existing.length > 0) {
+      const tag = existing[0];
+      return NextResponse.json({
+        tag: {
+          id: tag.id,
+          name: tag.fields.Name || name,
+          slug: tag.fields.Slug || ''
+        }
+      });
+    }
+
+    // Create new tag (do NOT set Slug, it's computed)
+    const created = await tagsTable.create([
+      { fields: { Name: name } }
+    ]);
+    const tag = created[0];
+    return NextResponse.json({
+      tag: {
+        id: tag.id,
+        name: tag.fields.Name || name,
+        slug: tag.fields.Slug || ''
+      }
+    });
+  } catch (error) {
+    console.error('Error creating tag:', error);
+    return NextResponse.json({ error: 'Failed to create tag' }, { status: 500 });
+  }
 } 

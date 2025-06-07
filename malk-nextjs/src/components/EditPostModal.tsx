@@ -22,6 +22,27 @@ interface EditPostModalProps {
   authorAvatarUrl?: string;
 }
 
+// Helper to create a new tag in Airtable and return its record ID
+async function createTag(name: string): Promise<TagOption> {
+  const res = await fetch('/api/get-tags', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ name }),
+  });
+  if (!res.ok) throw new Error('Failed to create tag');
+  const data = await res.json();
+  return data.tag; // Should return { id, name, slug }
+}
+
+// Helper to look up a tag by name using search-tags API
+async function getTagIdByName(name: string): Promise<string | null> {
+  const res = await fetch(`/api/search-tags?q=${encodeURIComponent(name)}`);
+  if (!res.ok) return null;
+  const data = await res.json();
+  const match = (data.tags || []).find((t: any) => t.name?.toLowerCase() === name.toLowerCase());
+  return match ? match.id : null;
+}
+
 export default function EditPostModal({ isOpen, onClose, post, onSave, authorName, authorAvatarUrl }: EditPostModalProps) {
   const [caption, setCaption] = useState(post.fields.UserCaption || '');
   const [category, setCategory] = useState<CategoryOption | null>(null);
@@ -189,13 +210,39 @@ export default function EditPostModal({ isOpen, onClose, post, onSave, authorNam
       setLoading(false);
       return;
     }
-    await onSave({
-      UserCaption: caption.trim(),
-      UserTags: tags.map(t => t.id),
-      Categories: category ? [category.id] : undefined,
-    });
-    setLoading(false);
-    onClose();
+    try {
+      // Ensure all tags are Airtable record IDs
+      let tagIds: string[] = [];
+      for (const tag of tags) {
+        if (tag.id.startsWith('new:')) {
+          // Create the tag in Airtable
+          const createdTag = await createTag(tag.name);
+          tagIds.push(createdTag.id);
+        } else if (tag.id.startsWith('rec')) {
+          tagIds.push(tag.id);
+        } else {
+          // Try to look up the tag by name
+          const foundId = await getTagIdByName(tag.name);
+          if (foundId) {
+            tagIds.push(foundId);
+          } else {
+            // Fallback: create the tag if not found
+            const createdTag = await createTag(tag.name);
+            tagIds.push(createdTag.id);
+          }
+        }
+      }
+      await onSave({
+        UserCaption: caption.trim(),
+        UserTags: tagIds,
+        Categories: category ? [category.id] : undefined,
+      });
+      setLoading(false);
+      onClose();
+    } catch (err: any) {
+      setError(err.message || 'Failed to save post');
+      setLoading(false);
+    }
   };
 
   if (!isOpen) return null;

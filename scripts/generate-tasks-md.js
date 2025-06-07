@@ -16,63 +16,80 @@ function formatDependencies(deps) {
   return deps.join(', ');
 }
 
-function groupSubtasks(subtasks) {
-  const groups = { 'Next Up': [], 'In Progress': [], 'Completed': [] };
-  for (const st of subtasks) {
-    if (st.status === 'done') groups['Completed'].push(st);
-    else if (st.status === 'in-progress') groups['In Progress'].push(st);
-    else groups['Next Up'].push(st);
-  }
-  return groups;
+function formatSummary(tasks) {
+  // Only main tasks (not subtasks) that are not done
+  return tasks
+    .filter(t => t.status !== 'done')
+    .map(t => `- ${t.title} ${statusBox(t.status)}`)
+    .join('\n');
 }
 
-function formatSubtasks(subtasks) {
+function formatSubtasksDetailed(subtasks) {
   if (!subtasks || !subtasks.length) return '';
-  const groups = groupSubtasks(subtasks);
-  let out = '   - **Subtasks:**\n';
-  for (const group of ['Next Up', 'In Progress', 'Completed']) {
-    if (groups[group].length) {
-      out += `     - **${group}:**\n`;
-      for (const st of groups[group]) {
-        out += `       ${st.id}. ${st.title} ${statusBox(st.status)} — ${st.description}\n`;
-      }
+  return subtasks
+    .filter(st => st.status !== 'done')
+    .map(st => `  - ${statusBox(st.status)} ${st.title} — ${st.description}`)
+    .join('\n');
+}
+
+function formatTaskDetailed(task) {
+  let out = `### ${task.id}. ${task.title} ${statusBox(task.status)}`;
+  out += `\n- ${task.description}`;
+  out += `\n- _Priority: ${task.priority ? task.priority.charAt(0).toUpperCase() + task.priority.slice(1) : 'N/A'}_`;
+  out += `\n- _Dependencies: ${formatDependencies(task.dependencies)}_`;
+  if (task.subtasks && task.subtasks.length) {
+    const subtasks = task.subtasks.filter(st => st.status !== 'done');
+    if (subtasks.length) {
+      out += `\n- **Subtasks:**\n${formatSubtasksDetailed(subtasks)}`;
+    } else {
+      out += `\n- **All subtasks completed**`;
     }
   }
   return out;
 }
 
-function formatTask(task, idx) {
-  let out = `${task.id}. **${task.title}** ${statusBox(task.status)}\n`;
-  out += `   - ${task.description}\n`;
-  out += `   - _Priority: ${task.priority ? task.priority.charAt(0).toUpperCase() + task.priority.slice(1) : 'N/A'}_\n`;
-  out += `   - _Dependencies: ${formatDependencies(task.dependencies)}_\n`;
+function formatCompletedSubtasks(subtasks) {
+  if (!subtasks || !subtasks.length) return '';
+  const completed = subtasks.filter(st => st.status === 'done');
+  if (!completed.length) return '';
+  return completed.map(st => `  - [x] ${st.title} — ${st.description}`).join('\n');
+}
+
+function formatCompletedTask(task) {
+  let out = `### ${task.id}. ${task.title} [x]`;
+  out += `\n- ${task.description}`;
+  out += `\n- _Priority: ${task.priority ? task.priority.charAt(0).toUpperCase() + task.priority.slice(1) : 'N/A'}_`;
+  out += `\n- _Dependencies: ${formatDependencies(task.dependencies)}_`;
   if (task.subtasks && task.subtasks.length) {
-    out += formatSubtasks(task.subtasks);
+    const completed = task.subtasks.filter(st => st.status === 'done');
+    if (completed.length) {
+      out += `\n- **Completed Subtasks:**\n${formatCompletedSubtasks(completed)}`;
+    }
   }
   return out;
 }
 
 function generateMarkdown(tasks) {
-  const legend = `# Malk.tv Project Task List\n\nThis document provides a human-readable overview of all current tasks and subtasks for the Malk.tv Beta project, based on the latest tasks.json.\n\n---\n\n## Legend\n- **[ ]** Pending\n- **[x]** Done\n- **[~]** In Progress\n\n---\n`;
-  let md = legend + '\n## Tasks\n\n';
-  const active = [];
-  const completed = [];
-  for (const task of tasks) {
-    if (task.status === 'done') completed.push(task);
-    else active.push(task);
-  }
-  // Only show active (pending/in-progress) tasks at the top
-  for (const task of active) {
-    md += formatTask(task) + '\n';
-  }
-  // Completed section
+  const legend = `# Malk.tv Project Task List\n\nThis document provides a human-readable overview of all current tasks and subtasks for the Malk.tv Beta project, based on the latest tasks.json.\n\n---\n\n## Legend\n- **[ ]** Pending\n- **[x]** Done\n- **[~]** In Progress\n\n---`;
+
+  // 1. Pending & In Progress Tasks (Summary)
+  const summary = '\n\n## Pending & In Progress Tasks (Summary)\n\n' + formatSummary(tasks) + '\n';
+
+  // 2. Pending & In Progress Tasks (Detailed)
+  const pendingDetailed = '\n---\n\n## Pending & In Progress Tasks (Detailed)\n\n' +
+    tasks
+      .filter(t => t.status !== 'done')
+      .map(formatTaskDetailed)
+      .join('\n\n');
+
+  // 3. Completed Tasks
+  const completed = tasks.filter(t => t.status === 'done');
+  let completedSection = '\n---\n\n## Completed Tasks\n';
   if (completed.length) {
-    md += '\n### Completed\n\n';
-    for (const task of completed) {
-      md += formatTask(task) + '\n';
-    }
+    completedSection += '\n' + completed.map(formatCompletedTask).join('\n\n');
   }
-  return md;
+
+  return legend + summary + pendingDetailed + completedSection + '\n';
 }
 
 function main() {

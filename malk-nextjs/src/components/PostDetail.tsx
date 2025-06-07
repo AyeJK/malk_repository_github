@@ -7,9 +7,11 @@ import { useSession } from 'next-auth/react';
 import Comments from './Comments';
 import Image from 'next/image';
 import DefaultAvatar from './DefaultAvatar';
-import { HeartIcon, ChatBubbleLeftIcon, ShareIcon, CheckIcon } from '@heroicons/react/24/outline';
+import { HeartIcon, ChatBubbleLeftIcon, ShareIcon, CheckIcon, EllipsisVerticalIcon } from '@heroicons/react/24/outline';
 import { getVideoTitle } from '@/lib/video-utils';
 import SharePostModal from './SharePostModal';
+import EditPostModal from './EditPostModal';
+import DeletePostModal from './DeletePostModal';
 
 interface Post {
   id: string;
@@ -72,6 +74,11 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
   const [isFollowLoading, setIsFollowLoading] = useState(true);
   const [videoTitle, setVideoTitle] = useState<string>(post.fields.VideoTitle || 'Untitled Video');
   const [isShareOpen, setIsShareOpen] = useState(false);
+  const [showActions, setShowActions] = useState(false);
+  const [showEditModal, setShowEditModal] = useState(false);
+  const [showDeleteModal, setShowDeleteModal] = useState(false);
+  const [actionLoading, setActionLoading] = useState(false);
+  const [actionError, setActionError] = useState<string | null>(null);
   
   const isOwnPost = user?.uid === authorFirebaseUID;
   
@@ -367,6 +374,44 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
     fetchVideoTitle();
   }, [post.fields.VideoTitle, post.fields.VideoURL]);
 
+  // Edit handler
+  const handleEdit = async (updatedFields: { UserCaption: string; UserTags?: string[]; Categories?: string[] }) => {
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/posts/${post.id}`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(updatedFields),
+      });
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed to update post');
+      setShowEditModal(false);
+      window.location.reload();
+    } catch (err: any) {
+      setActionError(err.message || 'Failed to update post');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
+  // Delete handler
+  const handleDeleteConfirm = async () => {
+    setActionLoading(true);
+    setActionError(null);
+    try {
+      const res = await fetch(`/api/posts/${post.id}`, { method: 'DELETE' });
+      if (!res.ok) throw new Error((await res.json()).error || 'Failed to delete post');
+      setShowDeleteModal(false);
+      if (onDelete) onDelete(post.id);
+      else window.location.href = '/posts';
+    } catch (err: any) {
+      setActionError(err.message || 'Failed to delete post');
+    } finally {
+      setActionLoading(false);
+    }
+  };
+
   return (
     <div className="w-full">
       {/* Video Section */}
@@ -413,28 +458,58 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
               <p className="text-sm text-gray-400">{formatDate(post.fields.DisplayDate || post.fields.DateCreated)}</p>
             </div>
           </div>
-          {!hideFollowButton && !isOwnPost && (
-            <button
-              onClick={handleToggleFollow}
-              disabled={isFollowLoading}
-              className={`py-1.5 text-sm font-medium min-w-[100px] inline-flex items-center justify-center ${
-                isFollowing
-                  ? 'bg-red-950 text-red-100 hover:bg-red-900 pl-2 pr-4'
-                  : 'bg-red-800 text-red-100 hover:bg-red-700 px-6'
-              } rounded-lg`}
-            >
-              {isFollowLoading ? (
-                '...'
-              ) : isFollowing ? (
-                <>
-                  <CheckIcon className="w-4 h-4" />
-                  <span className="ml-1.5">Following</span>
-                </>
-              ) : (
-                'Follow'
-              )}
-            </button>
-          )}
+          <div className="flex items-center gap-2">
+            {!hideFollowButton && !isOwnPost && (
+              <button
+                onClick={handleToggleFollow}
+                disabled={isFollowLoading}
+                className={`py-1.5 text-sm font-medium min-w-[100px] inline-flex items-center justify-center ${
+                  isFollowing
+                    ? 'bg-red-950 text-red-100 hover:bg-red-900 pl-2 pr-4'
+                    : 'bg-red-800 text-red-100 hover:bg-red-700 px-6'
+                } rounded-lg`}
+              >
+                {isFollowLoading ? (
+                  '...'
+                ) : isFollowing ? (
+                  <>
+                    <CheckIcon className="w-4 h-4" />
+                    <span className="ml-1.5">Following</span>
+                  </>
+                ) : (
+                  'Follow'
+                )}
+              </button>
+            )}
+            {/* Actions menu for post owner */}
+            {isOwnPost && (
+              <div className="relative ml-2">
+                <button
+                  className="pl-2 rounded-full focus:outline-none"
+                  onClick={() => setShowActions((v) => !v)}
+                  aria-label="Post actions"
+                >
+                  <EllipsisVerticalIcon className="w-6 h-6 text-gray-400 hover:text-[#fa7268] transition-colors" />
+                </button>
+                {showActions && (
+                  <div className="absolute right-0 mt-2 w-48 rounded-md shadow-lg py-1 bg-[#181c20] ring-1 ring-black ring-opacity-5 z-50">
+                    <button
+                      className="block w-full text-left px-4 py-2 text-sm text-white hover:bg-white/5"
+                      onClick={() => { setShowEditModal(true); setShowActions(false); }}
+                    >
+                      Edit
+                    </button>
+                    <button
+                      className="block w-full text-left px-4 py-2 text-sm text-red-400 hover:bg-white/5"
+                      onClick={() => { setShowDeleteModal(true); setShowActions(false); }}
+                    >
+                      Delete
+                    </button>
+                  </div>
+                )}
+              </div>
+            )}
+          </div>
         </div>
 
         {/* Title and Description */}
@@ -540,6 +615,22 @@ export default function PostDetail({ post, onDelete, hideFollowButton = false }:
         authorAvatarUrl={authorProfileImage || undefined}
         caption={post.fields.UserCaption}
       />
+      {/* Modals */}
+      <EditPostModal
+        isOpen={showEditModal}
+        onClose={() => setShowEditModal(false)}
+        post={post}
+        onSave={handleEdit}
+        authorName={authorName}
+        authorAvatarUrl={authorProfileImage || undefined}
+      />
+      <DeletePostModal
+        isOpen={showDeleteModal}
+        onClose={() => setShowDeleteModal(false)}
+        onConfirm={handleDeleteConfirm}
+        post={post}
+      />
+      {actionError && <div className="text-red-400 mt-2">{actionError}</div>}
     </div>
   );
 } 

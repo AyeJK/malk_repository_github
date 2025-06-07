@@ -6,6 +6,9 @@ alwaysApply: true
 - **TASKS.md Synchronization**
   - Whenever `.taskmaster/tasks/tasks.json` is updated (tasks added, removed, or modified), update `TASKS.md` to reflect the current state of all tasks and subtasks.
   - The markdown file must:
+    - Start with a summary list of all pending and in-progress main tasks at the top
+    - Follow with a detailed section listing all pending and in-progress tasks and subtasks (with status, dependencies, and descriptions)
+    - End with a section listing all completed tasks and subtasks
     - List all tasks and subtasks in a clear, human-readable hierarchy
     - Include task titles, descriptions, priorities, dependencies, and status (pending, in-progress, done, etc.)
     - Use checkboxes for status: `[ ]` for pending, `[~]` for in-progress, `[x]` for done
@@ -18,11 +21,11 @@ alwaysApply: true
   - **Automation:**
     - Use the script `scripts/generate-tasks-md.js` to regenerate `TASKS.md` from `.taskmaster/tasks/tasks.json`.
     - Run with: `node scripts/generate-tasks-md.js`
-    - This script enforces:
-      - Only active (pending/in-progress) main tasks at the top of the list
-      - Completed main tasks grouped at the bottom under `### Completed`
-      - Subtasks grouped as Next Up, In Progress, Completed
-      - All required formatting, checkboxes, and hierarchy
+    - This script must output the new format:
+      1. Pending & In Progress Tasks (Summary)
+      2. Pending & In Progress Tasks (Detailed)
+      3. Completed Tasks (with completed subtasks)
+    - The legend and checkboxes must always be present at the top.
     - **Always run this script after any change to `tasks.json` to keep `TASKS.md` in sync.**
 
 - **Up-to-Date Task Report on Request**
