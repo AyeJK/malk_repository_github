@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import PostCard from '@/components/PostCard';
 import LoadingSpinner from '@/components/LoadingSpinner';
@@ -12,35 +12,59 @@ export default function TagClient() {
   const [tag, setTag] = useState<{ name: string; postCount: number } | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [nextOffset, setNextOffset] = useState<string | null>(null);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const fetchTagPosts = async () => {
-      try {
-        setLoading(true);
-        const tagName = decodeURIComponent(tagSlug);
-        const response = await fetch(`/api/get-posts-by-tag?tag=${encodeURIComponent(tagName)}`);
-        if (!response.ok) {
-          if (response.status === 404) {
-            setError('Tag not found');
-          } else {
-            throw new Error('Failed to fetch tag posts');
-          }
-          return;
+  // Fetch posts (initial and paginated)
+  const fetchPosts = useCallback(async (offset?: string) => {
+    try {
+      if (offset) setIsFetchingMore(true);
+      else setLoading(true);
+      const tagName = decodeURIComponent(tagSlug);
+      const res = await fetch(`/api/get-posts-by-tag?tag=${encodeURIComponent(tagName)}&limit=10${offset ? `&offset=${offset}` : ''}`);
+      if (!res.ok) {
+        if (res.status === 404) {
+          setError('Tag not found');
+        } else {
+          throw new Error('Failed to fetch tag posts');
         }
-        const data = await response.json();
-        setPosts(data.posts || []);
-        setTag(data.tag || null);
-      } catch (err) {
-        console.error('Error fetching tag posts:', err);
-        setError('Failed to load posts');
-      } finally {
-        setLoading(false);
+        return;
       }
-    };
-    if (tagSlug) {
-      fetchTagPosts();
+      const data = await res.json();
+      setPosts(prev => offset ? [...prev, ...data.posts] : data.posts);
+      setNextOffset(data.nextOffset);
+      setTag(data.tag || null);
+      setError(null);
+    } catch (err) {
+      setError('Failed to load posts');
+    } finally {
+      setLoading(false);
+      setIsFetchingMore(false);
     }
   }, [tagSlug]);
+
+  // Initial load
+  useEffect(() => {
+    if (tagSlug) fetchPosts();
+  }, [tagSlug, fetchPosts]);
+
+  // Infinite scroll
+  useEffect(() => {
+    if (!nextOffset) return;
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && !isFetchingMore) {
+          fetchPosts(nextOffset);
+        }
+      },
+      { threshold: 1 }
+    );
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => {
+      if (loaderRef.current) observer.unobserve(loaderRef.current);
+    };
+  }, [nextOffset, isFetchingMore, fetchPosts]);
 
   if (loading) {
     return (
@@ -89,6 +113,11 @@ export default function TagClient() {
           {posts.map((post) => (
             <PostCard key={post.id} post={post} />
           ))}
+          {nextOffset && (
+            <div ref={loaderRef} className="flex justify-center py-8">
+              <LoadingSpinner />
+            </div>
+          )}
         </div>
       )}
     </div>

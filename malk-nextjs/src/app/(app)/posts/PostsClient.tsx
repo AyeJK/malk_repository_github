@@ -1,52 +1,69 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import LazyPostCard from '@/components/LazyPostCard';
-import { getAllPosts } from '@/lib/airtable';
 import ShareVideoModal from '@/components/ShareVideoModal';
 import { useAuth } from '@/lib/auth-context';
+
+const PAGE_SIZE = 10;
 
 export default function PostsClient() {
   const [posts, setPosts] = useState<any[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
+  const [nextOffset, setNextOffset] = useState<string | null>(null);
+  const [isFetchingMore, setIsFetchingMore] = useState(false);
   const { user } = useAuth();
   const [isShareModalOpen, setIsShareModalOpen] = useState(false);
+  const loaderRef = useRef<HTMLDivElement | null>(null);
 
-  useEffect(() => {
-    const fetchPosts = async () => {
-      try {
-        setLoading(true);
-        console.log('Starting to fetch posts...');
-        const fetchedPosts = await getAllPosts();
-        console.log('Posts fetched successfully:', fetchedPosts);
-        setPosts(fetchedPosts);
-        setError(null);
-      } catch (err: any) {
-        console.error('Error fetching posts:', err);
-        console.error('Error details:', {
-          name: err?.name,
-          message: err?.message,
-          stack: err?.stack
-        });
-        setError('Failed to load posts. Please try again later.');
-      } finally {
-        setLoading(false);
-      }
-    };
+  // Fetch posts (initial and paginated)
+  const fetchPosts = useCallback(async (offset?: string) => {
+    try {
+      if (offset) setIsFetchingMore(true);
+      else setLoading(true);
 
-    fetchPosts();
+      const res = await fetch(`/api/get-posts?limit=${PAGE_SIZE}${offset ? `&offset=${offset}` : ''}`);
+      if (!res.ok) throw new Error('Failed to load posts');
+      const data = await res.json();
+
+      setPosts(prev => offset ? [...prev, ...data.posts] : data.posts);
+      setNextOffset(data.nextOffset);
+      setError(null);
+    } catch (err: any) {
+      setError('Failed to load posts. Please try again later.');
+    } finally {
+      setLoading(false);
+      setIsFetchingMore(false);
+    }
   }, []);
 
-  const openShareModal = () => {
-    setIsShareModalOpen(true);
-  };
+  // Initial load
+  useEffect(() => {
+    fetchPosts();
+  }, [fetchPosts]);
 
-  const closeShareModal = () => {
-    setIsShareModalOpen(false);
-  };
+  // Infinite scroll
+  useEffect(() => {
+    if (!nextOffset) return;
+    const observer = new IntersectionObserver(
+      entries => {
+        if (entries[0].isIntersecting && !isFetchingMore) {
+          fetchPosts(nextOffset);
+        }
+      },
+      { threshold: 1 }
+    );
+    if (loaderRef.current) observer.observe(loaderRef.current);
+    return () => {
+      if (loaderRef.current) observer.unobserve(loaderRef.current);
+    };
+  }, [nextOffset, isFetchingMore, fetchPosts]);
 
-  if (loading) {
+  const openShareModal = () => setIsShareModalOpen(true);
+  const closeShareModal = () => setIsShareModalOpen(false);
+
+  if (loading && posts.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <div className="text-xl text-white">Loading posts...</div>
@@ -54,7 +71,7 @@ export default function PostsClient() {
     );
   }
 
-  if (error) {
+  if (error && posts.length === 0) {
     return (
       <div className="flex justify-center items-center min-h-[50vh]">
         <div className="text-xl text-red-400">{error}</div>
@@ -67,17 +84,11 @@ export default function PostsClient() {
       <div className="flex flex-col justify-center items-center min-h-[50vh]">
         <div className="text-xl text-white mb-6">No posts found.</div>
         {user && (
-          <button 
-            onClick={openShareModal}
-            className="btn-primary"
-          >
+          <button onClick={openShareModal} className="btn-primary">
             Share a Video
           </button>
         )}
-        <ShareVideoModal 
-          isOpen={isShareModalOpen} 
-          onClose={closeShareModal} 
-        />
+        <ShareVideoModal isOpen={isShareModalOpen} onClose={closeShareModal} />
       </div>
     );
   }
@@ -92,11 +103,12 @@ export default function PostsClient() {
           <LazyPostCard key={post.id} post={post} />
         ))}
       </div>
-      
-      <ShareVideoModal 
-        isOpen={isShareModalOpen} 
-        onClose={closeShareModal} 
-      />
+      {nextOffset && (
+        <div ref={loaderRef} className="flex justify-center py-8">
+          <div className="text-white">{isFetchingMore ? 'Loading more...' : 'Scroll to load more'}</div>
+        </div>
+      )}
+      <ShareVideoModal isOpen={isShareModalOpen} onClose={closeShareModal} />
     </div>
   );
 } 

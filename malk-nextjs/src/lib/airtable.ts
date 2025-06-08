@@ -925,4 +925,34 @@ export async function markNotificationAsRead(notificationId: string): Promise<bo
     console.error('Error marking notification as read:', error);
     return false;
   }
+}
+
+// Add this function to your airtable.ts
+export async function getPaginatedPosts({ limit = 10, offset = undefined }: { limit?: number, offset?: string }) {
+  try {
+    const apiKey = process.env.AIRTABLE_PAT || process.env.NEXT_PUBLIC_AIRTABLE_PAT;
+    const baseId = process.env.AIRTABLE_BASE_ID || process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID;
+    const tableName = 'Posts';
+    let url = `https://api.airtable.com/v0/${baseId}/${encodeURIComponent(tableName)}?pageSize=${limit}&sort[0][field]=DisplayDate&sort[0][direction]=desc&view=Grid%20view`;
+    if (offset) url += `&offset=${offset}`;
+
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+    });
+    if (!res.ok) throw new Error('Airtable API error');
+    const data = await res.json();
+
+    return {
+      posts: (data.records || []).map((record: any) => ({
+        id: record.id,
+        fields: record.fields,
+      })),
+      nextOffset: data.offset || null,
+    };
+  } catch (error) {
+    console.error('Error in getPaginatedPosts (REST):', error);
+    return { posts: [], nextOffset: null };
+  }
 } 

@@ -42,7 +42,7 @@ export default function ProfileClient() {
   const [userCategories, setUserCategories] = useState<{ id: string; name: string }[]>([]);
   const [userTags, setUserTags] = useState<{ id: string; name: string }[]>([]);
   const [userPosts, setUserPosts] = useState<any[]>([]);
-  const [categories, setCategories] = useState<{ id: string; name: string }[]>([]);
+  const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([]);
   const [tags, setTags] = useState<{ id: string; name: string }[]>([]);
   const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   const [tagsLoaded, setTagsLoaded] = useState(false);
@@ -228,16 +228,34 @@ export default function ProfileClient() {
 
   const handleAddSection = async () => {
     if (!selectedValue) return;
-    const selectedItem = selectedType === 'category'
-      ? userCategories.find(c => c.id === selectedValue)
-      : userTags.find(t => t.id === selectedValue);
-    if (!selectedItem) return;
-    const newSection = {
-      id: `${selectedType}-${selectedValue}`,
-      type: selectedType,
-      value: selectedValue,
-      name: selectedItem.name
-    };
+    let newSection = null;
+    if (selectedType === 'category') {
+      // Always look up the full category object by ID from canonical list
+      const selectedCategory = categories.find(c => c.id === selectedValue);
+      console.log('Selected category for new section:', selectedCategory);
+      if (!selectedCategory) return;
+      if (!selectedCategory.slug) {
+        console.warn('Cannot add section: selected category missing slug:', selectedCategory);
+        return;
+      }
+      newSection = {
+        id: `category-${selectedValue}`,
+        type: 'category',
+        value: selectedValue,
+        name: selectedCategory.name,
+        slug: selectedCategory.slug
+      };
+    } else if (selectedType === 'tag') {
+      const selectedTag = userTags.find(t => t.id === selectedValue);
+      if (!selectedTag) return;
+      newSection = {
+        id: `tag-${selectedValue}`,
+        type: 'tag',
+        value: selectedValue,
+        name: selectedTag.name
+      };
+    }
+    if (!newSection) return;
     const updatedSections = [...sections, newSection];
     try {
       const response = await fetch('/api/profile-sections', {

@@ -35,7 +35,8 @@ export async function GET(request: NextRequest) {
     const formattedCategories = categories.map(record => {
       const rawName = String(record.fields.Name || '');
       const normalizedName = normalizeCategory(rawName);
-      const slug = createSlug(normalizedName);
+      // Use the Airtable 'Slug' field if present, otherwise generate one
+      const slug = record.fields.Slug ? String(record.fields.Slug) : createSlug(normalizedName);
 
       return {
         id: record.id,

@@ -28,8 +28,8 @@ interface PostFields extends FieldSet {
 export async function GET(request: NextRequest) {
   try {
     const categoryName = request.nextUrl.searchParams.get('category');
-    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '10');
-    const offset = parseInt(request.nextUrl.searchParams.get('offset') || '0');
+    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '10', 10);
+    const offset = request.nextUrl.searchParams.get('offset') || undefined;
     const userId = request.nextUrl.searchParams.get('userId');
     
     if (!categoryName) {
@@ -64,85 +64,89 @@ export async function GET(request: NextRequest) {
     const linkedPostIds = fields.Posts || [];
 
     if (!linkedPostIds.length) {
-      return NextResponse.json({ 
-        posts: [],
-        totalCount: 0,
-        hasMore: false
-      });
+      return NextResponse.json({ posts: [], nextOffset: null });
     }
 
-    // Fetch the linked posts using their record IDs with pagination
-    try {
-      let posts = await base('Posts').select({
-        filterByFormula: `OR(${linkedPostIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
-        sort: [{ field: 'DisplayDate', direction: 'desc' }],
-        pageSize: limit,
-        offset: offset
-      }).all();
+    // Manual pagination of postIds (like tag feed)
+    const pageSize = limit;
+    const startIndex = offset ? parseInt(offset, 10) : 0;
+    const endIndex = startIndex + pageSize;
+    const paginatedPostIds = linkedPostIds.slice(startIndex, endIndex);
+    const nextOffset = endIndex < linkedPostIds.length ? String(endIndex) : null;
 
-      // If userId is provided, filter posts to only those by that user
-      if (userId) {
-        // Map Firebase UID to Airtable record ID
-        const userRecord = await getUserByFirebaseUID(userId);
-        if (!userRecord) {
-          return NextResponse.json({ posts: [], totalCount: 0, hasMore: false });
-        }
-        const airtableUserId = userRecord.id;
-        posts = posts.filter(post => {
-          const fuid = post.fields.FirebaseUID;
-          if (Array.isArray(fuid)) return fuid.includes(airtableUserId);
-          return fuid === airtableUserId;
-        });
+    if (paginatedPostIds.length === 0) {
+      return NextResponse.json({ posts: [], nextOffset: null });
+    }
+
+    // If userId is provided, map to Airtable record ID
+    let userAirtableId = null;
+    if (userId) {
+      const userRecord = await getUserByFirebaseUID(userId);
+      if (userRecord) userAirtableId = userRecord.id;
+    }
+
+    // Build filter formula for posts in this category (and user if provided)
+    let filterFormula = `OR(${paginatedPostIds.map(id => `RECORD_ID()='${id}'`).join(',')})`;
+    if (userAirtableId) {
+      filterFormula = `AND(${filterFormula}, FIND('${userAirtableId}', ARRAYJOIN({FirebaseUID})) > 0)`;
+    }
+
+    // Use Airtable REST API to fetch only the paginated posts
+    const apiKey = process.env.AIRTABLE_PAT;
+    const baseId = process.env.AIRTABLE_BASE_ID;
+    let url = `https://api.airtable.com/v0/${baseId}/Posts?` +
+      `filterByFormula=${encodeURIComponent(filterFormula)}` +
+      `&sort[0][field]=DisplayDate&sort[0][direction]=desc`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+    });
+    if (!res.ok) throw new Error('Airtable API error');
+    const data = await res.json();
+    const posts = data.records || [];
+
+    // Get all unique user IDs from the posts
+    const userIds = Array.from(new Set(
+      posts.flatMap((post: any) => post.fields.FirebaseUID || [])
+    ));
+
+    // Fetch user data for all authors
+    const users = userIds.length > 0 ? await base('Users').select({
+      filterByFormula: `OR(${userIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
+    }).all() : [];
+
+    // Create a map of user data
+    const userMap = new Map(users.map(user => [user.id, user.fields as UserFields]));
+
+    // Map the records to include only necessary fields and add user data
+    const formattedPosts = await Promise.all(posts.map(async (record: any) => {
+      const postFields = record.fields as PostFields;
+      const authorId = postFields.FirebaseUID?.[0];
+      const authorData = authorId ? userMap.get(authorId) : null;
+
+      // Get the best available thumbnail URL
+      let thumbnailUrl = null;
+      if (postFields['Video ID']) {
+        thumbnailUrl = await getYouTubeThumbnailUrl(postFields['Video ID']);
       }
 
-      // Get all unique user IDs from the posts
-      const userIds = Array.from(new Set(
-        posts.flatMap(post => (post.fields as PostFields).FirebaseUID || [])
-      ));
-
-      // Fetch user data for all authors
-      const users = userIds.length > 0 ? await base('Users').select({
-        filterByFormula: `OR(${userIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
-      }).all() : [];
-
-      // Create a map of user data
-      const userMap = new Map(users.map(user => [user.id, user.fields as UserFields]));
-
-      // Map the records to include only necessary fields and add user data
-      const formattedPosts = await Promise.all(posts.map(async record => {
-        const postFields = record.fields as PostFields;
-        const authorId = postFields.FirebaseUID?.[0];
-        const authorData = authorId ? userMap.get(authorId) : null;
-
-        // Get the best available thumbnail URL
-        let thumbnailUrl = null;
-        if (postFields['Video ID']) {
-          thumbnailUrl = await getYouTubeThumbnailUrl(postFields['Video ID']);
+      return {
+        id: record.id,
+        fields: {
+          ...postFields,
+          UserName: authorData?.DisplayName || 'Anonymous',
+          UserAvatar: authorData?.ProfileImage || null,
+          ThumbnailURL: thumbnailUrl
         }
+      };
+    }));
 
-        return {
-          id: record.id,
-          fields: {
-            ...postFields,
-            UserName: authorData?.DisplayName || 'Anonymous',
-            UserAvatar: authorData?.ProfileImage || null,
-            ThumbnailURL: thumbnailUrl
-          }
-        };
-      }));
-
-      return NextResponse.json({ 
-        posts: formattedPosts,
-        totalCount: linkedPostIds.length,
-        hasMore: offset + limit < linkedPostIds.length
-      });
-    } catch (error) {
-      console.error('Error fetching posts:', error);
-      return NextResponse.json(
-        { error: 'Failed to fetch posts', details: error },
-        { status: 500 }
-      );
-    }
+    // Only return a non-null nextOffset if there are actually posts in the response
+    return NextResponse.json({
+      posts: formattedPosts,
+      nextOffset: formattedPosts.length > 0 ? nextOffset : null
+    });
   } catch (error) {
     console.error('Error in category-feed:', error);
     return NextResponse.json(

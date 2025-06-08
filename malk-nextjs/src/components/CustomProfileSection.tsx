@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 import PostSlider from './PostSlider';
 
@@ -19,18 +19,18 @@ function uniqBy<T>(arr: T[], key: (item: T) => any): T[] {
   });
 }
 
+// Section type for discriminated union
+type Section =
+  | { id: string; type: 'category'; value: string; name: string; slug: string }
+  | { id: string; type: 'tag'; value: string; name: string };
+
 export default function CustomProfileSection({ userId, isOwnProfile, userAvatar, userName }: CustomProfileSectionProps) {
-  const [sections, setSections] = useState<Array<{
-    id: string;
-    type: 'category' | 'tag';
-    value: string;
-    name: string;
-  }>>([]);
+  const [sections, setSections] = useState<Section[]>([]);
   const [isAddingSection, setIsAddingSection] = useState(false);
   const [selectedType, setSelectedType] = useState<'category' | 'tag'>('category');
-  const [categories, setCategories] = useState<Array<{ id: string; name: string }>>([]);
+  const [categories, setCategories] = useState<Array<{ id: string; name: string; slug?: string }>>([]);
   const [tags, setTags] = useState<Array<{ id: string; name: string }>>([]);
-  const [userCategories, setUserCategories] = useState<Array<{ id: string; name: string }>>([]);
+  const [userCategories, setUserCategories] = useState<Array<{ id: string; name: string; slug: string }>>([]);
   const [userTags, setUserTags] = useState<Array<{ id: string; name: string }>>([]);
   const [selectedValue, setSelectedValue] = useState('');
   const [posts, setPosts] = useState<{ [key: string]: any[] }>({});
@@ -40,6 +40,9 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
   const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   const [tagsLoaded, setTagsLoaded] = useState(false);
   const [userPosts, setUserPosts] = useState<any[]>([]);
+  // New state for paginated category posts
+  const [categorySectionState, setCategorySectionState] = useState<{ [key: string]: { posts: any[]; offset: string | null; hasMore: boolean; isLoading: boolean } }>({});
+  const loaderRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Fetch categories and tags
   useEffect(() => {
@@ -48,6 +51,7 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
         const categoriesResponse = await fetch('/api/get-categories');
         const categoriesData = await categoriesResponse.json();
         setCategories(categoriesData.categories || []);
+        console.log('Canonical categories:', categoriesData.categories);
         setCategoriesLoaded(true);
 
         const tagsResponse = await fetch('/api/get-top-tags?limit=1000');
@@ -82,33 +86,133 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
     fetchSections();
   }, [userId]);
 
-  // Fetch posts for each section
+  // Fetch posts for each section (initial load)
   useEffect(() => {
-    const fetchPosts = async () => {
+    const fetchInitialPosts = async () => {
+      const newCategoryState: typeof categorySectionState = {};
       const newPosts: { [key: string]: any[] } = {};
       for (const section of sections) {
-        try {
-          let response;
-          if (section.type === 'category') {
-            response = await fetch(`/api/category-feed?category=${encodeURIComponent(section.name)}&limit=10&userId=${userId}`);
-          } else {
-            response = await fetch(`/api/get-posts-by-tag?tag=${encodeURIComponent(section.name)}&userId=${userId}`);
+        if (section.type === 'category') {
+          try {
+            // Use get-posts-by-category API (slug param, offset is index)
+            const slug = section.type === 'category' ? section.slug : '';
+            console.log('Fetching category posts with slug:', slug, 'for section:', section);
+            const res = await fetch(`/api/get-posts-by-category?slug=${encodeURIComponent(slug)}&limit=10&userId=${userId}`);
+            if (res.ok) {
+              const data = await res.json();
+              newCategoryState[section.id] = {
+                posts: data.posts || [],
+                offset: data.nextOffset,
+                hasMore: !!data.nextOffset,
+                isLoading: false,
+              };
+              newPosts[section.id] = data.posts || [];
+            } else {
+              newCategoryState[section.id] = { posts: [], offset: null, hasMore: false, isLoading: false };
+              newPosts[section.id] = [];
+            }
+          } catch (error) {
+            newCategoryState[section.id] = { posts: [], offset: null, hasMore: false, isLoading: false };
+            newPosts[section.id] = [];
           }
-          if (response.ok) {
-            const data = await response.json();
-            newPosts[section.id] = data.posts || [];
+        } else {
+          // Tag section: keep old logic
+          try {
+            const res = await fetch(`/api/get-posts-by-tag?tag=${encodeURIComponent(section.name)}&userId=${userId}`);
+            if (res.ok) {
+              const data = await res.json();
+              newPosts[section.id] = data.posts || [];
+            } else {
+              newPosts[section.id] = [];
+            }
+          } catch (error) {
+            newPosts[section.id] = [];
           }
-        } catch (error) {
-          console.error(`Error fetching posts for section ${section.name}:`, error);
-          newPosts[section.id] = [];
         }
       }
+      setCategorySectionState(newCategoryState);
       setPosts(newPosts);
     };
     if (sections.length > 0) {
-      fetchPosts();
+      fetchInitialPosts();
     }
   }, [sections, userId]);
+
+  // Infinite scroll for category sections
+  useEffect(() => {
+    const observers: { [key: string]: IntersectionObserver } = {};
+    sections.forEach(section => {
+      if (section.type === 'category' && loaderRefs.current[section.id]) {
+        if (observers[section.id]) observers[section.id].disconnect();
+        observers[section.id] = new IntersectionObserver(entries => {
+          if (entries[0].isIntersecting) {
+            // Fetch next page if hasMore and not already loading
+            const state = categorySectionState[section.id];
+            if (state && state.hasMore && !state.isLoading) {
+              fetchMoreCategoryPosts(section.id, section.name, state.offset);
+            }
+          }
+        }, { threshold: 1 });
+        observers[section.id].observe(loaderRefs.current[section.id]!);
+      }
+    });
+    return () => {
+      Object.values(observers).forEach(obs => obs.disconnect());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sections, categorySectionState]);
+
+  // Fetch more posts for a category section
+  const fetchMoreCategoryPosts = async (sectionId: string, sectionName: string, offset: string | null) => {
+    setCategorySectionState(prev => ({
+      ...prev,
+      [sectionId]: {
+        ...prev[sectionId],
+        isLoading: true,
+      },
+    }));
+    try {
+      // Use get-posts-by-category API (slug param, offset is index)
+      const section = sections.find(s => s.id === sectionId);
+      if (!section || section.type !== 'category') return;
+      console.log('Fetching category posts with slug:', section.slug, 'for section:', section);
+      const res = await fetch(`/api/get-posts-by-category?slug=${encodeURIComponent(section.slug)}&limit=10&userId=${userId}&offset=${offset}`);
+      if (res.ok) {
+        const data = await res.json();
+        setCategorySectionState(prev => ({
+          ...prev,
+          [sectionId]: {
+            posts: uniqBy([...(prev[sectionId]?.posts || []), ...(data.posts || [])], post => post.id),
+            offset: data.nextOffset,
+            hasMore: !!data.nextOffset,
+            isLoading: false,
+          },
+        }));
+        setPosts(prev => ({
+          ...prev,
+          [sectionId]: uniqBy([...(prev[sectionId] || []), ...(data.posts || [])], post => post.id),
+        }));
+      } else {
+        setCategorySectionState(prev => ({
+          ...prev,
+          [sectionId]: {
+            ...prev[sectionId],
+            hasMore: false,
+            isLoading: false,
+          },
+        }));
+      }
+    } catch (error) {
+      setCategorySectionState(prev => ({
+        ...prev,
+        [sectionId]: {
+          ...prev[sectionId],
+          hasMore: false,
+          isLoading: false,
+        },
+      }));
+    }
+  };
 
   // Fetch user's posts (wait for Add Section UI)
   useEffect(() => {
@@ -129,49 +233,69 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
     fetchUserPosts();
   }, [isAddingSection, userId]);
 
-  // Extract user categories/tags only when all data is loaded
+  // When building userCategories, always use the canonical categories list from /api/get-categories
+  // and include slug
   useEffect(() => {
     if (!isAddingSection || !categoriesLoaded || !tagsLoaded || isLoadingOptions) return;
-    // Debug logging
-    console.log('User posts:', userPosts);
-    console.log('All categories:', categories);
-    console.log('All tags:', tags);
-    let cats: { id: string; name: string }[] = [];
+    let cats: { id: string; name: string; slug: string }[] = [];
     let tagsArr: { id: string; name: string }[] = [];
     for (const post of userPosts) {
       // Categories
       if (post.fields.Categories && Array.isArray(post.fields.Categories)) {
         for (const catId of post.fields.Categories) {
+          // Always cross-reference canonical categories list by ID
           const cat = categories.find(c => c.id === catId);
-          if (cat) cats.push(cat);
-          else console.log('Category not found for ID:', catId);
+          if (cat && typeof cat.slug === 'string') {
+            cats.push({ id: cat.id, name: cat.name, slug: cat.slug });
+          } else if (cat && !cat.slug) {
+            console.warn('Category missing slug in canonical list:', cat);
+          }
         }
       }
       // Tags
       if (post.fields.UserTags && Array.isArray(post.fields.UserTags)) {
         for (const tagId of post.fields.UserTags) {
           const tag = tags.find(t => t.id === tagId);
-          if (tag) tagsArr.push(tag);
-          else console.log('Tag not found for ID:', tagId);
+          if (tag) tagsArr.push({ id: tag.id, name: tag.name });
         }
       }
     }
-    setUserCategories(uniqBy(cats, c => c.id));
-    setUserTags(uniqBy(tagsArr, t => t.id));
+    setUserCategories(cats);
+    setUserTags(tagsArr);
   }, [isAddingSection, categoriesLoaded, tagsLoaded, isLoadingOptions, userPosts, categories, tags]);
 
+  // When adding a section, store both name and slug for categories
   const handleAddSection = async () => {
     if (!selectedValue) return;
-    const selectedItem = selectedType === 'category'
-      ? userCategories.find(c => c.id === selectedValue)
-      : userTags.find(t => t.id === selectedValue);
-    if (!selectedItem) return;
-    const newSection = {
-      id: `${selectedType}-${selectedValue}`,
-      type: selectedType,
-      value: selectedValue,
-      name: selectedItem.name
-    };
+    let newSection: Section | null = null;
+    if (selectedType === 'category') {
+      // Always look up the full category object by ID from canonical list
+      const selectedCategory = categories.find(c => c.id === selectedValue);
+      console.log('Selected category for new section:', selectedCategory);
+      if (!selectedCategory) return;
+      if (!selectedCategory.slug) {
+        console.warn('Cannot add section: selected category missing slug:', selectedCategory);
+        return;
+      }
+      newSection = {
+        id: `category-${selectedValue}`,
+        type: 'category',
+        value: selectedValue,
+        name: selectedCategory.name,
+        slug: selectedCategory.slug
+      };
+    } else if (selectedType === 'tag') {
+      const selectedTag = userTags.find(t => t.id === selectedValue);
+      if (!selectedTag) return;
+      newSection = {
+        id: `tag-${selectedValue}`,
+        type: 'tag',
+        value: selectedValue,
+        name: selectedTag.name
+      };
+    }
+    if (!newSection) return;
+    // Save the full section object (including slug) to the backend
     const updatedSections = [...sections, newSection];
     try {
       const response = await fetch('/api/profile-sections', {
@@ -186,12 +310,12 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
       });
       if (!response.ok) throw new Error('Failed to save section');
       setSections(updatedSections);
-      setIsAddingSection(false);
-      setSelectedValue('');
-      setSearch('');
     } catch (error) {
       console.error('Error saving section:', error);
     }
+    setIsAddingSection(false);
+    setSelectedType('category');
+    setSelectedValue('');
   };
 
   const handleRemoveSection = async (sectionId: string) => {
@@ -229,12 +353,16 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
           'music','comedy','gaming','food','film / tv / movies','beauty / fashion','learning','nature','crafting / tech','podcasts','sports','travel','following'
         ];
         const isKnownCategory = knownCategories.includes(section.name.toLowerCase());
+        // Use paginated posts for category sections
+        const sectionPosts = section.type === 'category' ? (categorySectionState[section.id]?.posts || []) : (posts[section.id] || []);
+        // Only show 10 posts per page for category sections
+        const displayedPosts = section.type === 'category' ? sectionPosts.slice(0, 10) : sectionPosts;
         return (
           <div key={section.id} className="relative">
             <PostSlider
               title={section.type === 'tag' ? `#${section.name}` : section.name}
-              posts={posts[section.id] || []}
-              isLoading={!posts[section.id]}
+              posts={displayedPosts}
+              isLoading={section.type === 'category' ? categorySectionState[section.id]?.isLoading : !posts[section.id]}
               hideIcon={!isKnownCategory}
               userAvatar={userAvatar}
               userName={userName}
@@ -247,6 +375,13 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
                   <XMarkIcon className="w-5 h-5" />
                 </button>
               ) : null}
+              hasMore={section.type === 'category' ? categorySectionState[section.id]?.hasMore : false}
+              onLoadMore={section.type === 'category' ? () => {
+                const state = categorySectionState[section.id];
+                if (state && state.hasMore && !state.isLoading) {
+                  fetchMoreCategoryPosts(section.id, section.name, state.offset);
+                }
+              } : undefined}
             />
           </div>
         );

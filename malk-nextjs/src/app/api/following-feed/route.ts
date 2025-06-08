@@ -23,8 +23,8 @@ interface PostFields extends FieldSet {
 export async function GET(request: NextRequest) {
   try {
     const userId = request.nextUrl.searchParams.get('userId');
-    console.log('Following feed requested for user:', userId);
-    
+    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '10', 10);
+    const offset = request.nextUrl.searchParams.get('offset') || undefined;
     if (!userId) {
       return NextResponse.json(
         { error: 'Missing userId parameter' },
@@ -32,72 +32,65 @@ export async function GET(request: NextRequest) {
       );
     }
 
-    // First get the list of users we're following
-    const followingResponse = await base('Users').select({
-      filterByFormula: `FIND('${userId}', {FirebaseUID}) > 0`,
+    // Get the user's record
+    const userRecord = await base('Users').select({
+      filterByFormula: `{FirebaseUID} = '${userId}'`,
     }).firstPage();
-    console.log('Found user records:', followingResponse.length);
-
-    if (!followingResponse || followingResponse.length === 0) {
-      console.log('No user record found for Firebase UID:', userId);
-      return NextResponse.json({ posts: [] });
+    if (!userRecord || userRecord.length === 0) {
+      return NextResponse.json({ posts: [], nextOffset: null });
     }
-
-    const userFields = followingResponse[0].fields as UserFields;
+    const userFields = userRecord[0].fields as UserFields;
     const userIsFollowing = userFields.UserIsFollowing || [];
-    console.log('Raw UserIsFollowing data:', userIsFollowing);
-    console.log('User is following count:', userIsFollowing.length);
-    
     if (!Array.isArray(userIsFollowing) || userIsFollowing.length === 0) {
-      console.log('User is not following anyone');
-      return NextResponse.json({ posts: [] });
+      return NextResponse.json({ posts: [], nextOffset: null });
     }
-
-    // Extract record IDs from the userIsFollowing array
-    const followingRecordIds = userIsFollowing.map((record: any) => {
-      console.log('Processing following record:', record);
-      return typeof record === 'string' ? record : (record.id || record);
-    });
-    console.log('Following record IDs:', followingRecordIds);
-
-    // Get posts from all followed users
-    const posts = await base('Posts').select({
-      filterByFormula: `OR(${followingRecordIds.map(id => 
-        `FIND('${id}', ARRAYJOIN({FirebaseUID})) > 0`
-      ).join(',')})`,
-      sort: [{ field: 'DateCreated', direction: 'desc' }],
-      maxRecords: 50 // Limit to 50 most recent posts
+    // Map followed Airtable record IDs to FirebaseUIDs
+    const followingUsers = await base('Users').select({
+      filterByFormula: `OR(${userIsFollowing.map(id => `RECORD_ID()='${id}'`).join(',')})`,
     }).all();
-    console.log('Found posts count:', posts.length);
-
+    const followingFirebaseUIDs = followingUsers
+      .map(user => user.fields.FirebaseUID)
+      .filter(Boolean);
+    if (followingFirebaseUIDs.length === 0) {
+      return NextResponse.json({ posts: [], nextOffset: null });
+    }
+    // Build filter formula for FirebaseUIDs
+    const filterFormula = `OR(${followingFirebaseUIDs.map(uid => `{FirebaseUID}='${uid}'`).join(',')})`;
+    // Use Airtable REST API for pagination
+    const apiKey = process.env.AIRTABLE_PAT;
+    const baseId = process.env.AIRTABLE_BASE_ID;
+    let url = `https://api.airtable.com/v0/${baseId}/Posts?` +
+      `pageSize=${limit}` +
+      `&sort[0][field]=DateCreated&sort[0][direction]=desc`;
+    if (offset) url += `&offset=${offset}`;
+    url += `&filterByFormula=${encodeURIComponent(filterFormula)}`;
+    const res = await fetch(url, {
+      headers: {
+        Authorization: `Bearer ${apiKey}`,
+      },
+    });
+    if (!res.ok) throw new Error('Airtable API error');
+    const data = await res.json();
+    const posts = data.records || [];
     // Get all unique user IDs from the posts
     const userIds = Array.from(new Set(
-      posts.flatMap(post => (post.fields as PostFields).FirebaseUID || [])
+      posts.flatMap((post: any) => post.fields.FirebaseUID || [])
     ));
-    console.log('Unique user IDs in posts:', userIds.length);
-
     // Fetch user data for all authors
     const users = userIds.length > 0 ? await base('Users').select({
       filterByFormula: `OR(${userIds.map(id => `RECORD_ID()='${id}'`).join(',')})`,
     }).all() : [];
-    console.log('Found user data count:', users.length);
-
-    // Create a map of user data
     const userMap = new Map(users.map(user => [user.id, user.fields as UserFields]));
-
     // Map the records to include only necessary fields and add user data
-    const formattedPosts = await Promise.all(posts.map(async record => {
+    const formattedPosts = await Promise.all(posts.map(async (record: any) => {
       const postFields = record.fields as PostFields;
       const authorId = postFields.FirebaseUID?.[0];
       const authorData = authorId ? userMap.get(authorId) : null;
-
-      // Get the best available thumbnail URL
       let thumbnailUrl = null;
       const videoId = postFields['Video ID'];
       if (videoId && typeof videoId === 'string') {
         thumbnailUrl = await getYouTubeThumbnailUrl(videoId);
       }
-
       return {
         id: record.id,
         fields: {
@@ -108,9 +101,7 @@ export async function GET(request: NextRequest) {
         }
       };
     }));
-    console.log('Formatted posts count:', formattedPosts.length);
-
-    return NextResponse.json({ posts: formattedPosts });
+    return NextResponse.json({ posts: formattedPosts, nextOffset: data.offset || null });
   } catch (error) {
     console.error('Error fetching following feed:', error);
     return NextResponse.json(

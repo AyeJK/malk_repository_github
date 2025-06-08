@@ -39,6 +39,9 @@ export async function GET(request: NextRequest) {
       }
     }
 
+    // NOTE: If this route is ever updated to return posts directly, ensure to set ThumbnailURL for YouTube videos using getYouTubeThumbnailUrl.
+    // All downstream APIs (get-posts-by-category, get-posts-by-tag, etc.) should now set ThumbnailURL correctly.
+
     return NextResponse.json({ sections: customSections });
   } catch (error) {
     console.error('Error fetching profile sections:', error);
