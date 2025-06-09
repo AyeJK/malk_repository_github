@@ -67,24 +67,30 @@ export async function GET(request: NextRequest) {
         const { getYouTubeThumbnailUrl } = await import('@/lib/video-utils');
         thumbnailUrl = await getYouTubeThumbnailUrl(videoId);
       }
-      // Get user info for the post
+      // Get user info for the post (by Airtable record ID)
       let userData = null;
-      let firebaseUID = record.fields.FirebaseUID;
-      if (Array.isArray(firebaseUID)) {
-        firebaseUID = firebaseUID[0];
+      let userRecordId = Array.isArray(record.fields.FirebaseUID) ? record.fields.FirebaseUID[0] : record.fields.FirebaseUID;
+      if (userRecordId) {
+        // Directly fetch user record by Airtable record ID
+        const Airtable = (await import('airtable')).default;
+        const base = new Airtable({ apiKey: process.env.AIRTABLE_PAT || process.env.NEXT_PUBLIC_AIRTABLE_PAT }).base(process.env.AIRTABLE_BASE_ID || process.env.NEXT_PUBLIC_AIRTABLE_BASE_ID || '');
+        try {
+          const userRecord = await base('Users').find(userRecordId);
+          userData = userRecord;
+        } catch (e) {
+          userData = null;
+        }
       }
-      if (typeof firebaseUID === 'string' && firebaseUID) {
-        const { getUserByFirebaseUID } = await import('@/lib/airtable');
-        userData = await getUserByFirebaseUID(firebaseUID);
-      }
+      const fields = {
+        ...record.fields,
+        UserName: userData?.fields?.DisplayName || 'Anonymous',
+        UserAvatar: userData?.fields?.ProfileImage || null,
+        ThumbnailURL: thumbnailUrl
+      };
+      console.log('API get-user-liked-posts returning fields:', fields);
       return {
         id: record.id,
-        fields: {
-          ...record.fields,
-          UserName: userData?.fields?.DisplayName || 'Anonymous',
-          UserAvatar: userData?.fields?.ProfileImage || null,
-          ThumbnailURL: thumbnailUrl
-        }
+        fields
       };
     }));
     return NextResponse.json({ posts: formattedPosts, nextOffset });
