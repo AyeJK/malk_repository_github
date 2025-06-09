@@ -69,9 +69,13 @@ export async function GET(request: NextRequest) {
       }
       // Get user info for the post
       let userData = null;
-      if (record.fields.FirebaseUID) {
+      let firebaseUID = record.fields.FirebaseUID;
+      if (Array.isArray(firebaseUID)) {
+        firebaseUID = firebaseUID[0];
+      }
+      if (typeof firebaseUID === 'string' && firebaseUID) {
         const { getUserByFirebaseUID } = await import('@/lib/airtable');
-        userData = await getUserByFirebaseUID(record.fields.FirebaseUID);
+        userData = await getUserByFirebaseUID(firebaseUID);
       }
       return {
         id: record.id,
