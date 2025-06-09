@@ -19,43 +19,62 @@ export const dynamic = "force-dynamic";
 export async function GET(request: NextRequest) {
   try {
     const userId = request.nextUrl.searchParams.get('userId');
-    
+    const limit = parseInt(request.nextUrl.searchParams.get('limit') || '10', 10);
+    const offset = parseInt(request.nextUrl.searchParams.get('offset') || '0', 10);
+    const sort = request.nextUrl.searchParams.get('sort') || 'latest';
     if (!userId) {
       return NextResponse.json(
         { error: 'Missing userId parameter' },
         { status: 400 }
       );
     }
-
     // First get the user data
     const userRecords = await base('Users').select({
       filterByFormula: `{FirebaseUID} = '${userId}'`
     }).firstPage();
-
     if (!userRecords || userRecords.length === 0) {
       return NextResponse.json(
         { error: 'User not found' },
         { status: 404 }
       );
     }
-
     const userData = userRecords[0].fields;
-
-    // Get posts where FirebaseUID matches the provided userId
-    const posts = await base('Posts').select({
+    // Get all post IDs for this user
+    const allPosts = await base('Posts').select({
       filterByFormula: `{FirebaseUID} = '${userId}'`,
-      sort: [{ field: 'DateCreated', direction: 'desc' }]
+      // No sort here, we'll sort in-memory for full control
     }).all();
-
+    // Sort in-memory
+    let sortedPosts = [...allPosts];
+    if (sort === 'latest') {
+      sortedPosts.sort((a, b) => {
+        const dateA = typeof a.fields.DisplayDate === 'string' ? a.fields.DisplayDate : '';
+        const dateB = typeof b.fields.DisplayDate === 'string' ? b.fields.DisplayDate : '';
+        return dateB.localeCompare(dateA);
+      });
+    } else if (sort === 'oldest') {
+      sortedPosts.sort((a, b) => {
+        const dateA = typeof a.fields.DisplayDate === 'string' ? a.fields.DisplayDate : '';
+        const dateB = typeof b.fields.DisplayDate === 'string' ? b.fields.DisplayDate : '';
+        return dateA.localeCompare(dateB);
+      });
+    } else if (sort === 'popular') {
+      sortedPosts.sort((a, b) => {
+        const likeA = typeof a.fields.LikeCount === 'number' ? a.fields.LikeCount : 0;
+        const likeB = typeof b.fields.LikeCount === 'number' ? b.fields.LikeCount : 0;
+        return likeB - likeA;
+      });
+    }
+    // Pagination
+    const paginatedPosts = sortedPosts.slice(offset, offset + limit);
+    const nextOffset = offset + limit < sortedPosts.length ? String(offset + limit) : null;
     // Map the records to include only necessary fields and add user data
-    const formattedPosts = await Promise.all(posts.map(async record => {
-      // Get the best available thumbnail URL
+    const formattedPosts = await Promise.all(paginatedPosts.map(async record => {
       let thumbnailUrl = null;
       const videoId = record.fields['Video ID'];
       if (videoId && typeof videoId === 'string') {
         thumbnailUrl = await getYouTubeThumbnailUrl(videoId);
       }
-
       return {
         id: record.id,
         fields: {
@@ -66,8 +85,7 @@ export async function GET(request: NextRequest) {
         }
       };
     }));
-
-    return NextResponse.json({ posts: formattedPosts });
+    return NextResponse.json({ posts: formattedPosts, nextOffset });
   } catch (error) {
     console.error('Error fetching user posts:', error);
     return NextResponse.json(

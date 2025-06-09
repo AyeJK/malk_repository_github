@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useParams } from 'next/navigation';
 import Image from 'next/image';
 import Link from 'next/link';
@@ -16,6 +16,8 @@ import CustomProfileSection from '@/components/CustomProfileSection';
 import LazyPostCard from '@/components/LazyPostCard';
 import { PlusIcon, XMarkIcon } from '@heroicons/react/24/outline';
 
+const PAGE_SIZE = 10;
+
 export default function ProfileClient() {
   const params = useParams();
   const userId = params.id as string;
@@ -25,7 +27,15 @@ export default function ProfileClient() {
   
   const [user, setUser] = useState<any>(null);
   const [posts, setPosts] = useState<any[]>([]);
+  const [postsNextOffset, setPostsNextOffset] = useState<string | null>(null);
+  const [postsLoading, setPostsLoading] = useState(false);
+  const [postsFetchingMore, setPostsFetchingMore] = useState(false);
+  const postsLoaderRef = useRef<HTMLDivElement | null>(null);
   const [likedPosts, setLikedPosts] = useState<any[]>([]);
+  const [likesNextOffset, setLikesNextOffset] = useState<string | null>(null);
+  const [likesLoading, setLikesLoading] = useState(false);
+  const [likesFetchingMore, setLikesFetchingMore] = useState(false);
+  const likesLoaderRef = useRef<HTMLDivElement | null>(null);
   const [followers, setFollowers] = useState<any[]>([]);
   const [following, setFollowing] = useState<any[]>([]);
   const [activeTab, setActiveTab] = useState<'home' | 'posts' | 'likes' | 'followers' | 'following'>('home');
@@ -326,16 +336,87 @@ export default function ProfileClient() {
     </div>
   );
 
-  function getSortedPosts(arr: any[]) {
-    if (sort === 'latest') {
-      return [...arr].sort((a, b) => (b.fields.DisplayDate || '').localeCompare(a.fields.DisplayDate || ''));
-    } else if (sort === 'oldest') {
-      return [...arr].sort((a, b) => (a.fields.DisplayDate || '').localeCompare(b.fields.DisplayDate || ''));
-    } else if (sort === 'popular') {
-      return [...arr].sort((a, b) => (b.fields.LikeCount || 0) - (a.fields.LikeCount || 0));
+  const fetchPosts = useCallback(async (offset?: string, sortOverride?: string) => {
+    if (!firebaseUID) return;
+    try {
+      if (offset) setPostsFetchingMore(true);
+      else setPostsLoading(true);
+      const res = await fetch(`/api/get-user-posts?userId=${firebaseUID}&limit=${PAGE_SIZE}${offset ? `&offset=${offset}` : ''}&sort=${sortOverride || sort}`);
+      if (!res.ok) throw new Error('Failed to fetch user posts');
+      const data = await res.json();
+      setPosts(prev => offset ? [...prev, ...data.posts] : data.posts);
+      setPostsNextOffset(data.nextOffset);
+      setError(null);
+    } catch (err: any) {
+      setError('Failed to load posts');
+    } finally {
+      setPostsLoading(false);
+      setPostsFetchingMore(false);
     }
-    return arr;
-  }
+  }, [firebaseUID, sort]);
+
+  const fetchLikedPosts = useCallback(async (offset?: string, sortOverride?: string) => {
+    if (!firebaseUID) return;
+    try {
+      if (offset) setLikesFetchingMore(true);
+      else setLikesLoading(true);
+      const res = await fetch(`/api/get-user-liked-posts?userId=${firebaseUID}&limit=${PAGE_SIZE}${offset ? `&offset=${offset}` : ''}&sort=${sortOverride || sort}`);
+      if (!res.ok) throw new Error('Failed to fetch liked posts');
+      const data = await res.json();
+      setLikedPosts(prev => offset ? [...prev, ...data.posts] : data.posts);
+      setLikesNextOffset(data.nextOffset);
+      setError(null);
+    } catch (err: any) {
+      setError('Failed to load liked posts');
+    } finally {
+      setLikesLoading(false);
+      setLikesFetchingMore(false);
+    }
+  }, [firebaseUID, sort]);
+
+  useEffect(() => {
+    if (activeTab === 'posts' && firebaseUID) {
+      setPosts([]);
+      setPostsNextOffset(null);
+      fetchPosts(undefined, sort);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firebaseUID, sort, activeTab]);
+
+  useEffect(() => {
+    if (activeTab === 'likes' && firebaseUID) {
+      setLikedPosts([]);
+      setLikesNextOffset(null);
+      fetchLikedPosts(undefined, sort);
+    }
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [firebaseUID, sort, activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'posts' || !postsNextOffset) return;
+    const observer = new window.IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !postsFetchingMore) {
+        fetchPosts(postsNextOffset);
+      }
+    }, { threshold: 1 });
+    if (postsLoaderRef.current) observer.observe(postsLoaderRef.current);
+    return () => {
+      if (postsLoaderRef.current) observer.unobserve(postsLoaderRef.current);
+    };
+  }, [postsNextOffset, postsFetchingMore, fetchPosts, activeTab]);
+
+  useEffect(() => {
+    if (activeTab !== 'likes' || !likesNextOffset) return;
+    const observer = new window.IntersectionObserver(entries => {
+      if (entries[0].isIntersecting && !likesFetchingMore) {
+        fetchLikedPosts(likesNextOffset);
+      }
+    }, { threshold: 1 });
+    if (likesLoaderRef.current) observer.observe(likesLoaderRef.current);
+    return () => {
+      if (likesLoaderRef.current) observer.unobserve(likesLoaderRef.current);
+    };
+  }, [likesNextOffset, likesFetchingMore, fetchLikedPosts, activeTab]);
 
   const renderContent = () => {
     if (isLoading) {
@@ -390,7 +471,6 @@ export default function ProfileClient() {
         );
       }
       case 'posts': {
-        const sortedPosts = getSortedPosts(posts);
         return posts.length > 0 ? (
           <>
             <div className="flex flex-row justify-between items-center mb-4 gap-4 mt-[-8px]">
@@ -403,7 +483,7 @@ export default function ProfileClient() {
             </div>
             {layout === 'grid' ? (
               <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-3">
-                {sortedPosts.map((post: any) => (
+                {posts.map((post: any) => (
                   <div key={post.id} className="rounded-xl p-1 shadow w-full h-full flex flex-col">
                     <Link href={`/posts/${post.id}`} className="block overflow-hidden group h-full">
                       <div className="relative aspect-video rounded-lg overflow-hidden w-full">
@@ -430,18 +510,24 @@ export default function ProfileClient() {
               </div>
             ) : (
               <div className="space-y-6">
-                {sortedPosts.map((post: any) => (
+                {posts.map((post: any) => (
                   <LazyPostCard key={post.id} post={post} hideFollowButton={true} />
                 ))}
               </div>
             )}
+            {postsNextOffset && (
+              <div ref={postsLoaderRef} className="flex justify-center py-8">
+                <div className="text-white">{postsFetchingMore ? 'Loading more...' : 'Scroll to load more'}</div>
+              </div>
+            )}
           </>
+        ) : postsLoading ? (
+          <div className="flex justify-center p-4"><LoadingSpinner /></div>
         ) : (
           <div className="text-center p-4">No posts yet</div>
         );
       }
       case 'likes': {
-        const sortedLikes = getSortedPosts(likedPosts);
         return likedPosts.length > 0 ? (
           <>
             <div className="flex flex-row justify-between items-center mb-4 gap-4 mt-[-8px]">
@@ -453,59 +539,66 @@ export default function ProfileClient() {
               </div>
             </div>
             {layout === 'grid' ? (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-3">
-                {sortedLikes.map((post: any) => (
-              <div key={post.id} className="rounded-xl p-1 shadow w-full h-full flex flex-col">
-                <Link href={`/posts/${post.id}`} className="block overflow-hidden group h-full">
-                  <div className="relative aspect-video rounded-lg overflow-hidden w-full">
-                    {post.fields.ThumbnailURL ? (
-                      <Image
-                        src={post.fields.ThumbnailURL}
-                        alt={post.fields.VideoTitle || 'Video thumbnail'}
-                        fill
-                        className="object-cover absolute top-0 left-0 group-hover:scale-105 transition-transform duration-300"
-                        sizes="300px"
-                      />
-                    ) : (
-                      <div className="w-full h-full bg-gray-800 flex items-center justify-center">
-                        <span className="text-gray-400">No thumbnail</span>
+              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-x-2 gap-y-3">
+                {likedPosts.map((post: any) => (
+                  <div key={post.id} className="rounded-xl p-1 shadow w-full h-full flex flex-col">
+                    <Link href={`/posts/${post.id}`} className="block overflow-hidden group h-full">
+                      <div className="relative aspect-video rounded-lg overflow-hidden w-full">
+                        {post.fields.ThumbnailURL ? (
+                          <Image
+                            src={post.fields.ThumbnailURL}
+                            alt={post.fields.VideoTitle || 'Video thumbnail'}
+                            fill
+                            className="object-cover absolute top-0 left-0 group-hover:scale-105 transition-transform duration-300"
+                            sizes="300px"
+                          />
+                        ) : (
+                          <div className="w-full h-full bg-gray-800 flex items-center justify-center">
+                            <span className="text-gray-400">No thumbnail</span>
+                          </div>
+                        )}
                       </div>
-                    )}
+                      <div className="mt-2 flex items-center gap-2 mb-1">
+                        <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
+                          {post.fields.UserAvatar ? (
+                            <Image
+                              src={post.fields.UserAvatar}
+                              alt={post.fields.UserName || post.fields.DisplayName || 'User'}
+                              width={32}
+                              height={32}
+                              className="object-cover"
+                            />
+                          ) : (
+                            <DefaultAvatar userId={post.fields.FirebaseUID} userName={post.fields.UserName || post.fields.DisplayName || 'Anonymous'} />
+                          )}
+                        </div>
+                        <div className="text-base text-gray-300 truncate">
+                          <span className="font-semibold text-base">{post.fields.UserName || post.fields.DisplayName || 'Anonymous'}</span>
+                          <span className="ml-1 text-base">shared:</span>
+                        </div>
+                      </div>
+                      <h3 className="font-semibold text-base text-white line-clamp-2">
+                        {post.fields.VideoTitle || 'Untitled Video'}
+                      </h3>
+                    </Link>
                   </div>
-                  <div className="mt-2 flex items-center gap-2 mb-1">
-                    <div className="w-8 h-8 rounded-full overflow-hidden flex-shrink-0">
-                      {post.fields.UserAvatar ? (
-                        <Image
-                          src={post.fields.UserAvatar}
-                          alt={post.fields.UserName || post.fields.DisplayName || 'User'}
-                          width={32}
-                          height={32}
-                          className="object-cover"
-                        />
-                      ) : (
-                        <DefaultAvatar userId={post.fields.FirebaseUID} userName={post.fields.UserName || post.fields.DisplayName || 'Anonymous'} />
-                      )}
-                    </div>
-                    <div className="text-base text-gray-300 truncate">
-                      <span className="font-semibold text-base">{post.fields.UserName || post.fields.DisplayName || 'Anonymous'}</span>
-                      <span className="ml-1 text-base">shared:</span>
-                    </div>
-                  </div>
-                  <h3 className="font-semibold text-base text-white line-clamp-2">
-                    {post.fields.VideoTitle || 'Untitled Video'}
-                  </h3>
-                </Link>
+                ))}
               </div>
-            ))}
-          </div>
             ) : (
               <div className="space-y-6">
-                {sortedLikes.map((post: any) => (
+                {likedPosts.map((post: any) => (
                   <LazyPostCard key={post.id} post={post} />
                 ))}
               </div>
             )}
+            {likesNextOffset && (
+              <div ref={likesLoaderRef} className="flex justify-center py-8">
+                <div className="text-white">{likesFetchingMore ? 'Loading more...' : 'Scroll to load more'}</div>
+              </div>
+            )}
           </>
+        ) : likesLoading ? (
+          <div className="flex justify-center p-4"><LoadingSpinner /></div>
         ) : (
           <div className="text-center p-4">No liked posts yet</div>
         );
