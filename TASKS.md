@@ -34,13 +34,10 @@ This document provides a human-readable overview of all current tasks and subtas
 - _Priority: High_
 - _Dependencies: 4_
 - **Subtasks:**
-  - [ ] Frontend Virtualization — Implement virtualized lists for efficient feed rendering.
-  - [ ] Cursor-Based Pagination — Implement efficient cursor-based pagination for feed data.
   - [ ] Caching Strategy Implementation — Design and implement comprehensive caching for feed data.
   - [ ] Image Loading Optimization — Optimize image loading in feeds for faster rendering and reduced bandwidth.
   - [ ] Data Prefetching Strategy — Implement intelligent prefetching for anticipated feed content.
   - [ ] API Response Optimization — Optimize API responses for feed data to reduce payload size and processing time.
-  - [ ] Performance Monitoring and Testing — Implement performance monitoring and testing for feed components.
 
 ### 7. Stations Feature [ ]
 - Implement the Stations feature for continuous playlist autoplay on curator profiles.

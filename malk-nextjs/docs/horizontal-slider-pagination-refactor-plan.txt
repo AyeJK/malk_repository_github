@@ -1,0 +1,60 @@
+Horizontal Post Slider Offset-Based Pagination Refactor Plan
+============================================================
+
+Overview:
+---------
+This plan outlines the steps required to refactor all horizontal post sliders (e.g., on Profile and Discover pages) to use offset-based pagination for efficient, scalable loading of posts. The goal is to enable infinite horizontal scrolling, fetching posts in pages from the backend as the user scrolls.
+
+
+1. Backend API Enhancements
+--------------------------
+- Update all API endpoints that serve slider data (e.g., `/api/get-category-posts`, `/api/get-recent-posts`, etc.) to accept `limit` and `offset` query parameters.
+- Ensure each endpoint:
+  - Returns a paginated array of posts.
+  - Returns a `hasMore` flag or the total count to indicate if more posts are available.
+- Default sorting should be by latest, unless otherwise specified.
+- Test endpoints with large datasets to confirm correct pagination and performance.
+
+
+2. Frontend Refactor: Slider Components
+---------------------------------------
+- Update each horizontal slider component to:
+  - Maintain state for `posts`, `offset`, `hasMore`, and `loading`.
+  - Fetch the first page of posts on mount.
+  - Use an Intersection Observer or a sentinel element at the end of the slider to trigger loading more posts when the user scrolls near the end.
+  - On trigger, fetch the next page using the current offset and append new posts to the slider.
+  - Update `offset` and `hasMore` after each fetch.
+  - Show a loading spinner or skeleton cards while fetching.
+  - Handle and display errors gracefully.
+
+
+3. UI/UX Enhancements
+---------------------
+- Show a loader at the end of the slider when fetching more posts.
+- Disable or hide the right navigation arrow if there are no more posts to load.
+- Ensure keyboard navigation and accessibility are preserved.
+
+
+4. Code Quality & DRY Principles
+--------------------------------
+- Consider creating a reusable `useHorizontalInfiniteScroll` hook to encapsulate the infinite scroll logic.
+- Centralize API calls for paginated post fetching in a utility function.
+- Use deduplication (e.g., `uniqBy`) to prevent duplicate posts if needed.
+
+
+5. Testing & Validation
+-----------------------
+- Manually test with various section sizes, rapid scrolling, and edge cases (empty, very large, error states).
+- Add unit/integration tests for the hook and API logic if possible.
+- Profile performance with large datasets to ensure smooth scrolling and low memory usage.
+
+
+6. Documentation & Rollout
+--------------------------
+- Document the new API parameters and frontend usage in the project docs.
+- Communicate changes to the team and update onboarding materials if needed.
+
+
+Optional/Future:
+----------------
+- If performance issues arise with very large lists, consider switching to cursor-based pagination or adding virtualization (e.g., `react-window`). 

@@ -195,8 +195,9 @@ export default function PostSlider({
   }));
 
   // If not loading and posts is empty, show placeholder posts
+  const showInitialSkeletons = isLoading && posts.length === 0;
   const showEmptyState = !isLoading && posts.length === 0;
-  const displayPosts = isLoading || showEmptyState ? placeholderPosts : posts;
+  const displayPosts = showInitialSkeletons ? placeholderPosts : posts;
 
   const scroll = (direction: 'left' | 'right') => {
     if (!sliderRef.current) return;
@@ -274,14 +275,14 @@ export default function PostSlider({
           initial="hidden"
           animate="show"
         >
-          {displayPosts.map((post) => (
+          {displayPosts.map((post, idx) => (
             <motion.div
               key={post.id}
               data-post-id={post.id}
               className="flex-none w-[300px]"
               variants={itemVariants}
             >
-              {!isLoading && !showEmptyState ? (
+              {!showInitialSkeletons && !showEmptyState ? (
                 <Link
                   href={`/posts/${post.id}`}
                   className="block overflow-hidden group"

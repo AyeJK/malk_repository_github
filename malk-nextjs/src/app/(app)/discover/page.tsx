@@ -361,9 +361,21 @@ export default function DiscoverPage() {
   const { user } = useAuth();
   const [followingPosts, setFollowingPosts] = useState<Post[]>([]);
   const [followingLoading, setFollowingLoading] = useState(false);
-  const [categoriesWithPosts, setCategoriesWithPosts] = useState<CategoryWithPosts[]>(
-    categories.map(cat => ({ ...cat, posts: [], isLoading: false, hasMore: true, offset: 0 }))
-  );
+  const [categoriesWithPosts, setCategoriesWithPosts] = useState<Array<{
+    name: string;
+    icon: React.ElementType;
+    href: string;
+    posts: any[];
+    offset: string | null;
+    hasMore: boolean;
+    isLoading: boolean;
+  }>>(categories.map(cat => ({
+    ...cat,
+    posts: [],
+    offset: null,
+    hasMore: true,
+    isLoading: true,
+  })));
   const [loadedSections, setLoadedSections] = useState<Set<string>>(new Set());
   const [currentlyLoading, setCurrentlyLoading] = useState<string | null>(null);
   const loadingQueue = React.useRef<string[]>([]);
@@ -474,8 +486,8 @@ export default function DiscoverPage() {
                   ...cat,
                   posts,
                   isLoading: false,
-                  offset: 10,
-                  hasMore: data.hasMore
+                  offset: data.nextOffset || null,
+                  hasMore: !!data.nextOffset,
                 }
               : cat
           )
@@ -486,8 +498,8 @@ export default function DiscoverPage() {
           timestamp: now,
           data: {
             posts,
-            offset: 10,
-            hasMore: data.hasMore
+            offset: data.nextOffset || null,
+            hasMore: !!data.nextOffset
           }
         });
       }
@@ -574,50 +586,30 @@ export default function DiscoverPage() {
     }
   }, [loadedSections, processQueue]);
 
-  const loadMorePosts = React.useCallback(async (categoryName: string) => {
-    const category = categoriesWithPosts.find(c => c.name === categoryName);
-    if (!category || !category.hasMore) return;
-
-    const now = Date.now();
-    const lastRequest = lastRequestTime.current.get(`more-${categoryName}`) || 0;
-    if (now - lastRequest < REQUEST_DEBOUNCE) return;
-    lastRequestTime.current.set(`more-${categoryName}`, now);
-
-    try {
-      const response = await fetch(
-        `/api/category-feed?category=${encodeURIComponent(categoryName)}&offset=${category.offset}&limit=10`
-      );
-      
-      if (response.ok) {
-        const data = await response.json();
-        const newPosts = data.posts || [];
-        
-        setCategoriesWithPosts(prev =>
-          prev.map(cat =>
-            cat.name === categoryName
-              ? {
-                  ...cat,
-                  posts: [...(cat.posts || []), ...newPosts],
-                  offset: cat.offset + 10,
-                  hasMore: data.hasMore
-                }
-              : cat
-          )
-        );
-
-        // Update cache
-        categoryCache.current.set(categoryName, {
-          timestamp: now,
-          data: {
-            posts: [...(category.posts || []), ...newPosts],
-            offset: category.offset + 10,
-            hasMore: data.hasMore
-          }
-        });
-      }
-    } catch (error) {
-      console.error(`Error loading more posts for ${categoryName}:`, error);
-    }
+  const loadMorePosts = React.useCallback((categoryName: string) => {
+    setCategoriesWithPosts(prev => prev.map(cat => {
+      if (cat.name !== categoryName || !cat.hasMore || cat.isLoading) return cat;
+      return { ...cat, isLoading: true };
+    }));
+    const cat = categoriesWithPosts.find(c => c.name === categoryName);
+    if (!cat || !cat.hasMore || cat.isLoading) return;
+    fetch(`/api/category-feed?category=${encodeURIComponent(categoryName)}&limit=10&offset=${cat.offset}`)
+      .then(res => res.json())
+      .then(data => {
+        setCategoriesWithPosts(prev => prev.map(c => {
+          if (c.name !== categoryName) return c;
+          return {
+            ...c,
+            posts: [...(c.posts || []), ...(data.posts || [])],
+            offset: data.nextOffset || null,
+            hasMore: !!data.nextOffset,
+            isLoading: false,
+          };
+        }));
+      })
+      .catch(() => {
+        setCategoriesWithPosts(prev => prev.map(c => c.name === categoryName ? { ...c, isLoading: false } : c));
+      });
   }, [categoriesWithPosts]);
 
   const onSectionVisible = (sectionName: string) => {
@@ -692,6 +684,30 @@ export default function DiscoverPage() {
     setTimeout(updateTagScrollButton, 350);
   };
 
+  // Fetch initial posts for each category on mount
+  React.useEffect(() => {
+    const fetchInitialPosts = async () => {
+      const newCategories = await Promise.all(categories.map(async (cat) => {
+        try {
+          const res = await fetch(`/api/category-feed?category=${encodeURIComponent(cat.name)}&limit=10`);
+          if (res.ok) {
+            const data = await res.json();
+            return {
+              ...cat,
+              posts: data.posts || [],
+              offset: data.nextOffset || null,
+              hasMore: !!data.nextOffset,
+              isLoading: false,
+            };
+          }
+        } catch {}
+        return { ...cat, posts: [], offset: null, hasMore: false, isLoading: false };
+      }));
+      setCategoriesWithPosts(newCategories);
+    };
+    fetchInitialPosts();
+  }, []);
+
   return (
     <div className="p-8">
       <div className="max-w-7xl mx-auto">
@@ -762,7 +778,7 @@ export default function DiscoverPage() {
             <PostSlider 
               title="Following"
               posts={followingPosts}
-              isLoading={followingLoading || currentlyLoading === 'following'}
+              isLoading={(followingLoading || currentlyLoading === 'following') && followingPosts.length === 0}
               onVisible={() => onSectionVisible('following')}
               rootMargin="100px"
             />
@@ -773,7 +789,7 @@ export default function DiscoverPage() {
               key={category.name}
               title={category.name}
               posts={category.posts || []}
-              isLoading={category.isLoading || currentlyLoading === category.name}
+              isLoading={category.isLoading && (!category.posts || category.posts.length === 0)}
               onVisible={() => onSectionVisible(category.name)}
               rootMargin="100px"
               onLoadMore={() => loadMorePosts(category.name)}

@@ -42,6 +42,8 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
   const [userPosts, setUserPosts] = useState<any[]>([]);
   // New state for paginated category posts
   const [categorySectionState, setCategorySectionState] = useState<{ [key: string]: { posts: any[]; offset: string | null; hasMore: boolean; isLoading: boolean } }>({});
+  // Add new state for paginated tag posts
+  const [tagSectionState, setTagSectionState] = useState<{ [key: string]: { posts: any[]; offset: string | null; hasMore: boolean; isLoading: boolean } }>({});
   const loaderRefs = useRef<{ [key: string]: HTMLDivElement | null }>({});
 
   // Fetch categories and tags
@@ -88,53 +90,80 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
 
   // Fetch posts for each section (initial load)
   useEffect(() => {
-    const fetchInitialPosts = async () => {
-      const newCategoryState: typeof categorySectionState = {};
-      const newPosts: { [key: string]: any[] } = {};
-      for (const section of sections) {
-        if (section.type === 'category') {
+    if (sections.length === 0) return;
+    // 1. Set all section states to isLoading: true and empty posts
+    const initialCategoryState: typeof categorySectionState = {};
+    const initialTagState: typeof tagSectionState = {};
+    for (const section of sections) {
+      if (section.type === 'category') {
+        initialCategoryState[section.id] = { posts: [], offset: null, hasMore: true, isLoading: true };
+      } else if (section.type === 'tag') {
+        initialTagState[section.id] = { posts: [], offset: null, hasMore: true, isLoading: true };
+      }
+    }
+    setCategorySectionState(initialCategoryState);
+    setTagSectionState(initialTagState);
+
+    // 2. Fetch posts for each section and update state individually
+    for (const section of sections) {
+      if (section.type === 'category') {
+        (async () => {
           try {
-            // Use get-posts-by-category API (slug param, offset is index)
-            const slug = section.type === 'category' ? section.slug : '';
-            console.log('Fetching category posts with slug:', slug, 'for section:', section);
+            const slug = section.slug;
             const res = await fetch(`/api/get-posts-by-category?slug=${encodeURIComponent(slug)}&limit=10&userId=${userId}`);
             if (res.ok) {
               const data = await res.json();
-              newCategoryState[section.id] = {
-                posts: data.posts || [],
-                offset: data.nextOffset,
-                hasMore: !!data.nextOffset,
-                isLoading: false,
-              };
-              newPosts[section.id] = data.posts || [];
+              setCategorySectionState(prev => ({
+                ...prev,
+                [section.id]: {
+                  posts: data.posts || [],
+                  offset: data.nextOffset,
+                  hasMore: !!data.nextOffset,
+                  isLoading: false,
+                },
+              }));
             } else {
-              newCategoryState[section.id] = { posts: [], offset: null, hasMore: false, isLoading: false };
-              newPosts[section.id] = [];
+              setCategorySectionState(prev => ({
+                ...prev,
+                [section.id]: { posts: [], offset: null, hasMore: false, isLoading: false },
+              }));
             }
           } catch (error) {
-            newCategoryState[section.id] = { posts: [], offset: null, hasMore: false, isLoading: false };
-            newPosts[section.id] = [];
+            setCategorySectionState(prev => ({
+              ...prev,
+              [section.id]: { posts: [], offset: null, hasMore: false, isLoading: false },
+            }));
           }
-        } else {
-          // Tag section: keep old logic
+        })();
+      } else if (section.type === 'tag') {
+        (async () => {
           try {
-            const res = await fetch(`/api/get-posts-by-tag?tag=${encodeURIComponent(section.name)}&userId=${userId}`);
+            const res = await fetch(`/api/get-posts-by-tag?tag=${encodeURIComponent(section.name)}&limit=10&userId=${userId}`);
             if (res.ok) {
               const data = await res.json();
-              newPosts[section.id] = data.posts || [];
+              setTagSectionState(prev => ({
+                ...prev,
+                [section.id]: {
+                  posts: data.posts || [],
+                  offset: data.nextOffset,
+                  hasMore: !!data.nextOffset,
+                  isLoading: false,
+                },
+              }));
             } else {
-              newPosts[section.id] = [];
+              setTagSectionState(prev => ({
+                ...prev,
+                [section.id]: { posts: [], offset: null, hasMore: false, isLoading: false },
+              }));
             }
           } catch (error) {
-            newPosts[section.id] = [];
+            setTagSectionState(prev => ({
+              ...prev,
+              [section.id]: { posts: [], offset: null, hasMore: false, isLoading: false },
+            }));
           }
-        }
+        })();
       }
-      setCategorySectionState(newCategoryState);
-      setPosts(newPosts);
-    };
-    if (sections.length > 0) {
-      fetchInitialPosts();
     }
   }, [sections, userId]);
 
@@ -204,6 +233,73 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
       }
     } catch (error) {
       setCategorySectionState(prev => ({
+        ...prev,
+        [sectionId]: {
+          ...prev[sectionId],
+          hasMore: false,
+          isLoading: false,
+        },
+      }));
+    }
+  };
+
+  // Infinite scroll for tag sections
+  useEffect(() => {
+    const observers: { [key: string]: IntersectionObserver } = {};
+    sections.forEach(section => {
+      if (section.type === 'tag' && loaderRefs.current[section.id]) {
+        if (observers[section.id]) observers[section.id].disconnect();
+        observers[section.id] = new IntersectionObserver(entries => {
+          if (entries[0].isIntersecting) {
+            const state = tagSectionState[section.id];
+            if (state && state.hasMore && !state.isLoading) {
+              fetchMoreTagPosts(section.id, section.name, state.offset);
+            }
+          }
+        }, { threshold: 1 });
+        observers[section.id].observe(loaderRefs.current[section.id]!);
+      }
+    });
+    return () => {
+      Object.values(observers).forEach(obs => obs.disconnect());
+    };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [sections, tagSectionState]);
+
+  // Fetch more posts for a tag section
+  const fetchMoreTagPosts = async (sectionId: string, tagName: string, offset: string | null) => {
+    setTagSectionState(prev => ({
+      ...prev,
+      [sectionId]: {
+        ...prev[sectionId],
+        isLoading: true,
+      },
+    }));
+    try {
+      const res = await fetch(`/api/get-posts-by-tag?tag=${encodeURIComponent(tagName)}&limit=10&userId=${userId}&offset=${offset}`);
+      if (res.ok) {
+        const data = await res.json();
+        setTagSectionState(prev => ({
+          ...prev,
+          [sectionId]: {
+            posts: uniqBy([...(prev[sectionId]?.posts || []), ...(data.posts || [])], post => post.id),
+            offset: data.nextOffset,
+            hasMore: !!data.nextOffset,
+            isLoading: false,
+          },
+        }));
+      } else {
+        setTagSectionState(prev => ({
+          ...prev,
+          [sectionId]: {
+            ...prev[sectionId],
+            hasMore: false,
+            isLoading: false,
+          },
+        }));
+      }
+    } catch (error) {
+      setTagSectionState(prev => ({
         ...prev,
         [sectionId]: {
           ...prev[sectionId],
@@ -353,16 +449,18 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
           'music','comedy','gaming','food','film / tv / movies','beauty / fashion','learning','nature','crafting / tech','podcasts','sports','travel','following'
         ];
         const isKnownCategory = knownCategories.includes(section.name.toLowerCase());
-        // Use paginated posts for category sections
-        const sectionPosts = section.type === 'category' ? (categorySectionState[section.id]?.posts || []) : (posts[section.id] || []);
-        // Only show 10 posts per page for category sections
-        const displayedPosts = section.type === 'category' ? sectionPosts.slice(0, 10) : sectionPosts;
+        // Use paginated posts for both category and tag sections
+        const sectionPosts = section.type === 'category'
+          ? (categorySectionState[section.id]?.posts || [])
+          : (tagSectionState[section.id]?.posts || []);
         return (
           <div key={section.id} className="relative">
             <PostSlider
               title={section.type === 'tag' ? `#${section.name}` : section.name}
-              posts={displayedPosts}
-              isLoading={section.type === 'category' ? categorySectionState[section.id]?.isLoading : !posts[section.id]}
+              posts={sectionPosts}
+              isLoading={section.type === 'category'
+                ? categorySectionState[section.id]?.isLoading
+                : tagSectionState[section.id]?.isLoading}
               hideIcon={!isKnownCategory}
               userAvatar={userAvatar}
               userName={userName}
@@ -375,13 +473,22 @@ export default function CustomProfileSection({ userId, isOwnProfile, userAvatar,
                   <XMarkIcon className="w-5 h-5" />
                 </button>
               ) : null}
-              hasMore={section.type === 'category' ? categorySectionState[section.id]?.hasMore : false}
-              onLoadMore={section.type === 'category' ? () => {
-                const state = categorySectionState[section.id];
-                if (state && state.hasMore && !state.isLoading) {
-                  fetchMoreCategoryPosts(section.id, section.name, state.offset);
-                }
-              } : undefined}
+              hasMore={section.type === 'category'
+                ? categorySectionState[section.id]?.hasMore
+                : tagSectionState[section.id]?.hasMore}
+              onLoadMore={section.type === 'category'
+                ? () => {
+                    const state = categorySectionState[section.id];
+                    if (state && state.hasMore && !state.isLoading) {
+                      fetchMoreCategoryPosts(section.id, section.name, state.offset);
+                    }
+                  }
+                : () => {
+                    const state = tagSectionState[section.id];
+                    if (state && state.hasMore && !state.isLoading) {
+                      fetchMoreTagPosts(section.id, section.name, state.offset);
+                    }
+                  }}
             />
           </div>
         );

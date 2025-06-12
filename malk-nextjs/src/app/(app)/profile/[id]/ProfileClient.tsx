@@ -57,6 +57,10 @@ export default function ProfileClient() {
   const [categoriesLoaded, setCategoriesLoaded] = useState(false);
   const [tagsLoaded, setTagsLoaded] = useState(false);
   const [sections, setSections] = useState<any[]>([]);
+  const [recentPosts, setRecentPosts] = useState<any[]>([]);
+  const [recentOffset, setRecentOffset] = useState<string | null>(null);
+  const [recentHasMore, setRecentHasMore] = useState(false);
+  const [recentIsLoading, setRecentIsLoading] = useState(true);
 
   useEffect(() => {
     const fetchUserData = async () => {
@@ -418,6 +422,40 @@ export default function ProfileClient() {
     };
   }, [likesNextOffset, likesFetchingMore, fetchLikedPosts, activeTab]);
 
+  // Fetch initial Recent Posts (first page)
+  useEffect(() => {
+    if (!firebaseUID) return;
+    setRecentIsLoading(true);
+    fetch(`/api/get-user-posts?userId=${firebaseUID}&limit=10`)
+      .then(res => res.json())
+      .then(data => {
+        setRecentPosts(data.posts || []);
+        setRecentOffset(data.nextOffset || null);
+        setRecentHasMore(!!data.nextOffset);
+      })
+      .catch(() => {
+        setRecentPosts([]);
+        setRecentOffset(null);
+        setRecentHasMore(false);
+      })
+      .finally(() => setRecentIsLoading(false));
+  }, [firebaseUID]);
+
+  // Handler to load more Recent Posts
+  const handleLoadMoreRecent = () => {
+    if (!firebaseUID || !recentHasMore || recentIsLoading) return;
+    setRecentIsLoading(true);
+    fetch(`/api/get-user-posts?userId=${firebaseUID}&limit=10&offset=${recentOffset}`)
+      .then(res => res.json())
+      .then(data => {
+        setRecentPosts(prev => ([...prev, ...(data.posts || [])]));
+        setRecentOffset(data.nextOffset || null);
+        setRecentHasMore(!!data.nextOffset);
+      })
+      .catch(() => {})
+      .finally(() => setRecentIsLoading(false));
+  };
+
   const renderContent = () => {
     if (isLoading) {
       return <div className="flex justify-center p-4"><LoadingSpinner /></div>;
@@ -439,8 +477,10 @@ export default function ProfileClient() {
             {/* Recent Posts Slider */}
             <PostSlider
               title="Recent Posts"
-              posts={posts.slice(0, 10)}
-              isLoading={isLoading}
+              posts={recentPosts}
+              isLoading={recentIsLoading && recentPosts.length === 0}
+              hasMore={recentHasMore}
+              onLoadMore={handleLoadMoreRecent}
               hideIcon={true}
               userAvatar={user?.fields?.ProfileImage}
               userName={user?.fields?.DisplayName || user?.name || 'Anonymous'}
