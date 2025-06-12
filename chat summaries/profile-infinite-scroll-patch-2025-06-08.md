@@ -28,4 +28,4 @@ In this session, we addressed:
 - Test the profile's Posts and Likes tabs with all sort options to confirm correct order and smooth infinite loading.
 - Monitor for any edge cases (e.g., empty feeds, rapid sort changes, or API errors).
 - Consider DRYing up the infinite scroll logic into a shared hook if further feeds are refactored.
-- Watch for any performance issues with large like/post lists and optimize as needed. 
+- Watch for any performance issues with large like/post lists and optimize as needed.
