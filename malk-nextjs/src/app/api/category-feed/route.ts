@@ -67,35 +67,11 @@ export async function GET(request: NextRequest) {
       return NextResponse.json({ posts: [], nextOffset: null });
     }
 
-    // Manual pagination of postIds (like tag feed)
-    const pageSize = limit;
-    const startIndex = offset ? parseInt(offset, 10) : 0;
-    const endIndex = startIndex + pageSize;
-    const paginatedPostIds = linkedPostIds.slice(startIndex, endIndex);
-    const nextOffset = endIndex < linkedPostIds.length ? String(endIndex) : null;
-
-    if (paginatedPostIds.length === 0) {
-      return NextResponse.json({ posts: [], nextOffset: null });
-    }
-
-    // If userId is provided, map to Airtable record ID
-    let userAirtableId = null;
-    if (userId) {
-      const userRecord = await getUserByFirebaseUID(userId);
-      if (userRecord) userAirtableId = userRecord.id;
-    }
-
-    // Build filter formula for posts in this category (and user if provided)
-    let filterFormula = `OR(${paginatedPostIds.map(id => `RECORD_ID()='${id}'`).join(',')})`;
-    if (userAirtableId) {
-      filterFormula = `AND(${filterFormula}, FIND('${userAirtableId}', ARRAYJOIN({FirebaseUID})) > 0)`;
-    }
-
-    // Use Airtable REST API to fetch only the paginated posts
+    // Fetch all post records for the category (do not paginate IDs first)
     const apiKey = process.env.AIRTABLE_PAT;
     const baseId = process.env.AIRTABLE_BASE_ID;
     let url = `https://api.airtable.com/v0/${baseId}/Posts?` +
-      `filterByFormula=${encodeURIComponent(filterFormula)}` +
+      `filterByFormula=OR(${linkedPostIds.map(id => `RECORD_ID()='${id}'`).join(',')})` +
       `&sort[0][field]=DisplayDate&sort[0][direction]=desc`;
     const res = await fetch(url, {
       headers: {
@@ -104,11 +80,43 @@ export async function GET(request: NextRequest) {
     });
     if (!res.ok) throw new Error('Airtable API error');
     const data = await res.json();
-    const posts = data.records || [];
+    let posts = data.records || [];
 
-    // Get all unique user IDs from the posts
+    // If userId is provided, map to Airtable record ID
+    let userAirtableId = null;
+    if (userId) {
+      const userRecord = await getUserByFirebaseUID(userId);
+      if (userRecord) userAirtableId = userRecord.id;
+    }
+
+    // Filter posts by userAirtableId if provided
+    if (userAirtableId) {
+      posts = posts.filter((record: any) => {
+        const firebaseUID = record.fields.FirebaseUID;
+        if (Array.isArray(firebaseUID)) {
+          return firebaseUID.includes(userAirtableId);
+        }
+        return firebaseUID === userAirtableId;
+      });
+    }
+
+    // Sort all posts by DisplayDate (desc), fallback to DateCreated
+    posts = posts.sort((a: any, b: any) => {
+      const dateA = a.fields.DisplayDate || a.fields.DateCreated || '';
+      const dateB = b.fields.DisplayDate || b.fields.DateCreated || '';
+      return dateA < dateB ? 1 : dateA > dateB ? -1 : 0;
+    });
+
+    // Manual pagination of sorted posts
+    const pageSize = limit;
+    const startIndex = offset ? parseInt(offset, 10) : 0;
+    const endIndex = startIndex + pageSize;
+    const paginatedPosts = posts.slice(startIndex, endIndex);
+    const nextOffset = endIndex < posts.length ? String(endIndex) : null;
+
+    // Get all unique user IDs from the paginated posts
     const userIds = Array.from(new Set(
-      posts.flatMap((post: any) => post.fields.FirebaseUID || [])
+      paginatedPosts.flatMap((post: any) => post.fields.FirebaseUID || [])
     ));
 
     // Fetch user data for all authors
@@ -120,7 +128,7 @@ export async function GET(request: NextRequest) {
     const userMap = new Map(users.map(user => [user.id, user.fields as UserFields]));
 
     // Map the records to include only necessary fields and add user data
-    const formattedPosts = await Promise.all(posts.map(async (record: any) => {
+    const formattedPosts = await Promise.all(paginatedPosts.map(async (record: any) => {
       const postFields = record.fields as PostFields;
       const authorId = postFields.FirebaseUID?.[0];
       const authorData = authorId ? userMap.get(authorId) : null;
