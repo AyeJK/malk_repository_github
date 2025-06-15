@@ -1,0 +1,100 @@
+Image Loading Optimization Refactor Plan
+========================================
+
+**Goal:**
+Optimize image loading in all feeds and UI components for faster rendering and reduced bandwidth usage.
+
+---
+
+1. **Task Scope**
+   - Optimize all images (thumbnails, avatars, banners, etc.) for performance and bandwidth.
+   - Ensure best practices: lazy loading, responsive sizes, CDN usage, modern formats, and minimal layout shift.
+
+2. **Audit Summary**
+   - **Frontend:** Uses Next.js, React, and the Next `<Image />` component in many places.
+   - **Lazy Loading:** Present in some places, but not everywhere.
+   - **Thumbnails:** Fetched from YouTube or backend, sometimes missing for non-YouTube videos.
+   - **Avatars:** Uses `<Image />` or fallback SVG, but not always consistent.
+   - **Sliders/Feeds:** Infinite scroll and skeletons/spinners are used for loading states.
+
+3. **Key Gaps & Opportunities**
+   - Not all images use Next.js `<Image />` (some use `<img>` directly, especially in modals or dropdowns).
+   - No blur-up/placeholder for slow images.
+   - No fallback for failed image loads in all places.
+   - Not all images have explicit width/height (risk of layout shift).
+   - No guarantee of responsive images everywhere.
+   - CDN/Image Optimization may not be used for all user-uploaded images.
+
+---
+
+Component/Route Checklist
+------------------------
+
+| Component/File                        | Uses `<Image />`? | Needs Blur? | Needs Fallback? | Needs Responsive? | Notes |
+|---------------------------------------|:-----------------:|:-----------:|:---------------:|:-----------------:|-------|
+| PostCard                              | Yes               | Yes         | Yes             | Yes               | Good, but check modals |
+| LazyPostCard                          | No (skeleton)     | N/A         | N/A             | N/A               | Good |
+| PostDetail                            | Yes               | Yes         | Yes             | Yes               | Good |
+| SharePostModal                        | Sometimes `<img>` | Yes         | Yes             | Yes               | Needs update |
+| EditPostModal                         | Sometimes `<img>` | Yes         | Yes             | Yes               | Needs update |
+| Comments                              | Yes               | Yes         | Yes             | Yes               | Good |
+| Navbar                                | Yes               | Yes         | Yes             | Yes               | Good |
+| NotificationsDropdown                 | Sometimes `<img>` | Yes         | Yes             | Yes               | Needs update |
+| Sidebar                               | SVG/static        | N/A         | N/A             | N/A               | Fine |
+| CustomProfileSection/Sliders           | Yes               | Yes         | Yes             | Yes               | Good |
+
+---
+
+Actionable Steps
+----------------
+
+A. **Standardize on Next.js `<Image />` Everywhere**
+   - Replace all `<img>` tags for dynamic images (thumbnails, avatars) with `<Image />`.
+   - Ensure all images have explicit `width` and `height` props.
+
+B. **Use Blur Placeholder for Thumbnails and Avatars**
+   - Use `placeholder="blur"` and a low-res placeholder for all post thumbnails and avatars.
+   - For user-uploaded images, generate a blurDataURL or use a generic placeholder.
+
+C. **Responsive Images**
+   - Use `sizes` and `srcSet` via Next.js `<Image />` for all images, especially in grids and sliders.
+
+D. **Lazy Loading**
+   - Ensure all images are lazy-loaded (Next.js does this by default, but check for `<img>`).
+
+E. **Fallbacks for Failed Loads**
+   - Add `onError` handlers to show a default image if loading fails (especially for avatars and thumbnails).
+
+F. **CDN/Image Optimization**
+   - Ensure all images (especially user uploads) are served via a CDN or Next.js Image Optimization.
+   - If not using Vercel, consider a third-party CDN or self-hosted solution.
+
+G. **Prevent Layout Shift**
+   - Always set explicit `width` and `height` on images.
+   - Use aspect-ratio containers for images that may load slowly.
+
+H. **Modern Formats**
+   - If possible, serve images as WebP/AVIF for browsers that support them (Next.js handles this if using `<Image />`).
+
+---
+
+Next Steps
+----------
+
+1. Inventory all `<img>` tags for dynamic images and replace with `<Image />`.
+2. Add blur placeholder and fallback logic.
+3. Audit all image usages for explicit sizing and responsive props.
+4. Check CDN/Image Optimization config.
+5. DRY up image logic into shared components if possible.
+6. Test on slow connections and with broken image URLs.
+
+---
+
+**Summary:**
+- Replace all `<img>` with Next.js `<Image />` for dynamic images.
+- Add `placeholder="blur"` and a blurDataURL for all post thumbnails and avatars.
+- Add `onError` fallback for avatars and thumbnails.
+- Ensure all images have explicit `width` and `height`.
+- Check that all images are lazy-loaded and responsive.
+- Ensure all user-uploaded images are served via CDN/Image Optimization.
+- Document and DRY up image loading logic (e.g., shared Avatar/Thumbnail component). 

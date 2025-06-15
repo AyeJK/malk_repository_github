@@ -166,27 +166,27 @@ export default function LandingPage() {
             pointerEvents: 'none',
           }}
         />
-        <div className="flex-1 flex flex-col px-16 md:px-24 py-6 md:py-8 relative z-10">
+        <div className="flex-1 flex flex-col px-4 sm:px-8 md:px-16 lg:px-24 py-4 sm:py-6 md:py-8 relative z-10 overflow-x-hidden">
           {/* Logo */}
           <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.5 }}
           >
-            <h1 className={`${lobster.className} text-4xl md:text-5xl text-white mb-12`}>
+            <h1 className={`${lobster.className} text-3xl sm:text-4xl md:text-5xl text-white mb-8 sm:mb-12`}>
               Malk
             </h1>
           </motion.div>
 
           {/* Main Content */}
           <div className="flex-1 flex flex-col justify-center">
-            <div className="max-w-4xl mx-auto">
+            <div className="max-w-xl md:max-w-4xl mx-auto w-full md:w-auto">
               {/* Text Content */}
               <motion.div
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7 }}
-                className="flex flex-col gap-6"
+                className="flex flex-col gap-4 sm:gap-6"
               >
                 <AccentBar
                   accentColor="#ff8178"
@@ -195,7 +195,7 @@ export default function LandingPage() {
                   gradient="linear-gradient(90deg, #ff8178, #ffb6b6, #ff8178)"
                   animationName="gradient-move-1"
                 >
-                  <h2 className="text-4xl md:text-6xl font-extrabold uppercase text-[#ff8178] px-6 py-4 tracking-tight">
+                  <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase text-[#ff8178] px-2 sm:px-6 py-2 sm:py-4 tracking-tight">
                     VIDEO DISCOVERY
                   </h2>
                 </AccentBar>
@@ -206,7 +206,7 @@ export default function LandingPage() {
                   gradient="linear-gradient(120deg, #ff9d47, #ffe29a, #ff9d47)"
                   animationName="gradient-move-2"
                 >
-                  <h2 className="text-4xl md:text-6xl font-extrabold uppercase text-[#ff9d47] px-6 py-4 tracking-tight">
+                  <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase text-[#ff9d47] px-2 sm:px-6 py-2 sm:py-4 tracking-tight">
                     SHOULDNʼT BE A
                   </h2>
                 </AccentBar>
@@ -217,7 +217,7 @@ export default function LandingPage() {
                   gradient="linear-gradient(135deg, #ffb61a, #fff6b6, #ffb61a)"
                   animationName="gradient-move-3"
                 >
-                  <h2 className="text-4xl md:text-6xl font-extrabold uppercase text-[#ffb61a] px-6 py-4 tracking-tight">
+                  <h2 className="text-4xl sm:text-5xl md:text-6xl font-extrabold uppercase text-[#ffb61a] px-2 sm:px-6 py-2 sm:py-4 tracking-tight">
                     SOLO MISSION
                   </h2>
                 </AccentBar>
@@ -228,10 +228,10 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.2 }}
-                className="mt-12"
+                className="mt-6 sm:mt-12"
               >
-                <p className={`text-2xl md:text-3xl text-white leading-relaxed ${raleway.className}`}>
-                  The best <span className="font-semibold">video recommendations</span> come<br />
+                <p className={`text-xl sm:text-2xl md:text-3xl text-white leading-relaxed ${raleway.className}`}>
+                  The best <span className="font-semibold">video recommendations</span> come <br className="hidden sm:block" />
                   from real people – not algorithms
                 </p>
               </motion.div>
@@ -241,105 +241,194 @@ export default function LandingPage() {
                 initial={{ opacity: 0, y: 20 }}
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.7, delay: 0.3 }}
-                className="mt-12 flex gap-6"
+                className="mt-20 sm:mt-12 flex flex-col sm:flex-row gap-2 sm:gap-6 w-full"
               >
-                <motion.div
-                  animate={{ width: showInviteInput ? 340 : 220 }}
-                  initial={false}
-                  transition={{ duration: 0.6, ease: 'easeInOut' }}
-                  className="relative rounded-xl p-[3px] animate-border-gradient"
-                  style={{
-                    background: 'linear-gradient(90deg, #ff8178, #ffb6b6, #ff8178)',
-                    backgroundSize: '200% 200%',
-                    display: 'inline-block',
-                  }}
-                >
-                  <Button className="bg-[#1a1a1a] hover:bg-[#2a0f0f] text-[#ff8178] font-semibold text-xl px-8 py-6 rounded-xl relative z-10 w-full min-w-0 flex justify-center items-center transition-all duration-300 shadow-lg">
-                    <AnimatePresence mode="wait" initial={false}>
-                      {!showInviteInput && (
-                        <motion.span
-                          key="join-text"
-                          initial={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: 60 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          transition={{ duration: 0.6, ease: 'easeInOut' }}
-                          onClick={handleBetaClick}
-                          className="cursor-pointer w-full block text-center"
-                        >
-                          JOIN THE BETA
-                        </motion.span>
-                      )}
+                <div className="flex flex-col sm:flex-row gap-4 sm:gap-6 w-full">
+                  {/* Mobile-only Join the Beta button (no animation, full width, but reveals invite input on click) */}
+                  <div className="block sm:hidden w-full">
+                    <div
+                      className="relative rounded-xl p-[2px] w-full"
+                      style={{
+                        background: 'linear-gradient(90deg, #ff8178, #ffb6b6, #ff8178)',
+                        backgroundSize: '200% 200%',
+                        display: 'inline-block',
+                        boxShadow: '0 0 16px 2px #ff817880',
+                      }}
+                    >
+                      <Button
+                        className={`bg-[#1a1a1a] hover:bg-[#2a0f0f] text-[#ff8178] font-semibold text-lg rounded-xl relative z-10 w-full min-w-0 flex items-center justify-center transition-all duration-300 shadow-lg h-14 ${showInviteInput ? 'hidden' : 'flex'}`}
+                        onClick={handleBetaClick}
+                        disabled={showInviteInput}
+                      >
+                        JOIN THE BETA
+                      </Button>
+                      {/* Show invite input and verify button when showInviteInput is true */}
                       {showInviteInput && (
                         <motion.div
-                          key="invite-form"
-                          initial={{ opacity: 0, x: -60 }}
-                          animate={{ opacity: 1, x: 0 }}
-                          exit={{ opacity: 0, x: -60 }}
+                          key="mobile-invite-form"
+                          initial={{ opacity: 0, y: 20 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0, y: 20 }}
                           transition={{ duration: 0.3, ease: 'easeInOut' }}
-                          className="flex items-center gap-2 w-full justify-center"
-                          style={{ minWidth: 180 }}
+                          className="w-full"
                         >
-                          <form onSubmit={handleInviteSubmit} className="flex items-center gap-2 w-full">
-                            <input
-                              type="text"
-                              className="flex-1 bg-[#18181b] outline-none text-xl text-[#ffb6b6] placeholder-[#ff8178] border-b-2 border-[#ff8178] focus:border-[#ffb61a] transition-colors px-1 py-0.5 min-w-0 rounded-none"
-                              placeholder="Invite code"
-                              value={inviteCode}
-                              onChange={e => setInviteCode(e.target.value)}
-                              autoFocus
-                              disabled={loading || success}
-                            />
-                            <button
-                              type="submit"
-                              className="bg-[#ff8178] hover:bg-[#ff9d47] text-white font-semibold text-base px-4 py-1.5 rounded-lg transition-colors shadow-md"
-                              disabled={loading || success}
-                            >
-                              {loading
-                                ? 'Verifying...'
-                                : redirecting
-                                  ? (
-                                      <span className="inline-block w-5 h-5 align-middle">
-                                        <span className="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full"></span>
-                                      </span>
-                                    )
-                                  : success
-                                    ? '✔️'
-                                    : 'Verify'}
-                            </button>
-                          </form>
+                          <div className="bg-[#1a1a1a] rounded-xl w-full flex flex-row items-center px-2 py-2 gap-2">
+                            <form onSubmit={handleInviteSubmit} className="flex flex-row gap-2 w-full min-w-0 items-center">
+                              <input
+                                type="text"
+                                className="flex-1 bg-transparent outline-none text-base text-[#ffb6b6] placeholder-[#ff8178] border-b-2 border-[#ff8178] focus:border-[#ffb61a] transition-colors px-2 py-1 min-w-0 rounded-none w-full"
+                                placeholder="Invite code"
+                                value={inviteCode}
+                                onChange={e => setInviteCode(e.target.value)}
+                                autoFocus
+                                disabled={loading || success}
+                              />
+                              <button
+                                type="submit"
+                                className="bg-[#ff8178] hover:bg-[#ff9d47] text-white font-semibold text-sm px-4 py-2 rounded-lg transition-colors shadow-md w-auto"
+                                disabled={loading || success}
+                              >
+                                {loading
+                                  ? 'Verifying...'
+                                  : redirecting
+                                    ? (
+                                        <span className="inline-block w-5 h-5 align-middle">
+                                          <span className="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full"></span>
+                                        </span>
+                                      )
+                                    : success
+                                      ? '✔️'
+                                      : 'Verify'}
+                              </button>
+                            </form>
+                          </div>
+                          {inputError && (
+                            <div className="text-red-500 text-sm mt-1 px-2 text-center">{inputError}</div>
+                          )}
                         </motion.div>
                       )}
-                    </AnimatePresence>
-                  </Button>
-                  <span className="absolute inset-0 rounded-xl pointer-events-none" style={{ boxShadow: '0 0 16px 2px #ff817880' }} />
-                  {inputError && showInviteInput && (
-                    <div className="text-red-500 text-sm mt-1 px-2 absolute left-0 right-0 top-full text-center">{inputError}</div>
-                  )}
-                </motion.div>
-                <Link href="/login">
-                  <div
-                    className="relative rounded-xl p-[3px]"
-                    style={{
-                      background: 'transparent',
-                      display: 'inline-block',
-                    }}
-                  >
-                    <Button className="bg-[#18181b] hover:bg-[#232323] text-[#e5e5e5] font-semibold text-xl px-8 py-6 rounded-xl relative z-10 w-full min-w-0 flex justify-center items-center transition-all duration-300 border border-[#232323]">
-                      LOGIN
-                    </Button>
+                      <span className="absolute inset-0 rounded-xl pointer-events-none" style={{ boxShadow: '0 0 16px 2px #ff817880' }} />
+                    </div>
                   </div>
-                </Link>
+                  {/* Mobile-only LOGIN button (full width, h-14, matches mobile Join the Beta) */}
+                  <div className="block sm:hidden w-full mt-1">
+                    <Link href="/login" className="w-full">
+                      <div
+                        className="relative rounded-xl p-[2px] w-full"
+                        style={{
+                          background: 'transparent',
+                          display: 'inline-block',
+                        }}
+                      >
+                        <Button className="bg-[#18181b] hover:bg-[#232323] text-[#e5e5e5] font-semibold text-lg rounded-xl relative z-10 w-full min-w-0 flex justify-center items-center transition-all duration-300 border border-[#232323] h-14">
+                          LOGIN
+                        </Button>
+                      </div>
+                    </Link>
+                  </div>
+                  {/* Desktop/Tablet: Animated Join the Beta button (hidden on mobile) */}
+                  <div className="hidden sm:block w-full sm:w-auto">
+                    <motion.div
+                      animate={{ width: showInviteInput ? 340 : 220 }}
+                      initial={false}
+                      transition={{ duration: 0.6, ease: 'easeInOut' }}
+                      className="relative rounded-xl p-[2px] sm:p-[3px] animate-border-gradient w-full sm:w-auto"
+                      style={{
+                        background: 'linear-gradient(90deg, #ff8178, #ffb6b6, #ff8178)',
+                        backgroundSize: '200% 200%',
+                        display: 'inline-block',
+                      }}
+                    >
+                      <Button className="bg-[#1a1a1a] hover:bg-[#2a0f0f] text-[#ff8178] font-semibold text-lg sm:text-xl px-4 sm:px-8 py-4 sm:py-6 rounded-xl relative z-10 w-full min-w-0 flex justify-center items-center transition-all duration-300 shadow-lg">
+                        <AnimatePresence mode="wait" initial={false}>
+                          {!showInviteInput && (
+                            <motion.span
+                              key="join-text"
+                              initial={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: 60 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              transition={{ duration: 0.6, ease: 'easeInOut' }}
+                              onClick={handleBetaClick}
+                              className="cursor-pointer w-full block text-center"
+                            >
+                              JOIN THE BETA
+                            </motion.span>
+                          )}
+                          {showInviteInput && (
+                            <motion.div
+                              key="invite-form"
+                              initial={{ opacity: 0, x: -60 }}
+                              animate={{ opacity: 1, x: 0 }}
+                              exit={{ opacity: 0, x: -60 }}
+                              transition={{ duration: 0.3, ease: 'easeInOut' }}
+                              className="w-full"
+                            >
+                              <form onSubmit={handleInviteSubmit} className="flex flex-col sm:flex-row items-stretch sm:items-center gap-2 w-full min-w-0">
+                                <input
+                                  type="text"
+                                  className="flex-1 bg-[#18181b] outline-none text-base text-[#ffb6b6] placeholder-[#ff8178] border-b-2 border-[#ff8178] focus:border-[#ffb61a] transition-colors px-2 py-1 min-w-0 rounded-none w-full"
+                                  placeholder="Invite code"
+                                  value={inviteCode}
+                                  onChange={e => setInviteCode(e.target.value)}
+                                  autoFocus
+                                  disabled={loading || success}
+                                />
+                                <button
+                                  type="submit"
+                                  className="bg-[#ff8178] hover:bg-[#ff9d47] text-white font-semibold text-sm px-4 py-1.5 rounded-lg transition-colors shadow-md w-full sm:w-auto"
+                                  disabled={loading || success}
+                                >
+                                  {loading
+                                    ? 'Verifying...'
+                                    : redirecting
+                                      ? (
+                                          <span className="inline-block w-5 h-5 align-middle">
+                                            <span className="animate-spin inline-block w-5 h-5 border-2 border-white border-t-transparent rounded-full"></span>
+                                          </span>
+                                        )
+                                      : success
+                                        ? '✔️'
+                                        : 'Verify'}
+                                </button>
+                              </form>
+                            </motion.div>
+                          )}
+                        </AnimatePresence>
+                      </Button>
+                      <span className="absolute inset-0 rounded-xl pointer-events-none" style={{ boxShadow: '0 0 16px 2px #ff817880' }} />
+                      {inputError && showInviteInput && (
+                        <div className="text-red-500 text-sm mt-1 px-2 absolute left-0 right-0 top-full text-center">{inputError}</div>
+                      )}
+                    </motion.div>
+                  </div>
+                  {/* Desktop/Tablet: LOGIN button (hidden on mobile, matches desktop Join the Beta) */}
+                  <div className="hidden sm:block w-full sm:w-auto">
+                    <Link href="/login" className="w-full sm:w-auto">
+                      <div
+                        className="relative rounded-xl p-[2px] sm:p-[3px] w-full sm:w-auto"
+                        style={{
+                          background: 'transparent',
+                          display: 'inline-block',
+                        }}
+                      >
+                        <Button className="bg-[#18181b] hover:bg-[#232323] text-[#e5e5e5] font-semibold text-lg sm:text-xl px-4 sm:px-8 py-4 sm:py-6 rounded-xl relative z-10 w-full min-w-0 flex justify-center items-center transition-all duration-300 border border-[#232323]">
+                          LOGIN
+                        </Button>
+                      </div>
+                    </Link>
+                  </div>
+                </div>
               </motion.div>
               {/* Waitlist message appears only when invite input is shown */}
               {showInviteInput && (
                 <>
                   <motion.div
-                    className="mt-4 text-left"
+                    className="mt-2 sm:mt-4 text-left"
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 1.2 }}
                   >
-                    <span className="text-white/80 text-base">Don't have an invite code? </span>
+                    <span className="text-white/80 text-sm sm:text-base">Don't have an invite code? </span>
                     <a
                       href="#waitlist" // TODO: Replace with actual waitlist link or mailto
                       className="text-[#ff8178] underline hover:text-[#ffb61a] transition-colors font-semibold"
